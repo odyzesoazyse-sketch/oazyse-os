@@ -1,0 +1,34 @@
+{
+  "header": {
+    "protocol": "mesh",
+    "version": "1.0-genesis",
+    "constitution_hash": "12942e3a558089b2831cdbb8c094e8e2528017d94208c1374d2861ebab303945",
+    "creator_pubkey": "ES1J5d9bqLdELMd2TVeZ3m4GEGCmEP4bqwsPvFzihQBL",
+    "timestamp": 1775265694403,
+    "node_id": "node-es1j5d9b",
+    "settlement_layer": "solana-devnet"
+  },
+  "core_intent": "ABUNDANCE_FOR_ALL_LIFE",
+  "payload": {
+    "type": "GENESIS",
+    "cid": "local-1775265694403-fhwhml",
+    "description": "Network Genesis — ABUNDANCE_FOR_ALL_LIFE",
+    "price": 0,
+    "tags": [
+      "genesis",
+      "mesh",
+      "protocol"
+    ],
+    "metadata": {}
+  },
+  "economics": {
+    "creator_share": 0.9,
+    "dao_share": 0.05,
+    "hoster_share": 0.05
+  },
+  "proof": {
+    "hash": "7decb114f428234e8792f5744ecb08f24fbe9b1a63bf2f68525dfa586f7bf993",
+    "signature": "U665VxNZ8CYwmG+66CpT1k+pXtGeolTy9+0UnzMABr0glyDFTS4W0FiWHhHznR5x7TP6aOOp+3CRBUxrLMzJAw==",
+    "verified": true
+  }
+}

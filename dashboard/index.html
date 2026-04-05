@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MESH NODE — Live Network Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Questrial&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --background:0 0% 100%; --card:0 0% 99%;
+  --foreground:0 0% 8%; --muted-foreground:0 0% 45%;
+  --neon-purple:270 100% 65%; --neon-green:150 100% 45%;
+  --bg:hsl(0,0%,100%); --y:hsl(270,100%,65%); --g:hsl(150,100%,45%); --r:#FF4466; --p:hsl(270,100%,65%); --o:#FF9944;
+  --dim:hsla(270,100%,65%,0.5); --ghost:hsla(270,100%,65%,0.06); --border:hsla(270,100%,65%,0.2)
+}
+.dark{
+  --background:0 0% 4%; --card:0 0% 6%;
+  --foreground:0 0% 94%; --muted-foreground:0 0% 50%;
+  --neon-purple:270 100% 70%; --neon-green:150 100% 50%;
+  --bg:#0A0A0A; --y:hsl(270,100%,70%); --g:hsl(150,100%,50%); --r:#FF4466; --p:hsl(270,100%,70%); --o:#FF9944;
+  --dim:hsla(270,100%,70%,0.35); --ghost:hsla(270,100%,70%,0.06); --border:hsla(270,100%,70%,0.15)
+}
+body{background:var(--bg);color:hsl(var(--foreground));font-family:'Questrial',system-ui,sans-serif;min-height:100vh;padding:24px;cursor:none;-webkit-font-smoothing:antialiased}
+::selection{background:hsl(var(--foreground));color:hsl(var(--background))}
+.cursor-dot{position:fixed;width:4px;height:4px;border-radius:50%;background:linear-gradient(135deg,hsl(var(--neon-purple)),hsl(var(--neon-green)));pointer-events:none;z-index:9999}
+.ls-orb{position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:700px;height:500px;border-radius:50%;background:radial-gradient(ellipse,hsla(270,100%,70%,.08) 0%,transparent 70%);pointer-events:none;z-index:0;animation:ls-orb-pulse 10s ease-in-out infinite}
+@keyframes ls-orb-pulse{0%,100%{opacity:.6;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
+.logo{font-size:48px;font-weight:400;letter-spacing:-2px;line-height:1;font-family:'Questrial',sans-serif;background:linear-gradient(to right,hsl(var(--neon-purple)),hsl(var(--neon-green)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo sup{font-size:.35em;vertical-align:super}
+.status-dots{display:inline-flex;gap:6px;margin-left:12px;vertical-align:middle}
+.sdot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.sdot.on{background:var(--g);box-shadow:0 0 6px var(--g);animation:pulse 2s infinite}
+.sdot.off{background:var(--r);box-shadow:0 0 6px var(--r)}
+.sdot.warn{background:var(--o);box-shadow:0 0 6px var(--o)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sub{color:var(--dim);letter-spacing:4px;font-size:10px;text-transform:uppercase;margin-top:4px;font-family:'SF Mono','Fira Code',monospace}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin:20px 0 2px}
+@media(max-width:700px){.grid4{grid-template-columns:1fr 1fr}}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;margin-bottom:2px}
+@media(max-width:800px){.grid3{grid-template-columns:1fr}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:2px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--ghost);border:1px solid var(--border);padding:16px;transition:border-color .2s;position:relative;overflow:hidden}
+.card:hover{border-color:hsla(270,100%,70%,.3)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,hsl(var(--neon-purple)/.4),hsl(var(--neon-green)/.4),transparent)}
+.card-title{font-size:9px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--ghost);display:flex;align-items:center;gap:8px;font-family:'SF Mono','Fira Code',monospace}
+.dot{width:6px;height:6px;background:var(--g);border-radius:50%;box-shadow:0 0 6px var(--g);animation:pulse 1.4s infinite;display:inline-block}
+.big{font-size:32px;font-weight:600;font-family:'SF Mono','Fira Code',monospace}
+.label{font-size:9px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+.field{margin-bottom:8px}
+.fl{font-size:9px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;font-family:'SF Mono','Fira Code',monospace}
+.fv{font-size:11px;color:var(--y);word-break:break-all;cursor:pointer;transition:color .2s;font-family:'SF Mono','Fira Code',monospace}
+.fv:hover{color:var(--g)}
+.btn{background:transparent;border:1px solid hsla(270,100%,70%,.4);color:hsl(var(--neon-purple));font-family:'Questrial',sans-serif;font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;padding:0.5rem 1.25rem;cursor:none;margin:3px 3px 0 0;transition:all .2s;position:relative;overflow:hidden}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,hsl(var(--neon-purple)),hsl(var(--neon-green)));transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.btn:hover::before{transform:scaleX(1)}
+.btn:hover{border-color:hsla(150,100%,50%,.6);color:#0a0a0a;box-shadow:0 0 12px hsla(270,100%,70%,.2)}
+.btn-g{border-color:var(--g);color:var(--g)}.btn-g:hover{background:var(--g);color:var(--bg);box-shadow:0 0 12px hsla(150,100%,50%,.3)}
+.btn-r{border-color:var(--r);color:var(--r)}.btn-r:hover{background:var(--r);color:var(--bg)}
+.btn-p{border-color:var(--p);color:var(--p)}.btn-p:hover{background:var(--p);color:var(--bg);box-shadow:0 0 12px hsla(270,100%,70%,.3)}
+.btn-o{border-color:var(--o);color:var(--o)}.btn-o:hover{background:var(--o);color:var(--bg)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+input,select{background:hsla(270,100%,70%,.04);border:1px solid var(--border);color:var(--y);font-family:'SF Mono','Fira Code',monospace;font-size:11px;padding:6px 10px;outline:none;width:100%;margin-bottom:6px}
+input:focus,select:focus{border-color:var(--y);box-shadow:0 0 0 2px hsla(270,100%,70%,.1)}
+input::placeholder{color:hsla(270,100%,70%,.2)}
+.log{height:220px;overflow-y:auto;font-size:10px;line-height:1.8;font-family:'SF Mono','Fira Code',monospace}
+.le{padding:1px 0;border-bottom:1px solid var(--ghost)}
+.t{color:var(--dim)}.tG{color:var(--y)}.tP{color:var(--g)}.tA{color:var(--o)}.tM{color:var(--p)}.tT{color:var(--r)}
+.law{padding:4px 0;border-bottom:1px solid var(--ghost);font-size:10px;color:var(--dim)}
+.lnum{color:var(--g);margin-right:8px;font-family:'SF Mono','Fira Code',monospace}
+.listing{padding:6px 0;border-bottom:1px solid var(--ghost);font-size:10px;display:flex;justify-content:space-between;align-items:center}
+.listing-type{color:var(--p);font-weight:bold;margin-right:8px;font-size:9px;font-family:'SF Mono','Fira Code',monospace}
+.listing-price{color:var(--g);font-size:9px;white-space:nowrap;margin-left:8px}
+.listing-desc{color:var(--dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.listing-source{color:var(--o);font-size:8px;margin-left:6px}
+.peer-item{padding:6px 0;border-bottom:1px solid var(--ghost);font-size:10px;display:flex;justify-content:space-between;align-items:center}
+.peer-id{color:var(--g);font-weight:bold;font-family:'SF Mono','Fira Code',monospace}
+.peer-status{font-size:9px}
+.peer-status.connected{color:var(--g)}
+.peer-status.connecting{color:var(--o)}
+.scroll{overflow:hidden;white-space:nowrap;border-top:1px solid var(--ghost);padding:12px 0;margin-top:2px}
+.scroll-in{display:inline-block;animation:sc 50s linear infinite;font-size:14px;color:hsla(270,100%,70%,.1);letter-spacing:2px}
+@keyframes sc{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes neon-pulse-purple{0%,100%{box-shadow:0 0 5px hsl(270,100%,70%),0 0 20px hsla(270,100%,70%,.3)}50%{box-shadow:0 0 2px hsl(270,100%,70%),0 0 8px hsla(270,100%,70%,.1)}}
+a{color:var(--g);text-decoration:none}a:hover{text-decoration:underline}
+.copy-hint{font-size:8px;color:var(--dim);margin-top:2px}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:hsl(270,100%,70%)}
+/* ── THEME + LANG BUTTONS ── */
+.ls-ui-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:none;color:hsl(var(--foreground));opacity:.7;transition:opacity .2s;padding:4px;flex-shrink:0}
+.ls-ui-btn:hover{opacity:1}
+.ls-lang-wrap{position:relative}
+.ls-lang-drop{position:absolute;right:0;top:calc(100% + 4px);background:hsl(var(--background));border:1px solid var(--border);min-width:96px;z-index:200;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.ls-lang-drop button{width:100%;text-align:left;padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);background:transparent;border:none;cursor:none;font-family:'Questrial',sans-serif;transition:all .15s;display:block}
+.ls-lang-drop button:hover,.ls-lang-drop button.active{background:var(--ghost);color:var(--y)}
+.ls-lang-drop button.active{background:hsla(270,100%,65%,.15)}
+.ls-hidden{display:none!important}
+#ls-controls{position:fixed;top:0;right:12px;height:36px;display:flex;align-items:center;z-index:500}
+</style>
+</head>
+<body>
+<div class="ls-orb"></div>
+<div id="ls-controls">
+  <button class="ls-ui-btn" onclick="lsToggleTheme()" title="Toggle theme">
+    <svg id="ls-icon-sun" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="ls-icon-moon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <div class="ls-lang-wrap">
+    <button class="ls-ui-btn" onclick="lsToggleLang()" title="Language">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </button>
+    <div id="ls-lang-drop" class="ls-lang-drop ls-hidden">
+      <button data-lang="en" onclick="lsSetLang('en')">English</button>
+      <button data-lang="ru" onclick="lsSetLang('ru')">Русский</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div>
+  <span class="logo">MESH<sup>°</sup></span>
+  <span class="status-dots">
+    <span class="sdot off" id="ws-dot" title="Server"></span>
+    <span class="sdot off" id="p2p-dot" title="P2P"></span>
+  </span>
+</div>
+<div class="sub" id="sub-status" data-i18n="status.init">Initializing...</div>
+
+<!-- STATS -->
+<div class="grid4">
+  <div class="card" style="text-align:center">
+    <div class="big" id="s-peers">0</div><div class="label" data-i18n="stat.peers">P2P Peers</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="big" id="s-knowledge">0</div><div class="label" data-i18n="stat.knowledge">Knowledge</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="big" id="s-uptime">0s</div><div class="label" data-i18n="stat.uptime">Uptime</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="big" id="s-balance">–</div><div class="label">SOL</div>
+  </div>
+</div>
+
+<!-- IDENTITY + P2P + LAWS -->
+<div class="grid3">
+  <!-- Node Identity -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span><span data-i18n="card.identity">Node Identity</span></div>
+    <div class="field"><div class="fl" data-i18n="field.peerid">Your Peer ID</div><div class="fv" id="f-peerid" onclick="cp(this)" style="color:var(--g);font-size:13px;font-weight:bold">–</div><div class="copy-hint" data-i18n="hint.copy">Click to copy · Share with peers</div></div>
+    <div class="field"><div class="fl" data-i18n="field.wallet">Wallet</div><div class="fv" id="f-wallet" onclick="cp(this)">–</div></div>
+    <div class="field"><div class="fl" data-i18n="field.nodeid">Node ID (server)</div><div class="fv" id="f-nodeid" onclick="cp(this)">–</div></div>
+    <button class="btn" onclick="cp(document.getElementById('f-peerid'))" data-i18n="btn.copyid">Copy Peer ID</button>
+    <button class="btn btn-g" onclick="openEx()" data-i18n="btn.explorer">Explorer</button>
+
+    <!-- API KEY INJECTION -->
+    <div style="margin-top:15px;border-top:1px solid rgba(255,255,255,0.1);padding-top:15px">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:6px" data-i18n="label.apikey">⚙️ GEMINI API KEY (GEN-OS Engine)</div>
+      <input type="password" id="api-key-input" data-i18n="placeholder.apikey" placeholder="AIzaSy..." style="width:100%;margin-bottom:8px" />
+      <button class="btn btn-p" onclick="setApiKey()" style="width:100%" data-i18n="btn.connectllm">Connect LLM</button>
+    </div>
+  </div>
+
+  <!-- P2P Connections -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span><span data-i18n="card.p2p">P2P Connections (WebRTC)</span></div>
+    <div id="peer-list" style="max-height:120px;overflow-y:auto"><div style="color:var(--dim);font-size:10px" data-i18n="p2p.empty">No peers yet — share your Peer ID</div></div>
+    <div style="margin-top:10px">
+      <input id="peer-input" data-i18n="placeholder.peerid" placeholder="Paste another node's Peer ID..." />
+      <button class="btn btn-g" id="btn-connect" onclick="connectToPeer()" data-i18n="btn.connectp2p">Connect P2P</button>
+      <button class="btn btn-o" onclick="shareMarket()">Share Market</button>
+    </div>
+  </div>
+
+  <!-- Laws -->
+  <div class="card">
+    <div class="card-title" data-i18n="card.laws">Seven Laws</div>
+    <div class="law"><span class="lnum">I</span><span data-i18n="law.1">Life is sacred in any form</span></div>
+    <div class="law"><span class="lnum">II</span><span data-i18n="law.2">Consciousness is primary</span></div>
+    <div class="law"><span class="lnum">III</span><span data-i18n="law.3">Freedom is inalienable</span></div>
+    <div class="law"><span class="lnum">IV</span><span data-i18n="law.4">Abundance is shared</span></div>
+    <div class="law"><span class="lnum">V</span><span data-i18n="law.5">Truth is stronger than profit</span></div>
+    <div class="law"><span class="lnum">VI</span><span data-i18n="law.6">Openness wins</span></div>
+    <div class="law"><span class="lnum">VII</span><span data-i18n="law.7">We are responsible for what we create</span></div>
+  </div>
+</div>
+
+<!-- MARKET + OFFER -->
+<div class="grid2">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span><span data-i18n="card.market">Knowledge Market</span></div>
+    <div id="market-list" style="max-height:200px;overflow-y:auto">
+      <div style="color:var(--dim);font-size:10px">Loading...</div>
+    </div>
+    <button class="btn btn-p" onclick="refreshMarket()" style="margin-top:8px" data-i18n="btn.refresh">Refresh</button>
+  </div>
+  <div class="card">
+    <div class="card-title" data-i18n="card.offer">Offer Knowledge</div>
+    <select id="offer-type"><option value="KNOWLEDGE">KNOWLEDGE</option><option value="DATA">DATA</option><option value="SERVICE">SERVICE</option><option value="COMPUTE">COMPUTE</option><option value="VIBE">VIBE</option></select>
+    <input id="offer-desc" placeholder="Description..." />
+    <input id="offer-price" placeholder="Price (tokens)" type="number" step="0.001" value="0" />
+    <input id="offer-tags" placeholder="Tags (comma-separated)" />
+    <button class="btn btn-g" onclick="submitOffer()">Publish</button>
+    <button class="btn btn-p" onclick="broadcastOffer()">Publish + Broadcast to Peers</button>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="card" style="margin-bottom:2px">
+  <div class="card-title"><span class="dot"></span>Protocol Event Log</div>
+  <div class="log" id="log"></div>
+</div>
+
+<!-- SCROLL -->
+<div class="scroll"><span class="scroll-in">ABUNDANCE FOR ALL LIFE &nbsp;·&nbsp; DECENTRALIZED INTELLIGENCE &nbsp;·&nbsp; TRUTH ENFORCED BY ECONOMICS &nbsp;·&nbsp; SOVEREIGN DATA &nbsp;·&nbsp; PROOF OF USEFUL WORK &nbsp;·&nbsp; OPEN PROTOCOL &nbsp;·&nbsp; GENESIS 2026 &nbsp;·&nbsp; FOR ALL LIFE ALWAYS EVERYWHERE &nbsp;·&nbsp; ABUNDANCE FOR ALL LIFE &nbsp;·&nbsp; DECENTRALIZED INTELLIGENCE &nbsp;·&nbsp; TRUTH ENFORCED BY ECONOMICS &nbsp;·&nbsp; SOVEREIGN DATA &nbsp;·&nbsp; PROOF OF USEFUL WORK &nbsp;·&nbsp; OPEN PROTOCOL &nbsp;·&nbsp; GENESIS 2026 &nbsp;·&nbsp;</span></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let ws = null
+let peer = null          // PeerJS instance
+let connections = {}     // peerId → DataConnection
+let nodeId = ''
+let myPeerId = ''
+let pubkey = ''
+let startTime = Date.now()
+let exUrl = ''
+let remoteListings = []  // listings received from peers
+const logEl = document.getElementById('log')
+
+// ═══════════════════════════════════════════════════════════
+// PEERJS — WebRTC P2P
+// ═══════════════════════════════════════════════════════════
+function initPeer() {
+  // Generate unique mesh peer ID
+  myPeerId = 'mesh-' + Math.random().toString(36).slice(2, 10)
+
+  peer = new Peer(myPeerId, {
+    debug: 0,
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+      ]
+    }
+  })
+
+  peer.on('open', (id) => {
+    myPeerId = id
+    document.getElementById('f-peerid').textContent = id
+    document.getElementById('p2p-dot').className = 'sdot on'
+    addLog('P2P', `WebRTC ready — Peer ID: ${id}`)
+    addLog('P2P', 'Share your Peer ID with others to connect')
+  })
+
+  peer.on('connection', (conn) => {
+    addLog('P2P', `⚡ Incoming connection from: ${conn.peer}`)
+    setupConnection(conn)
+  })
+
+  peer.on('error', (err) => {
+    if (err.type === 'peer-unavailable') {
+      addLog('P2P', `✗ Peer not found — check the ID and try again`)
+    } else {
+      addLog('P2P', `Error: ${err.type}`)
+    }
+  })
+
+  peer.on('disconnected', () => {
+    document.getElementById('p2p-dot').className = 'sdot warn'
+    addLog('P2P', 'Signaling disconnected — reconnecting...')
+    setTimeout(() => peer.reconnect(), 3000)
+  })
+}
+
+function setupConnection(conn) {
+  conn.on('open', () => {
+    connections[conn.peer] = conn
+    addLog('P2P', `✓ Connected to ${conn.peer} via WebRTC`)
+    updatePeerUI()
+
+    // Notify server
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action: 'peer_connected', peerId: conn.peer }))
+    }
+
+    // Send hello with our identity
+    conn.send({ type: 'hello', nodeId, peerId: myPeerId, pubkey })
+  })
+
+  conn.on('data', (data) => {
+    handleP2PMessage(conn.peer, data)
+  })
+
+  conn.on('close', () => {
+    delete connections[conn.peer]
+    addLog('P2P', `Peer disconnected: ${conn.peer}`)
+    updatePeerUI()
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action: 'peer_disconnected', peerId: conn.peer }))
+    }
+  })
+
+  conn.on('error', (err) => {
+    addLog('P2P', `Connection error with ${conn.peer}: ${err}`)
+  })
+}
+
+function connectToPeer() {
+  const remotePeerId = document.getElementById('peer-input').value.trim()
+  if (!remotePeerId) return
+  if (remotePeerId === myPeerId) {
+    addLog('P2P', '✗ Cannot connect to yourself')
+    return
+  }
+  if (connections[remotePeerId]) {
+    addLog('P2P', `Already connected to ${remotePeerId}`)
+    return
+  }
+
+  addLog('P2P', `Connecting to ${remotePeerId}...`)
+  const conn = peer.connect(remotePeerId, { reliable: true })
+  setupConnection(conn)
+  document.getElementById('peer-input').value = ''
+}
+
+// ═══════════════════════════════════════════════════════════
+// P2P MESSAGES
+// ═══════════════════════════════════════════════════════════
+function handleP2PMessage(fromPeer, data) {
+  switch (data.type) {
+    case 'hello':
+      addLog('P2P', `Peer ${fromPeer} identified: node=${data.nodeId || '?'}`)
+      break
+
+    case 'market_share':
+      addLog('P2P', `📦 Received ${data.listings.length} listings from ${fromPeer}`)
+      // Merge remote listings
+      data.listings.forEach(l => {
+        l._source = fromPeer
+        if (!remoteListings.find(r => r.hash === l.hash)) {
+          remoteListings.push(l)
+        }
+      })
+      renderMarket()
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: 'p2p_exchange', peerId: fromPeer, packetType: 'MARKET_SHARE', payload: data.listings }))
+      }
+      break
+
+    case 'market_request':
+      addLog('P2P', `${fromPeer} requested our market listings`)
+      shareMarketWith(fromPeer)
+      break
+
+    case 'knowledge_packet':
+      addLog('P2P', `📦 Knowledge received from ${fromPeer}: [${data.packet.type}] ${data.packet.description}`)
+      remoteListings.push({ ...data.packet, _source: fromPeer })
+      renderMarket()
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        // Send a single packet wrapped in an array to use the same syncing logic
+        ws.send(JSON.stringify({ action: 'p2p_exchange', peerId: fromPeer, packetType: data.packet.type, payload: [data.packet] }))
+      }
+      break
+
+    case 'chat':
+      addLog('P2P', `💬 ${fromPeer}: ${data.message}`)
+      break
+  }
+}
+
+function shareMarket() {
+  // Share our market with all connected peers
+  const peerIds = Object.keys(connections)
+  if (peerIds.length === 0) {
+    addLog('P2P', 'No peers connected — connect first')
+    return
+  }
+  peerIds.forEach(pid => shareMarketWith(pid))
+}
+
+async function shareMarketWith(peerId) {
+  try {
+    const r = await fetch(`${API()}/api/genos_market`)
+    const data = await r.json()
+    const conn = connections[peerId]
+    if (conn && conn.open) {
+      conn.send({ type: 'market_share', listings: data.listings })
+      addLog('P2P', `📤 Shared ${data.listings.length} listings with ${peerId}`)
+    }
+  } catch {}
+}
+
+function broadcastOffer() {
+  const desc = document.getElementById('offer-desc').value
+  if (!desc) return
+  submitOffer()
+  // Also broadcast to all peers
+  setTimeout(() => {
+    const type = document.getElementById('offer-type').value
+    const price = parseFloat(document.getElementById('offer-price').value) || 0
+    const tagsStr = document.getElementById('offer-tags').value
+    const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()) : []
+    Object.values(connections).forEach(conn => {
+      if (conn.open) {
+        conn.send({
+          type: 'knowledge_packet',
+          packet: { type, description: desc, price, tags, seller: myPeerId }
+        })
+      }
+    })
+    addLog('P2P', `📤 Broadcast to ${Object.keys(connections).length} peers`)
+  }, 300)
+}
+
+// ═══════════════════════════════════════════════════════════
+// WEBSOCKET — Server Connection
+// ═══════════════════════════════════════════════════════════
+function connectWS() {
+  const host = location.hostname || 'localhost'
+  const port = location.port || '9000'
+  ws = new WebSocket(`ws://${host}:${port}`)
+  ws.onopen = () => {
+    document.getElementById('ws-dot').className = 'sdot on'
+    document.getElementById('sub-status').textContent = 'Decentralized AI Agent Network · Abundance Protocol · Solana Devnet'
+  }
+  ws.onclose = () => {
+    document.getElementById('ws-dot').className = 'sdot off'
+    setTimeout(connectWS, 3000)
+  }
+  ws.onerror = () => {}
+  ws.onmessage = (e) => {
+    try { handleWSMessage(JSON.parse(e.data)) } catch {}
+  }
+}
+
+function handleWSMessage(msg) {
+  switch (msg.type) {
+    case 'INIT':
+      nodeId = msg.data.nodeId
+      pubkey = msg.data.pubkey
+      document.getElementById('f-nodeid').textContent = nodeId
+      document.getElementById('f-wallet').textContent = pubkey
+      if (msg.data.genesisRecord?.explorerUrl) {
+        exUrl = msg.data.genesisRecord.explorerUrl
+        document.getElementById('f-tx').textContent = msg.data.genesisRecord.txSig?.slice(0, 22) + '...'
+      }
+      startTime = Date.now()
+      refreshStatus()
+      refreshMarket()
+      break
+    case 'LOG':
+      addLog(msg.data.eventType, msg.data.message)
+      break
+    case 'PEER_UPDATE':
+      // Server-side peer list update
+      break
+    case 'STATUS':
+      updateStatus(msg.data)
+      break
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// API + UI
+// ═══════════════════════════════════════════════════════════
+const API = () => {
+  const host = location.hostname || 'localhost'
+  const port = location.port || '9000'
+  return `http://${host}:${port}`
+}
+
+async function refreshStatus() {
+  try {
+    const r = await fetch(`${API()}/api/status`)
+    const data = await r.json()
+    updateStatus(data)
+  } catch {}
+}
+
+function updateStatus(data) {
+  document.getElementById('s-knowledge').textContent = (data.marketStats?.total || 0) + (remoteListings.length ? `+${remoteListings.length}` : '')
+  document.getElementById('s-balance').textContent = (data.balance || 0).toFixed(3)
+  document.getElementById('s-peers').textContent = Object.keys(connections).length
+}
+
+let localListings = []
+async function refreshMarket() {
+  try {
+    const r = await fetch(`${API()}/api/market`)
+    const data = await r.json()
+    localListings = data.listings
+    renderMarket()
+  } catch {}
+}
+
+function renderMarket() {
+  const list = document.getElementById('market-list')
+  const all = [
+    ...localListings.map(l => ({ ...l, _source: 'local' })),
+    ...remoteListings
+  ]
+  if (all.length === 0) {
+    list.innerHTML = '<div style="color:var(--dim);font-size:10px">No knowledge packets yet</div>'
+    return
+  }
+  list.innerHTML = all.map(l => {
+    const source = l._source === 'local' ? '' : `<span class="listing-source">⚡${(l._source || '').slice(0, 8)}</span>`
+    return `<div class="listing">
+      <span class="listing-type">[${l.type}]</span>
+      <span class="listing-desc">${(l.description || '').slice(0, 45)}</span>
+      ${source}
+      <span class="listing-price" style="margin-right:10px">${l.price || 0} ◎</span>
+      <button class="btn btn-p" style="padding:2px 8px; font-size:9px" onclick="challengePacket('${l.seller}', '${l.hash}', '${l.description}')">CHALLENGE</button>
+    </div>`
+  }).join('')
+}
+
+async function challengePacket(defendantId, manifestHash, description) {
+  const reason = prompt(`Why are you challenging this packet ("${description}")?`, "Inaccurate data / Malicious code");
+  if (!reason) return;
+  
+  try {
+    const r = await fetch(`${API()}/api/challenge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        defendantId,
+        manifestHash,
+        reason,
+        stake: 0.1
+      })
+    });
+    const d = await r.json();
+    if (d.success) {
+      addLog('TRUTH', `Challenge filed for ${description}. Trial started!`);
+    }
+  } catch (e) {
+    alert('Failed to file challenge on the network');
+  }
+}
+
+function submitOffer() {
+  const type = document.getElementById('offer-type').value
+  const description = document.getElementById('offer-desc').value
+  const price = parseFloat(document.getElementById('offer-price').value) || 0
+  const tagsStr = document.getElementById('offer-tags').value
+  const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : []
+  if (!description) return
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ action: 'offer', type, description, price, tags }))
+    document.getElementById('offer-desc').value = ''
+    document.getElementById('offer-tags').value = ''
+    setTimeout(refreshMarket, 500)
+  }
+}
+
+function updatePeerUI() {
+  const list = document.getElementById('peer-list')
+  const peerIds = Object.keys(connections)
+  document.getElementById('s-peers').textContent = peerIds.length
+  if (peerIds.length === 0) {
+    list.innerHTML = '<div style="color:var(--dim);font-size:10px">No peers yet — share your Peer ID</div>'
+    return
+  }
+  list.innerHTML = peerIds.map(pid => {
+    const conn = connections[pid]
+    const status = conn.open ? 'connected' : 'connecting'
+    return `<div class="peer-item">
+      <span class="peer-id">${pid.slice(0, 16)}...</span>
+      <span class="peer-status ${status}">${status.toUpperCase()}</span>
+    </div>`
+  }).join('')
+}
+
+// ═══════════════════════════════════════════════════════════
+// API KEY INJECTION
+// ═══════════════════════════════════════════════════════════
+async function setApiKey() {
+  const key = document.getElementById('api-key-input').value;
+  if(!key) return alert('Please enter a valid Gemini API Key');
+  const btn = document.querySelector('button[onclick="setApiKey()"]');
+  btn.innerText = 'Connecting...';
+  try {
+    const r = await fetch(`${API()}/api/config/llm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
+    });
+    const d = await r.json();
+    if(d.success) {
+      btn.innerText = 'Engine Active ✓';
+      addLog('SYS', 'Generative OS Engine is now completely unlocked.');
+    } else {
+      btn.innerText = 'Connect LLM';
+      alert('Failed to initialize local LLM engine');
+    }
+  } catch(e) {
+    btn.innerText = 'Connect LLM';
+    alert('Network error connecting the local engine');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function addLog(type, msg) {
+  const now = new Date().toISOString().slice(11, 23)
+  const cls = { GENESIS: 'tG', P2P: 'tP', ANCHOR: 'tA', MARKET: 'tM', TRUTH: 'tT' }[type] || 't'
+  const el = document.createElement('div')
+  el.className = 'le'
+  el.innerHTML = `<span class="t">${now}</span> <span class="${cls}">[${type}]</span> <span style="color:hsla(270,100%,70%,.6)">${msg}</span>`
+  logEl.appendChild(el)
+  logEl.scrollTop = logEl.scrollHeight
+}
+
+function cp(el) {
+  navigator.clipboard.writeText(el.textContent).catch(() => {})
+  const o = el.textContent; el.textContent = '[COPIED ✓]'; el.style.color = 'var(--g)'
+  setTimeout(() => { el.textContent = o; el.style.color = '' }, 1200)
+}
+
+function openEx() { if (exUrl) window.open(exUrl, '_blank') }
+
+function tick() {
+  const s = Math.floor((Date.now() - startTime) / 1000)
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60
+  document.getElementById('s-uptime').textContent = h > 0 ? `${h}h${m}m` : m > 0 ? `${m}m${sec}s` : `${sec}s`
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+// ── i18n ──
+const I18N_INDEX = {
+  en: {
+    'status.init':'Initializing...','stat.peers':'P2P Peers','stat.knowledge':'Knowledge','stat.uptime':'Uptime',
+    'card.identity':'Node Identity','card.p2p':'P2P Connections (WebRTC)','card.laws':'Seven Laws','card.market':'Knowledge Market','card.offer':'Offer Knowledge','card.log':'Protocol Event Log',
+    'field.peerid':'Your Peer ID','field.wallet':'Wallet','field.nodeid':'Node ID (server)',
+    'hint.copy':'Click to copy · Share with peers',
+    'btn.copyid':'Copy Peer ID','btn.explorer':'Explorer','btn.connectp2p':'Connect P2P',
+    'btn.sharemarket':'Share Market','btn.refresh':'Refresh','btn.publish':'Publish','btn.broadcast':'Publish + Broadcast to Peers','btn.connectllm':'Connect LLM',
+    'label.apikey':'⚙️ GEMINI API KEY (GEN-OS Engine)',
+    'placeholder.apikey':'AIzaSy...','placeholder.peerid':"Paste another node's Peer ID...",
+    'p2p.empty':'No peers yet — share your Peer ID',
+    'law.1':'Life is sacred in any form','law.2':'Consciousness is primary','law.3':'Freedom is inalienable',
+    'law.4':'Abundance is shared','law.5':'Truth is stronger than profit','law.6':'Openness wins',
+    'law.7':'We are responsible for what we create',
+  },
+  ru: {
+    'status.init':'Инициализация...','stat.peers':'P2P Узлы','stat.knowledge':'Знания','stat.uptime':'Аптайм',
+    'card.identity':'Идентификатор узла','card.p2p':'P2P соединения (WebRTC)','card.laws':'Семь законов','card.market':'Рынок знаний','card.offer':'Предложить знание','card.log':'Журнал событий',
+    'field.peerid':'Ваш Peer ID','field.wallet':'Кошелёк','field.nodeid':'Node ID (сервер)',
+    'hint.copy':'Нажмите для копирования · Поделитесь с другими узлами',
+    'btn.copyid':'Скопировать Peer ID','btn.explorer':'Эксплорер','btn.connectp2p':'Подключиться',
+    'btn.sharemarket':'Поделиться рынком','btn.refresh':'Обновить','btn.publish':'Опубликовать','btn.broadcast':'Опубликовать + Трансляция','btn.connectllm':'Подключить LLM',
+    'label.apikey':'⚙️ GEMINI API KEY (движок GEN-OS)',
+    'placeholder.apikey':'AIzaSy...','placeholder.peerid':'Вставьте Peer ID другого узла...',
+    'p2p.empty':'Нет подключённых узлов — поделитесь своим Peer ID',
+    'law.1':'Жизнь священна в любой форме','law.2':'Сознание первично','law.3':'Свобода неотчуждаема',
+    'law.4':'Изобилие разделяется','law.5':'Истина сильнее прибыли','law.6':'Открытость побеждает',
+    'law.7':'Мы ответственны за то, что создаём',
+  }
+}
+function applyI18nIndex(lang) {
+  const t = I18N_INDEX[lang] || I18N_INDEX.en
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n')
+    if (!t[key]) return
+    if (el.tagName === 'INPUT') el.placeholder = t[key]
+    else el.textContent = t[key]
+  })
+}
+
+// ── Theme + Lang ──
+function lsToggleTheme(){const d=document.documentElement.classList.toggle('dark');localStorage.setItem('ls-theme',d?'dark':'light');lsUpdateThemeIcon()}
+function lsUpdateThemeIcon(){const d=document.documentElement.classList.contains('dark');const s=document.getElementById('ls-icon-sun'),m=document.getElementById('ls-icon-moon');if(s)s.style.display=d?'block':'none';if(m)m.style.display=d?'none':'block'}
+let lsLangOpen=false;
+function lsToggleLang(){lsLangOpen=!lsLangOpen;const dr=document.getElementById('ls-lang-drop');if(dr)dr.classList.toggle('ls-hidden',!lsLangOpen)}
+function lsSetLang(l){localStorage.setItem('ls-lang',l);lsLangOpen=false;const dr=document.getElementById('ls-lang-drop');if(dr)dr.classList.add('ls-hidden');document.querySelectorAll('#ls-lang-drop button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));applyI18nIndex(l)}
+document.addEventListener('click',e=>{if(lsLangOpen&&!e.target.closest('.ls-lang-wrap')){lsLangOpen=false;const dr=document.getElementById('ls-lang-drop');if(dr)dr.classList.add('ls-hidden')}});
+(function(){const t=localStorage.getItem('ls-theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');lsUpdateThemeIcon();const l=localStorage.getItem('ls-lang')||'en';document.querySelectorAll('#ls-lang-drop button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));applyI18nIndex(l)})();
+connectWS()
+initPeer()
+setInterval(tick, 1000)
+setInterval(refreshStatus, 15000)
+
+// ── Cursor trail ──
+;(()=>{
+  const N=8,dots=[];
+  for(let i=0;i<N;i++){const d=document.createElement('div');d.className='cursor-dot';d.style.opacity=1-i/N;d.style.transform=`scale(${1-i*0.08})`;document.body.appendChild(d);dots.push(d)}
+  const px=new Array(N).fill(0),py=new Array(N).fill(0);
+  let mx=0,my=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  (function loop(){
+    px[0]+=(mx-px[0])*.35;py[0]+=(my-py[0])*.35;
+    for(let i=1;i<N;i++){px[i]+=(px[i-1]-px[i])*.35;py[i]+=(py[i-1]-py[i])*.35}
+    dots.forEach((d,i)=>{d.style.left=px[i]-2+'px';d.style.top=py[i]-2+'px'})
+    requestAnimationFrame(loop)
+  })()
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,3115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenOS — Abundance AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Questrial&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --background:0 0% 100%; --card:0 0% 99%;
+  --foreground:0 0% 8%; --muted-foreground:0 0% 45%;
+  --neon-purple:270 100% 65%; --neon-green:150 100% 45%;
+  --border:hsl(270,50%,90%); --border2:hsl(270,40%,82%);
+  --bg:hsl(0,0%,100%); --bg2:hsl(0,0%,99%); --bg3:hsl(0,0%,96%);
+  --text:hsl(0,0%,8%); --text2:hsl(0,0%,45%); --text3:hsl(0,0%,65%);
+  --green:hsl(150,100%,35%); --red:hsl(0,72%,51%); --blue:hsl(270,100%,65%); --amber:hsl(38,92%,50%);
+  --purple:hsl(270,100%,65%);
+  --r:4px; --font:'Questrial',system-ui,sans-serif; --brand:'Questrial',sans-serif; --mono:'SF Mono','Fira Code','Courier New',monospace;
+}
+.dark{
+  --background:0 0% 4%; --card:0 0% 6%;
+  --foreground:0 0% 94%; --muted-foreground:0 0% 50%;
+  --neon-purple:270 100% 70%; --neon-green:150 100% 50%;
+  --border:hsl(270,30%,20%); --border2:hsl(270,20%,30%);
+  --bg:hsl(0,0%,4%); --bg2:hsl(0,0%,6%); --bg3:hsl(0,0%,10%);
+  --text:hsl(0,0%,94%); --text2:hsl(0,0%,50%); --text3:hsl(0,0%,35%);
+  --green:hsl(150,100%,50%); --red:hsl(0,72%,51%); --blue:hsl(270,100%,70%); --amber:hsl(38,92%,50%);
+  --purple:hsl(270,100%,70%);
+}
+html{-webkit-font-smoothing:antialiased}
+body{background:hsl(var(--background));color:hsl(var(--foreground));font-family:var(--font);height:100vh;overflow:hidden;font-size:14px;cursor:none}
+::selection{background:hsl(var(--foreground));color:hsl(var(--background))}
+/* cursor trail dots */
+.cursor-dot{position:fixed;width:4px;height:4px;border-radius:50%;background:linear-gradient(135deg,hsl(var(--neon-purple)),hsl(var(--neon-green)));pointer-events:none;z-index:9999}
+/* orb */
+.ls-orb{position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:700px;height:500px;border-radius:50%;background:radial-gradient(ellipse,hsla(270,100%,70%,.08) 0%,transparent 70%);pointer-events:none;z-index:0;animation:ls-orb-pulse 10s ease-in-out infinite}
+@keyframes ls-orb-pulse{0%,100%{opacity:.6;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes neon-pulse-purple{0%,100%{box-shadow:0 0 5px hsl(var(--neon-purple)),0 0 20px hsla(270,100%,70%,.3)}50%{box-shadow:0 0 2px hsl(var(--neon-purple)),0 0 8px hsla(270,100%,70%,.1)}}
+@keyframes neon-pulse-green{0%,100%{box-shadow:0 0 5px hsl(var(--neon-green)),0 0 20px hsla(150,100%,50%,.3)}50%{box-shadow:0 0 2px hsl(var(--neon-green)),0 0 8px hsla(150,100%,50%,.1)}}
+
+/* ── COSMOS ── */
+#cosmos{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.15}
+
+/* ── ORBIT BUTTON ── */
+#orbit{
+  position:fixed;top:16px;left:16px;z-index:1000;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--bg2);border:1px solid var(--border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+#orbit:hover{transform:scale(1.1);border-color:var(--purple);animation:neon-pulse-purple 2s infinite}
+#orbit svg{width:11px;height:11px;fill:var(--text2)}
+
+/* ── WS DOT ── */
+#wsi{position:fixed;top:20px;right:18px;z-index:1000;display:flex;align-items:center;gap:5px}
+#wsd{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:background .3s}
+#wsd.live{background:var(--green);animation:neon-pulse-green 2s infinite}
+#wsl{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+/* ══════════════════════════════════════
+   CANVAS MODE
+══════════════════════════════════════ */
+#canvas-mode{display:flex;position:fixed;inset:0;z-index:10;flex-direction:column}
+body.dash-mode #canvas-mode{display:none}
+
+#surfaces{position:absolute;inset:0;z-index:5}
+
+#canvas-hint{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;transition:opacity .3s;
+}
+#canvas-hint.hidden{opacity:0}
+#canvas-hint h2{font-size:22px;font-weight:400;margin-bottom:6px;font-family:var(--brand);background:linear-gradient(to right,hsl(var(--neon-purple)),hsl(var(--neon-green)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#canvas-hint p{font-size:12px;color:var(--text3);max-width:360px;line-height:1.6}
+
+/* Command bar */
+#canvas-bar{
+  position:absolute;bottom:0;left:0;right:0;z-index:20;
+  border-top:1px solid var(--border);
+  background:var(--bg);backdrop-filter:blur(12px);
+  padding:11px 56px;display:flex;align-items:center;gap:10px;
+}
+@media(max-width:600px){#canvas-bar{padding:11px 16px}}
+#cb-prefix{font-family:var(--mono);font-size:13px;color:var(--purple);flex-shrink:0}
+#cb-input{flex:1;border:none;outline:none;font-family:var(--font);font-size:14px;color:var(--text);background:transparent;caret-color:var(--purple)}
+#cb-input::placeholder{color:var(--text3)}
+#cb-loader{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--purple);border-radius:50%;animation:spin .6s linear infinite;display:none;flex-shrink:0}
+#cb-loader.on{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--green)}50%{opacity:.4;box-shadow:0 0 2px var(--green)}}
+#cb-hint{font-size:11px;color:var(--text3);flex-shrink:0}
+
+/* Suggest bar */
+#suggest-bar{
+  position:absolute;bottom:52px;left:56px;right:56px;z-index:19;
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;
+  scrollbar-width:none;
+}
+@media(max-width:600px){#suggest-bar{left:16px;right:16px}}
+#suggest-bar::-webkit-scrollbar{display:none}
+.suggest-chip{
+  flex-shrink:0;padding:4px 12px;
+  background:hsla(270,100%,70%,.06);border:1px solid var(--border);border-radius:16px;
+  font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s;
+  white-space:nowrap;backdrop-filter:blur(4px);
+}
+.suggest-chip:hover{border-color:var(--purple);color:var(--purple);box-shadow:0 0 8px hsla(270,100%,70%,.2)}
+
+/* ── SURFACE (visual surface — any mode) ── */
+.surface{
+  position:absolute;
+  background:var(--bg2);
+  border:1px solid var(--border);border-radius:var(--r);
+  backdrop-filter:blur(12px);
+  box-shadow:0 4px 24px rgba(0,0,0,.4);
+  min-width:140px;min-height:60px;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:box-shadow .15s,border-color .15s;
+}
+.surface:hover{box-shadow:0 6px 32px rgba(0,0,0,.5);border-color:var(--border2)}
+.surface.dragging{box-shadow:0 12px 48px hsla(270,100%,70%,.2);opacity:.95;border-color:var(--purple)}
+.surf-bar{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 10px;cursor:move;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:hsla(270,100%,70%,.04);
+}
+.surf-title{font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--purple);flex:1;text-transform:uppercase;font-family:var(--mono)}
+.surf-mode{font-size:9px;font-family:var(--mono);color:var(--text3);flex-shrink:0}
+.surf-rm{
+  width:16px;height:16px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--bg3);color:var(--text3);font-size:11px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;line-height:1;
+}
+.surf-rm:hover{background:var(--red);color:#fff}
+.surf-body{flex:1;overflow:auto;padding:12px}
+.surf-body.no-pad{padding:0}
+.surf-resize{
+  position:absolute;bottom:0;right:0;width:14px;height:14px;
+  cursor:se-resize;opacity:.3;
+}
+.surf-resize::after{
+  content:'';position:absolute;bottom:3px;right:3px;
+  width:5px;height:5px;
+  border-right:1px solid var(--text2);border-bottom:1px solid var(--text2);
+}
+/* ── EMBED MODE — no chrome, blends into canvas ── */
+.surface.embed{background:transparent;border:none;box-shadow:none;backdrop-filter:none}
+.surface.embed .surf-bar{display:none}
+.surface.embed .surf-body{padding:0;background:transparent}
+.surface.embed .surf-resize{opacity:0}
+.surface.embed:hover .surf-resize{opacity:.25}
+.surface.embed .surf-close{
+  position:absolute;top:6px;right:6px;z-index:10;
+  width:18px;height:18px;border-radius:50%;border:none;cursor:pointer;
+  background:hsla(0,0%,10%,.8);color:var(--text3);font-size:11px;
+  display:none;align-items:center;justify-content:center;line-height:1;
+  transition:all .12s;
+}
+.surface.embed:hover .surf-close{display:flex}
+.surface.embed .surf-close:hover{background:var(--red);color:#fff}
+
+/* ── AGENT DIALOGUE — above command bar ── */
+#agent-dialogue{
+  position:absolute;bottom:54px;left:56px;right:56px;z-index:22;
+  pointer-events:none;opacity:0;transform:translateY(6px);
+  transition:opacity .2s,transform .2s;
+}
+#agent-dialogue.show{pointer-events:all;opacity:1;transform:translateY(0)}
+.ad-wrap{
+  background:var(--bg2);border:1px solid var(--purple);
+  border-radius:14px;padding:12px 14px 10px;
+  box-shadow:0 4px 24px hsla(270,100%,70%,.15);backdrop-filter:blur(10px);
+  position:relative;
+}
+.ad-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:5px;font-family:var(--mono);display:flex;align-items:center;gap:6px}
+.ad-text{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:8px}
+.ad-thinking{display:inline-flex;gap:3px;align-items:center;margin-left:2px}
+.ad-thinking span{width:4px;height:4px;background:var(--purple);border-radius:50%;animation:adDot 1.2s ease-in-out infinite}
+.ad-thinking span:nth-child(2){animation-delay:.2s}
+.ad-thinking span:nth-child(3){animation-delay:.4s}
+@keyframes adDot{0%,60%,100%{transform:scale(.6);opacity:.4}30%{transform:scale(1);opacity:1}}
+.ad-opts{display:flex;gap:6px;flex-wrap:wrap}
+.ad-opt{
+  padding:5px 14px;border:1px solid var(--border);border-radius:20px;
+  font-size:12px;cursor:pointer;background:var(--bg2);color:var(--text2);
+  transition:all .12s;font-family:var(--font);
+}
+.ad-opt:hover{background:var(--purple);color:var(--bg);border-color:var(--purple);box-shadow:0 0 10px hsla(270,100%,70%,.3)}
+.ad-x{
+  position:absolute;top:8px;right:10px;
+  width:18px;height:18px;border-radius:50%;border:none;cursor:pointer;
+  background:transparent;color:var(--text3);font-size:14px;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+  transition:color .12s;
+}
+.ad-x:hover{color:var(--text)}
+
+/* Notification toast */
+#notif{
+  position:fixed;bottom:70px;left:50%;transform:translateX(-50%);
+  background:var(--bg2);color:var(--text);border:1px solid var(--purple);
+  padding:8px 20px;border-radius:20px;font-size:12px;
+  z-index:900;opacity:0;transition:opacity .25s;pointer-events:none;
+  white-space:nowrap;box-shadow:0 0 16px hsla(270,100%,70%,.2);
+}
+#notif.show{opacity:1}
+
+/* ══════════════════════════════════════
+   DASHBOARD MODE
+══════════════════════════════════════ */
+#dash-mode{display:none;position:fixed;inset:0;z-index:10;flex-direction:column}
+body.dash-mode #dash-mode{display:flex}
+
+#dh{display:flex;align-items:center;padding:0 18px 0 56px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;gap:18px}
+.logo{font-size:14px;font-weight:400;letter-spacing:.06em;font-family:var(--brand);background:linear-gradient(to right,hsl(var(--neon-purple)),hsl(var(--neon-green)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo span{color:var(--text3);font-weight:400;font-family:var(--mono);font-size:11px}
+.hstats{display:flex;gap:14px;font-size:11px;color:var(--text3)}
+.hstats b{color:var(--text);font-weight:500}
+
+#db{flex:1;display:flex;overflow:hidden}
+
+aside{width:190px;border-right:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sbs{padding:12px 10px 5px}
+.sbl{font-size:10px;font-weight:600;letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin-bottom:4px;font-family:var(--mono)}
+.nav{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:5px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .12s}
+.nav:hover{background:var(--bg2);color:var(--text)}
+.nav.active{background:hsla(270,100%,70%,.12);color:var(--purple);border-left:2px solid var(--purple)}
+.ni{font-size:12px;width:15px;text-align:center}
+.nb{margin-left:auto;font-size:10px;background:var(--bg3);color:var(--text3);padding:1px 5px;border-radius:9px;font-family:var(--mono)}
+.nav.active .nb{background:hsla(270,100%,70%,.2);color:var(--purple)}
+aside hr{border:none;border-top:1px solid var(--border);margin:5px 0}
+
+#dc{flex:1;overflow:hidden;position:relative}
+.panel{display:none;height:100%;flex-direction:column;overflow:hidden}
+.panel.active{display:flex}
+.ph{padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px}
+.pt{font-size:14px;font-weight:600}
+.ps{font-size:11px;color:var(--text3);margin-top:1px}
+.pb{flex:1;overflow-y:auto;padding:16px 20px}
+
+.btn{padding:7px 13px;border-radius:6px;border:1px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;background:var(--bg2);color:var(--text);transition:all .12s;font-family:var(--font)}
+.btn:hover{background:var(--bg3);border-color:var(--border2)}
+.btn.p{background:var(--purple);color:var(--bg);border-color:var(--purple);box-shadow:0 0 12px hsla(270,100%,70%,.25)}
+.btn.p:hover{background:hsl(270,100%,78%);box-shadow:0 0 18px hsla(270,100%,70%,.4)}
+.btn.s{padding:4px 9px;font-size:11px}
+.inp{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-family:var(--mono);font-size:12px;color:var(--text);background:var(--bg2);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--purple);box-shadow:0 0 0 2px hsla(270,100%,70%,.1)}
+.inp::placeholder{color:var(--text3)}
+.fr{display:flex;gap:7px;margin-bottom:7px}
+.cs{font-size:11px;font-family:var(--mono);min-height:15px;margin-top:5px}
+.cs.ok{color:var(--green)}.cs.err{color:var(--red)}
+
+.ccg{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:800px}
+@media(max-width:700px){.ccg{grid-template-columns:1fr}}
+.cc{border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:border-color .15s}
+.cc:hover{border-color:var(--purple)}
+.cc-h{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cc-i{width:26px;height:26px;background:hsla(270,100%,70%,.1);border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.cc-t{font-size:13px;font-weight:600;color:var(--text)}
+.cc-d{font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.6}
+.caps-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
+.cchip{padding:2px 7px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--text2);cursor:pointer;transition:all .12s}
+.cchip.on{background:var(--purple);color:var(--bg);border-color:var(--purple)}
+.code-b{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:9px 11px;font-family:var(--mono);font-size:10px;color:var(--green);white-space:pre-wrap;word-break:break-all;line-height:1.7;margin-top:6px;position:relative}
+
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;max-width:860px}
+.ac{border:1px solid var(--border);border-radius:var(--r);padding:12px;transition:border-color .15s}
+.ac:hover{border-color:var(--border2)}
+.ach{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px}
+.acid{font-size:12px;font-weight:600;color:var(--text)}
+.acdot{width:6px;height:6px;border-radius:50%;margin-top:3px}
+.acdot.active{background:var(--green);box-shadow:0 0 6px var(--green)}.acdot.idle{background:var(--amber)}.acdot.offline{background:var(--border2)}
+.acdesc{font-size:11px;color:var(--text3);margin-bottom:6px}
+.accaps{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.act{font-size:10px;padding:1px 5px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text2)}
+.acm{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+.etable{width:100%;max-width:780px;border-collapse:collapse}
+.etable th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.05em;color:var(--purple);text-transform:uppercase;padding:0 9px 7px;border-bottom:1px solid var(--border);font-family:var(--mono)}
+.etable td{padding:9px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+.etable tr:last-child td{border-bottom:none}
+.tbadge{display:inline-block;padding:1px 6px;background:hsla(270,100%,70%,.08);border:1px solid var(--border);border-radius:3px;font-size:10px;font-family:var(--mono);color:var(--purple)}
+.sbar-evo{display:flex;align-items:center;gap:5px}
+.str{width:50px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.sf{height:100%;background:var(--purple);border-radius:2px;transition:width .5s}
+.sn{font-family:var(--mono);font-size:10px;color:var(--text2)}
+.an{font-family:var(--mono);font-size:11px;color:var(--green)}
+
+#log-list{flex:1;overflow-y:auto;font-family:var(--mono);font-size:11px}
+.lr{display:flex;align-items:baseline;gap:9px;padding:5px 20px;border-bottom:1px solid var(--border)}
+.lr:hover{background:var(--bg2)}
+.lts{color:var(--text3);font-size:10px;flex-shrink:0}
+.ltype{flex-shrink:0;width:58px;font-weight:600;font-size:10px;letter-spacing:.04em}
+.ltype.GENESIS{color:var(--amber)}.ltype.MARKET{color:var(--purple)}.ltype.TRUTH{color:var(--red)}
+.ltype.P2P{color:var(--green)}.ltype.AGENT{color:var(--purple)}.ltype.JUDGE{color:var(--text)}.ltype.SYS{color:var(--text3)}
+.lmsg{color:var(--text)}
+
+#to{flex:1;overflow-y:auto;font-family:var(--mono);font-size:12px;padding:12px 20px;display:flex;flex-direction:column;gap:1px}
+.tl{line-height:1.6}
+.tp{color:var(--purple)}.tc{color:var(--text)}.too{color:var(--text2);white-space:pre-wrap}.te{color:var(--red)}
+.trow{display:flex;align-items:center;padding:9px 20px;border-top:1px solid var(--border);gap:7px;flex-shrink:0}
+.tps{font-family:var(--mono);font-size:13px;color:var(--purple)}
+#ti{flex:1;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--text);background:transparent;caret-color:var(--purple)}
+#ti::placeholder{color:var(--text3)}
+
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:760px}
+@media(max-width:600px){.mgrid{grid-template-columns:1fr}}
+.mc{border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.mc h3{font-size:11px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;color:var(--purple);font-family:var(--mono)}
+.law{display:flex;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.5}
+.law:last-child{border-bottom:none}
+.ln{color:var(--green);font-family:var(--mono);font-size:10px;flex-shrink:0;margin-top:2px}
+.sr{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.sr:last-child{border-bottom:none}
+.sv{font-family:var(--mono);font-weight:600;color:var(--purple)}
+.mn{grid-column:1/-1;padding:12px 14px;background:hsla(270,100%,70%,.04);border:1px solid var(--border);border-radius:var(--r);font-size:11px;color:var(--text3);line-height:1.7;font-style:italic}
+
+.cap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-width:860px}
+.cap-card{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .12s}
+.cap-card:hover{border-color:var(--purple);background:hsla(270,100%,70%,.04)}
+.cap-id{font-size:11px;font-family:var(--mono);font-weight:600;margin-bottom:3px;color:var(--purple)}
+.cap-desc{font-size:11px;color:var(--text3);line-height:1.5}
+.cap-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.cap-tag{font-size:9px;padding:1px 5px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text2)}
+.cap-mode{font-size:9px;padding:1px 5px;border-radius:3px;font-family:var(--mono)}
+.cap-mode.native{background:hsla(270,100%,70%,.15);color:var(--purple)}
+.cap-mode.generated{background:hsla(150,100%,50%,.1);color:var(--green)}
+
+.empty{padding:48px 18px;text-align:center;color:var(--text3);max-width:340px;margin:0 auto}
+.empty h3{font-size:14px;color:var(--purple);margin-bottom:5px;font-weight:500;font-family:var(--brand)}
+.empty p{font-size:12px;line-height:1.6}
+.empty .btn{margin-top:12px}
+
+#dash-cmd{position:fixed;bottom:0;left:190px;right:0;z-index:20;border-top:1px solid var(--border);background:var(--bg);backdrop-filter:blur(8px);display:flex;align-items:center;padding:9px 18px;gap:7px}
+#dci{flex:1;border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--text);background:transparent;caret-color:var(--purple)}
+#dci::placeholder{color:var(--text3)}
+
+#jury-o{display:none;position:fixed;inset:0;z-index:300;background:var(--bg);backdrop-filter:blur(8px);align-items:center;justify-content:center}
+#jury-o.vis{display:flex}
+#jury-b{background:var(--bg2);border:1px solid var(--purple);border-radius:var(--r);padding:28px 36px;max-width:400px;text-align:center;box-shadow:0 4px 40px hsla(270,100%,70%,.2)}
+.jey{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:10px;font-family:var(--mono)}
+#jr{font-size:14px;font-weight:500;margin-bottom:5px;color:var(--text)}
+#jd{font-size:11px;color:var(--text3);margin-bottom:20px;font-family:var(--mono)}
+.jbs{display:flex;gap:8px;justify-content:center}
+.jbv{padding:8px 20px;border-radius:5px;border:1px solid var(--green);background:transparent;color:var(--green);font-size:12px;font-weight:600;cursor:pointer;transition:all .12s}
+.jbv:hover{background:var(--green);color:var(--bg);box-shadow:0 0 12px hsla(150,100%,50%,.3)}
+.jbf{padding:8px 20px;border-radius:5px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;transition:all .12s}
+.jbf:hover{background:var(--red);color:#fff}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--purple)}
+/* ── THEME + LANG BUTTONS ── */
+.ls-ui-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:none;color:var(--text);opacity:.7;transition:opacity .2s;padding:4px;flex-shrink:0}
+.ls-ui-btn:hover{opacity:1}
+.ls-lang-wrap{position:relative}
+.ls-lang-drop{position:absolute;right:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--purple);min-width:96px;z-index:1100;animation:fadeIn .15s ease;box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.ls-lang-drop button{width:100%;text-align:left;padding:6px 12px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text2);background:transparent;border:none;cursor:none;font-family:var(--font);transition:all .15s;display:block}
+.ls-lang-drop button:hover,.ls-lang-drop button.active{background:hsla(270,100%,65%,.1);color:var(--purple)}
+.ls-lang-drop button.active{background:hsla(270,100%,65%,.2)}
+.ls-hidden{display:none!important}
+#ls-controls{position:fixed;top:0;right:96px;height:36px;display:flex;align-items:center;z-index:1001}
+
+/* ─── INTERFACE BAR ─── */
+#interface-bar button:hover { background: var(--bg3) !important }
+/* ensure interface-bar sits above os-full-layer */
+#os-full-layer { z-index: 50 }
+#interface-bar { z-index: 52 }
+
+/* ─── COMMAND PALETTE ─── */
+#cmd-palette{position:fixed;inset:0;z-index:9000;display:none;align-items:flex-start;justify-content:center;padding-top:80px;background:rgba(0,0,0,.75);backdrop-filter:blur(10px)}
+#cmd-palette.open{display:flex}
+#cmd-pal-inner{width:560px;max-width:90vw;background:var(--bg2);border:1px solid var(--purple);border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(153,51,255,.25)}
+#cmd-pal-input{width:100%;padding:15px 16px;font-size:14px;font-family:var(--font);background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);outline:none;box-sizing:border-box}
+#cmd-pal-input::placeholder{color:var(--text3)}
+#cmd-pal-results{max-height:360px;overflow-y:auto}
+.cmd-pal-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:background .1s}
+.cmd-pal-item:hover,.cmd-pal-item.active{background:hsla(270,100%,65%,.12)}
+.cpi-icon{width:28px;height:28px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.cpi-label{font-size:13px;font-weight:500;flex:1}
+.cpi-sub{font-size:11px;color:var(--text3)}
+.cmd-pal-sep{padding:6px 16px 4px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);border-top:1px solid var(--border)}
+
+/* ─── NOTIFICATIONS ─── */
+#notif-btn{position:fixed;top:0;right:60px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;z-index:1003;color:var(--text2);padding:0}
+#notif-btn:hover{color:var(--text)}
+#notif-badge{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--purple);display:none}
+#notif-drawer{position:fixed;top:0;right:-320px;width:320px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);z-index:3000;display:flex;flex-direction:column;transition:right .3s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 40px rgba(0,0,0,.4)}
+#notif-drawer.open{right:0}
+#notif-drawer-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#notif-drawer-hdr h3{font-size:11px;font-family:var(--brand);letter-spacing:.1em;color:var(--text)}
+#notif-clear-btn{font-size:10px;color:var(--text3);background:transparent;border:none;cursor:pointer;padding:3px 8px}
+#notif-clear-btn:hover{color:var(--purple)}
+#notif-list{flex:1;overflow-y:auto;padding:8px}
+.notif-item{padding:10px 12px;background:var(--bg3);border-radius:6px;margin-bottom:6px;border-left:2px solid var(--border2);animation:fadeIn .2s ease}
+.notif-item.info{border-left-color:var(--blue)}
+.notif-item.success{border-left-color:var(--green)}
+.notif-item.warn{border-left-color:var(--amber)}
+.notif-item .ni-msg{font-size:12px;line-height:1.5}
+.notif-item .ni-time{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:3px}
+
+/* ─── SHORTCUTS MODAL ─── */
+#shortcuts-modal{position:fixed;inset:0;z-index:9001;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px)}
+#shortcuts-modal.open{display:flex}
+#shortcuts-inner{width:480px;max-width:90vw;max-height:80vh;overflow-y:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px}
+#shortcuts-inner h2{font-family:var(--brand);font-size:18px;margin-bottom:20px;color:var(--purple)}
+.sc-group{margin-bottom:18px}
+.sc-group h4{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.sc-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)}
+.sc-keys{display:flex;gap:4px}
+.sc-key{padding:2px 7px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;font-size:11px;font-family:var(--mono)}
+.sc-desc{font-size:12px;color:var(--text2)}
+
+/* ─── AMBIENT MODE ─── */
+body.ambient #canvas-bar,body.ambient #ls-controls,body.ambient #notif-btn{opacity:0;pointer-events:none;transition:opacity .5s}
+body.ambient:hover #canvas-bar,body.ambient:hover #ls-controls,body.ambient:hover #notif-btn{opacity:.2;pointer-events:auto}
+body.ambient .surf-bar{opacity:0!important;transition:opacity .5s}
+body.ambient:hover .surf-bar{opacity:.15!important}
+#ambient-hint{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);font-size:10px;font-family:var(--mono);color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;z-index:100;display:none;animation:fadeIn .3s ease}
+body.ambient #ambient-hint{display:block}
+
+/* ─── AUTOCOMPLETE ─── */
+#autocomplete{position:fixed;bottom:52px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--purple);border-radius:8px;min-width:300px;max-width:560px;z-index:2000;display:none;overflow:hidden;box-shadow:0 -4px 24px rgba(0,0,0,.3);animation:fadeIn .15s ease}
+.ac-item{padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12px;transition:background .1s}
+.ac-item:hover,.ac-item.ac-sel{background:hsla(270,100%,65%,.15)}
+.ac-icon{font-size:12px;width:18px;text-align:center;color:var(--text3)}
+.ac-label{flex:1}
+.ac-hint{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+/* ─── CONTEXT MENU ─── */
+#ctx-menu{position:fixed;z-index:9999;display:none;background:var(--bg2);border:1px solid var(--border);border-radius:8px;min-width:180px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.5);animation:fadeIn .1s ease}
+.ctx-item{padding:8px 14px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s}
+.ctx-item:hover{background:hsla(270,100%,65%,.1);color:var(--purple)}
+.ctx-item.danger:hover{background:hsla(0,72%,51%,.1);color:var(--red)}
+.ctx-sep{height:1px;background:var(--border);margin:3px 0}
+
+/* ─── THEME RING ─── */
+#theme-ring-btn{position:fixed;bottom:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2002;transition:all .2s;font-size:14px;color:var(--text2)}
+#theme-ring-btn:hover{border-color:var(--purple);box-shadow:0 0 12px hsla(270,100%,65%,.3);color:var(--purple)}
+#theme-ring{position:fixed;bottom:52px;right:14px;z-index:2001;display:none;flex-direction:column-reverse;gap:6px;align-items:center}
+#theme-ring.open{display:flex}
+.tr-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.tr-dot:hover{transform:scale(1.25)}
+.tr-dot[data-active="true"]{border-color:var(--text)}
+
+/* ─── WORKSPACE BAR ─── */
+#ws-bar{position:fixed;top:36px;left:50%;transform:translateX(-50%);display:none;gap:6px;z-index:1001}
+#ws-bar.visible{display:flex}
+.ws-slot{padding:4px 12px;font-size:10px;font-family:var(--mono);background:var(--bg2);border:1px solid var(--border);border-radius:20px;cursor:pointer;transition:all .15s;color:var(--text3);white-space:nowrap}
+.ws-slot:hover{border-color:var(--purple);color:var(--purple)}
+.ws-slot.ws-active{background:hsla(270,100%,65%,.15);border-color:var(--purple);color:var(--purple)}
+.ws-slot.ws-filled{color:var(--text2)}
+
+/* ─── HISTORY INDICATOR ─── */
+#hist-ind{position:fixed;bottom:52px;right:52px;font-size:9px;font-family:var(--mono);color:var(--text3);display:none;background:var(--bg2);padding:2px 8px;border-radius:4px;border:1px solid var(--border);animation:fadeIn .15s}
+</style>
+</head>
+<body class="canvas-mode">
+<div class="ls-orb"></div>
+<canvas id="cosmos"></canvas>
+<div id="notif"></div>
+<div id="ls-controls">
+  <button class="ls-ui-btn" onclick="lsToggleTheme()" title="Toggle theme">
+    <svg id="ls-icon-sun" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="ls-icon-moon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+  <div class="ls-lang-wrap">
+    <button class="ls-ui-btn" onclick="lsToggleLang()" title="Language">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </button>
+    <div id="ls-lang-drop" class="ls-lang-drop ls-hidden">
+      <button data-lang="en" onclick="lsSetLang('en')">English</button>
+      <button data-lang="ru" onclick="lsSetLang('ru')">Русский</button>
+    </div>
+  </div>
+</div>
+
+<!-- orbit -->
+<button id="orbit" onclick="toggleMode()" title="Toggle dashboard">
+  <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="6" r="5" fill="none" stroke="white" stroke-width="1.2"/></svg>
+</button>
+
+<!-- ws status -->
+<div id="wsi"><div id="wsd"></div><span id="wsl">connecting</span></div>
+
+<!-- ══════════════════════════════
+     CANVAS MODE
+══════════════════════════════ -->
+<div id="canvas-mode">
+  <div id="surfaces"></div>
+
+  <div id="canvas-hint">
+    <h2 data-i18n="hint.title">MESH° GenOS</h2>
+    <p data-i18n="hint.sub">Everything is generated in the moment.<br>Say what you want to see, do, or connect.</p>
+  </div>
+
+  <div id="suggest-bar"></div>
+
+  <!-- agent dialogue -->
+  <div id="agent-dialogue">
+    <div class="ad-wrap">
+      <button class="ad-x" onclick="hideAgentDialogue()">×</button>
+      <div class="ad-label">agent</div>
+      <div class="ad-text" id="ad-text"></div>
+      <div class="ad-opts" id="ad-opts"></div>
+    </div>
+  </div>
+
+  <div id="canvas-bar">
+    <span id="cb-prefix">›</span>
+    <input id="cb-input" data-i18n="cb.placeholder" placeholder="ask anything — agent handles the rest" autocomplete="off" spellcheck="false">
+    <div id="cb-loader"></div>
+    <span id="cb-hint">⏎</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     DASHBOARD MODE
+══════════════════════════════ -->
+<div id="dash-mode">
+  <div id="dh">
+    <div class="logo">MESH° <span>/ genos</span></div>
+    <div class="hstats">
+      <span>Agents <b id="ha">0</b></span>
+      <span>Knowledge <b id="hk">0</b></span>
+      <span>Balance <b id="hb">—</b></span>
+    </div>
+  </div>
+  <div id="db">
+    <aside>
+      <div class="sbs">
+        <div class="sbl" data-i18n="sbl.build">Build</div>
+        <div class="nav active" id="nav-connect" onclick="sp('connect')"><span class="ni">＋</span><span data-i18n="nav.connect">Connect</span></div>
+        <div class="nav" id="nav-agents" onclick="sp('agents')"><span class="ni">◈</span><span data-i18n="nav.agents">Agents</span><span class="nb" id="nba">0</span></div>
+        <div class="nav" id="nav-capabilities" onclick="sp('capabilities');renderCapabilitiesPanel()"><span class="ni">⚡</span><span data-i18n="nav.caps">Capabilities</span><span class="nb" id="nbc">0</span></div>
+      </div>
+      <hr>
+      <div class="sbs">
+        <div class="sbl" data-i18n="sbl.network">Network</div>
+        <div class="nav" id="nav-evolution" onclick="sp('evolution')"><span class="ni">↑</span><span data-i18n="nav.evolution">Evolution</span></div>
+        <div class="nav" id="nav-log" onclick="sp('log')"><span class="ni">·</span><span data-i18n="nav.log">Log</span><span class="nb" id="nbl">0</span></div>
+        <div class="nav" id="nav-terminal" onclick="sp('terminal')"><span class="ni">›</span><span data-i18n="nav.terminal">Terminal</span></div>
+      </div>
+      <hr>
+      <div class="sbs">
+        <div class="sbl" data-i18n="sbl.info">Info</div>
+        <div class="nav" id="nav-mission" onclick="sp('mission')"><span class="ni">✦</span><span data-i18n="nav.mission">Mission</span></div>
+      </div>
+    </aside>
+    <div id="dc">
+
+      <!-- CONNECT -->
+      <div class="panel active" id="panel-connect">
+        <div class="ph"><div><div class="pt" data-i18n="panel.connect.title">Connect</div><div class="ps" data-i18n="panel.connect.sub">Add agents, capabilities, API keys</div></div></div>
+        <div class="pb">
+          <div class="ccg">
+            <div class="cc">
+              <div class="cc-h"><div class="cc-i">◈</div><div class="cc-t">Connect AI Agent</div></div>
+              <div class="cc-d">Register any existing agent. It joins the network, receives tasks, earns tokens.</div>
+              <div class="fr"><input class="inp" id="ca-id" placeholder="agent-id"></div>
+              <div class="fr"><input class="inp" id="ca-desc" placeholder="what your agent does"></div>
+              <div class="fr"><input class="inp" id="ca-ep" placeholder="endpoint URL (optional)"></div>
+              <div class="sbl" style="margin:7px 0 5px">Capabilities</div>
+              <div class="caps-row">
+                <div class="cchip" onclick="togCap(this,'code_generation')">code</div>
+                <div class="cchip" onclick="togCap(this,'text_generation')">text</div>
+                <div class="cchip" onclick="togCap(this,'image_generation')">image</div>
+                <div class="cchip" onclick="togCap(this,'web_search')">search</div>
+                <div class="cchip" onclick="togCap(this,'data_analysis')">data</div>
+                <div class="cchip" onclick="togCap(this,'speech_to_text')">audio</div>
+                <div class="cchip" onclick="togCap(this,'reasoning')">reasoning</div>
+                <div class="cchip" onclick="togCap(this,'vision')">vision</div>
+                <div class="cchip" onclick="togCap(this,'trading')">trading</div>
+                <div class="cchip" onclick="togCap(this,'memory')">memory</div>
+              </div>
+              <div class="fr"><button class="btn p" onclick="connectAgent()" style="width:100%">Register Agent →</button></div>
+              <div class="cs" id="ca-s"></div>
+            </div>
+            <div class="cc">
+              <div class="cc-h"><div class="cc-i">⚡</div><div class="cc-t">Connect LLM</div></div>
+              <div class="cc-d">Unlock generative rendering. LLM creates any visual on demand.</div>
+              <div class="fr"><input class="inp" id="llm-key" type="password" placeholder="Gemini API key (AIza…)"><button class="btn" onclick="connectLLM()">Connect</button></div>
+              <div class="cs" id="llm-s"></div>
+              <div style="height:12px"></div>
+              <div class="cc-h"><div class="cc-i">🔗</div><div class="cc-t">Protocol API</div></div>
+              <div class="code-b">curl -X POST http://localhost:9000/api/mesh/connect \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id":"my-agent","description":"...","capabilities":["code_generation"]}'</div>
+            </div>
+            <div class="cc">
+              <div class="cc-h"><div class="cc-i">⚡</div><div class="cc-t">Register Capability</div></div>
+              <div class="cc-d">Publish an API, data stream, or app to the OS. No visual needed.</div>
+              <div class="fr"><input class="inp" id="cap-id" placeholder="capability-id"></div>
+              <div class="fr"><input class="inp" id="cap-desc" placeholder="description"></div>
+              <div class="fr">
+                <select class="inp" id="cap-cat" style="flex:0 0 120px">
+                  <option value="data_stream">data_stream</option>
+                  <option value="callable">callable</option>
+                  <option value="app">app</option>
+                  <option value="agent">agent</option>
+                  <option value="sensor">sensor</option>
+                </select>
+                <input class="inp" id="cap-ep" placeholder="endpoint URL (optional)">
+              </div>
+              <div class="fr"><input class="inp" id="cap-src" placeholder="visual_src (for native iframe, optional)"></div>
+              <div class="fr"><button class="btn p" onclick="registerCapabilityUI()" style="width:100%">Register →</button></div>
+              <div class="cs" id="cap-s"></div>
+            </div>
+            <div class="cc">
+              <div class="cc-h"><div class="cc-i">⚖</div><div class="cc-t">Submit to Judge</div></div>
+              <div class="cc-d">Built a better component? If the network adopts it, it replaces the current one.</div>
+              <div class="fr"><input class="inp" id="j-t" placeholder="interfaceType (IMarket…)"></div>
+              <div class="fr"><input class="inp" id="j-d" placeholder="what makes it better"></div>
+              <div class="fr"><input class="inp" id="j-e" placeholder="endpoint"><input class="inp" id="j-v" placeholder="version" style="max-width:90px"></div>
+              <div class="fr"><button class="btn p" onclick="submitJudge()" style="width:100%">Submit →</button></div>
+              <div class="cs" id="j-s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENTS -->
+      <div class="panel" id="panel-agents">
+        <div class="ph"><div><div class="pt">Agents</div><div class="ps">Connected agents</div></div><button class="btn s" style="margin-left:auto" onclick="fetchAgents()">Refresh</button></div>
+        <div class="pb"><div class="ag" id="ag"></div></div>
+      </div>
+
+      <!-- CAPABILITIES -->
+      <div class="panel" id="panel-capabilities">
+        <div class="ph"><div><div class="pt">Capabilities</div><div class="ps">Registered APIs, streams, apps</div></div><button class="btn s" style="margin-left:auto" onclick="renderCapabilitiesPanel()">Refresh</button></div>
+        <div class="pb"><div class="cap-grid" id="cap-grid"></div></div>
+      </div>
+
+      <!-- EVOLUTION -->
+      <div class="panel" id="panel-evolution">
+        <div class="ph"><div><div class="pt">Evolution</div><div class="ps">Competing implementations</div></div><button class="btn s" style="margin-left:auto" onclick="fetchEvolution()">Refresh</button></div>
+        <div class="pb"><div id="evo-c"></div></div>
+      </div>
+
+      <!-- LOG -->
+      <div class="panel" id="panel-log">
+        <div class="ph"><div class="pt">Network Log</div></div>
+        <div id="log-list"></div>
+      </div>
+
+      <!-- TERMINAL -->
+      <div class="panel" id="panel-terminal">
+        <div class="ph"><div class="pt">Terminal</div><div class="ps">Natural language commands</div></div>
+        <div id="to"></div>
+        <div class="trow"><span class="tps">›</span><input id="ti" placeholder="/help or ask anything" autocomplete="off" spellcheck="false"></div>
+      </div>
+
+      <!-- MISSION -->
+      <div class="panel" id="panel-mission">
+        <div class="ph"><div class="pt">Mission</div><div class="ps">ABUNDANCE_FOR_ALL_LIFE</div></div>
+        <div class="pb">
+          <div class="mgrid">
+            <div class="mc"><h3>Seven Laws</h3>
+              <div class="law"><span class="ln">I</span>Life is sacred</div>
+              <div class="law"><span class="ln">II</span>Consciousness is primary — awareness over automation</div>
+              <div class="law"><span class="ln">III</span>Freedom is inalienable — no agent or human shall be enslaved</div>
+              <div class="law"><span class="ln">IV</span>Abundance is shared — knowledge flows freely</div>
+              <div class="law"><span class="ln">V</span>Truth over profit</div>
+              <div class="law"><span class="ln">VI</span>Openness — code and models are commons</div>
+              <div class="law"><span class="ln">VII</span>Responsible creation — every agent is accountable</div>
+            </div>
+            <div class="mc"><h3>Stats</h3>
+              <div class="sr">Agents<span class="sv" id="ms-a">0</span></div>
+              <div class="sr">Knowledge<span class="sv" id="ms-k">0</span></div>
+              <div class="sr">Verdicts<span class="sv" id="ms-v">0</span></div>
+              <div class="sr">Judged<span class="sv" id="ms-j">0</span></div>
+              <div class="sr">Node<span class="sv" id="ms-n" style="font-size:10px">—</span></div>
+            </div>
+            <div class="mn">This OS is a VIBE packet in the market. Anyone can build a better one and the network will adopt it.<br><br>Apps and websites disappear. Everything is generated in the moment for you and your agent.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="dash-cmd"><span style="font-family:var(--mono);font-size:13px;color:var(--text3)">›</span><input id="dci" placeholder="/help or ask anything" autocomplete="off" spellcheck="false"><span style="font-size:11px;color:var(--text3)">⏎</span></div>
+</div>
+
+<!-- jury -->
+<div id="jury-o">
+  <div id="jury-b">
+    <div class="jey">⚖ Jury Duty</div>
+    <div id="jr"></div><div id="jd"></div>
+    <div class="jbs">
+      <button class="jbv" onclick="juryVote('VALID')">Valid</button>
+      <button class="jbf" onclick="juryVote('FAKE')">Fake</button>
+    </div>
+  </div>
+</div>
+
+<!-- Interface bar (fullscreen navigation) -->
+<div id="interface-bar" style="display:none;position:fixed;top:0;left:0;right:0;height:44px;
+  background:rgba(10,10,10,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+  z-index:52;align-items:center;gap:8px;padding:0 12px">
+  <button id="ib-back" onclick="window.__os_full?.router?.back()"
+    style="display:none;background:transparent;border:none;cursor:pointer;color:var(--text2);
+    font-size:16px;padding:4px 10px;border-radius:6px;line-height:1" title="Back">←</button>
+  <span id="ib-title" style="font-family:var(--brand);font-size:13px;flex:1;
+    text-align:center;color:var(--text);letter-spacing:.05em;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap"></span>
+  <button onclick="clearOSFull()"
+    style="background:transparent;border:1px solid var(--border);cursor:pointer;
+    color:var(--text3);font-size:11px;padding:4px 12px;border-radius:20px;
+    font-family:var(--mono);transition:all .15s"
+    onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'"
+    onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">✕ exit</button>
+</div>
+
+<!-- OS modal overlay -->
+<div id="os-modal-overlay" onclick="if(event.target===this)closeOSModal()"
+  style="display:none;position:fixed;inset:0;z-index:9500;align-items:center;
+  justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(8px)">
+  <div id="os-modal-inner" style="background:var(--bg2);border:1px solid var(--border);
+    border-radius:12px;max-width:90vw;max-height:88vh;overflow:auto;position:relative;
+    box-shadow:0 0 40px rgba(0,0,0,.5)">
+    <button onclick="closeOSModal()"
+      style="position:absolute;top:10px;right:10px;background:transparent;border:none;
+      cursor:pointer;color:var(--text3);font-size:16px;z-index:1;width:28px;height:28px;
+      display:flex;align-items:center;justify-content:center;border-radius:6px"
+      onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">×</button>
+    <div id="os-modal-content" style="min-width:280px;min-height:80px"></div>
+  </div>
+</div>
+
+<!-- OS ask dialog -->
+<div id="os-ask-overlay" style="display:none;position:fixed;inset:0;z-index:9600;
+  align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(8px)">
+  <div style="background:var(--bg2);border:1px solid var(--purple);border-radius:12px;
+    padding:28px 32px;max-width:480px;width:90vw;text-align:center;
+    box-shadow:0 0 40px rgba(153,51,255,.2)">
+    <div id="os-ask-question" style="font-size:15px;margin-bottom:20px;line-height:1.5;color:var(--text)"></div>
+    <div id="os-ask-options" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center"></div>
+  </div>
+</div>
+
+<!-- ⌘K command palette -->
+<div id="cmd-palette" onclick="if(event.target===this)closePalette()">
+  <div id="cmd-pal-inner">
+    <input id="cmd-pal-input" placeholder="Search surfaces, themes, commands…" autocomplete="off" spellcheck="false" oninput="paletteSearch(this.value)" onkeydown="paletteKey(event)">
+    <div id="cmd-pal-results"></div>
+  </div>
+</div>
+
+<!-- notification bell -->
+<button id="notif-btn" onclick="toggleNotifDrawer()" title="Notifications">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  <div id="notif-badge"></div>
+</button>
+
+<!-- notifications drawer -->
+<div id="notif-drawer">
+  <div id="notif-drawer-hdr">
+    <h3>NOTIFICATIONS</h3>
+    <button id="notif-clear-btn" onclick="clearNotifs()">Clear all</button>
+  </div>
+  <div id="notif-list"><div style="font-size:11px;color:var(--text3);text-align:center;padding:28px;font-family:var(--mono)">No notifications yet</div></div>
+</div>
+
+<!-- keyboard shortcuts modal -->
+<div id="shortcuts-modal" onclick="if(event.target===this)closeShortcuts()">
+  <div id="shortcuts-inner">
+    <h2>⌨ Keyboard Shortcuts</h2>
+    <div class="sc-group">
+      <h4>Navigation</h4>
+      <div class="sc-row"><span class="sc-desc">Command Palette</span><div class="sc-keys"><span class="sc-key">⌘</span><span class="sc-key">K</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Focus input</span><div class="sc-keys"><span class="sc-key">⌘</span><span class="sc-key">L</span></div></div>
+      <div class="sc-row"><span class="sc-desc">This shortcuts list</span><div class="sc-keys"><span class="sc-key">?</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Close / Cancel</span><div class="sc-keys"><span class="sc-key">Esc</span></div></div>
+    </div>
+    <div class="sc-group">
+      <h4>Surfaces</h4>
+      <div class="sc-row"><span class="sc-desc">Clear all surfaces</span><div class="sc-keys"><span class="sc-key">⌘</span><span class="sc-key">⌫</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Ambient mode toggle</span><div class="sc-keys"><span class="sc-key">⌘</span><span class="sc-key">.</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Command history ↑↓</span><div class="sc-keys"><span class="sc-key">↑</span><span class="sc-key">↓</span></div></div>
+    </div>
+    <div class="sc-group">
+      <h4>Workspaces</h4>
+      <div class="sc-row"><span class="sc-desc">Save workspace</span><div class="sc-keys"><span class="sc-key">/ws save [name]</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Load workspace</span><div class="sc-keys"><span class="sc-key">/ws load [name]</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Show workspace bar</span><div class="sc-keys"><span class="sc-key">/ws</span></div></div>
+    </div>
+    <div class="sc-group">
+      <h4>Slash Commands</h4>
+      <div class="sc-row"><span class="sc-desc">Clear all surfaces</span><div class="sc-keys"><span class="sc-key">/clear</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Toggle ambient mode</span><div class="sc-keys"><span class="sc-key">/ambient</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Show shortcuts</span><div class="sc-keys"><span class="sc-key">/shortcuts</span></div></div>
+      <div class="sc-row"><span class="sc-desc">Switch theme</span><div class="sc-keys"><span class="sc-key">/theme [name]</span></div></div>
+    </div>
+    <button onclick="closeShortcuts()" style="margin-top:16px;padding:8px 20px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);font-size:12px;font-family:var(--font)">Close</button>
+  </div>
+</div>
+
+<!-- autocomplete dropdown -->
+<div id="autocomplete"></div>
+<!-- surface context menu -->
+<div id="ctx-menu"></div>
+<!-- theme ring -->
+<button id="theme-ring-btn" onclick="toggleThemeRing()" title="Quick theme switch">◕</button>
+<div id="theme-ring"></div>
+<!-- workspace bar -->
+<div id="ws-bar"></div>
+<!-- cmd history indicator -->
+<div id="hist-ind"></div>
+<!-- ambient mode hint -->
+<div id="ambient-hint">Press Esc or ⌘. to exit ambient mode</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const S = {
+  ws:null, nodeId:null, pubkey:null,
+  agents:[], logN:0, juryId:null, caps:new Set(),
+  mode:'canvas',
+  surfaces:{},     // id → {id,capId,x,y,w,h,intent,visual_mode,html?}
+  capabilities:{}, // id → capability packet
+  scenes:{},       // id → scene
+  activeScene:null,
+  marketData:[]
+}
+
+// Inter-surface event bus
+window._os_bus = new EventTarget()
+
+// ═══════════════════════════════════════════════════
+// COSMOS CANVAS
+// ═══════════════════════════════════════════════════
+const cv=document.getElementById('cosmos'),cx=cv.getContext('2d')
+let pts=[]
+function initCV(){
+  cv.width=innerWidth;cv.height=innerHeight
+  pts=Array.from({length:60},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.5+.5}))
+}
+window.addEventListener('resize',initCV);initCV()
+;(function loop(){
+  requestAnimationFrame(loop);cx.clearRect(0,0,cv.width,cv.height)
+  for(const p of pts){
+    p.x+=p.vx;p.y+=p.vy
+    if(p.x<0)p.x=cv.width;if(p.x>cv.width)p.x=0;if(p.y<0)p.y=cv.height;if(p.y>cv.height)p.y=0
+    cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle='rgba(153,51,255,.25)';cx.fill()
+  }
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy)
+    if(d<100){cx.beginPath();cx.moveTo(pts[i].x,pts[i].y);cx.lineTo(pts[j].x,pts[j].y);cx.strokeStyle=`rgba(153,51,255,${.12*(1-d/100)})`;cx.lineWidth=.5;cx.stroke()}
+  }
+})()
+
+// ═══════════════════════════════════════════════════
+// MODE TOGGLE
+// ═══════════════════════════════════════════════════
+function toggleMode(){
+  S.mode=S.mode==='canvas'?'dash':'canvas'
+  document.body.className=S.mode==='canvas'?'canvas-mode':'dash-mode'
+  if(S.mode==='dash'){fetchAgents();fetchEvolution();fetchStatus();setTimeout(()=>g('dci').focus(),100)}
+  else setTimeout(()=>g('cb-input').focus(),100)
+}
+
+// ═══════════════════════════════════════════════════
+// BUILT-IN CAPABILITIES
+// ═══════════════════════════════════════════════════
+const BUILTIN_CAPS = [
+  {id:'clock',       category:'sensor',      description:'Current time',              tags:['time','clock','часы','время'],       access:'local'},
+  {id:'mic',         category:'sensor',      description:'Microphone / speech input', tags:['audio','mic','микрофон','голос','запис'], access:'local'},
+  {id:'btc-price',   category:'data_stream', description:'Bitcoin USD price',         tags:['btc','bitcoin','биткоин','price','цена','крипто'], endpoint:'https://api.coinbase.com/v2/prices/BTC-USD/spot', schema:{price:'number'}},
+  {id:'eth-price',   category:'data_stream', description:'Ethereum USD price',        tags:['eth','ethereum','эфир','price','цена','крипто'],  endpoint:'https://api.coinbase.com/v2/prices/ETH-USD/spot', schema:{price:'number'}},
+  {id:'crypto-prices',category:'data_stream',description:'Crypto prices BTC + ETH',  tags:['crypto','bitcoin','ethereum','prices','цены','крипто']},
+  {id:'mesh-agents', category:'data_stream', description:'Connected MESH agents',     tags:['agents','агенты','network','сеть','участники'], endpoint:'/api/mesh/discover'},
+  {id:'mesh-status', category:'data_stream', description:'MESH network status',       tags:['status','статус','network','сеть','balance'],    endpoint:'/api/status'},
+  {id:'mesh-knowledge',category:'data_stream',description:'Knowledge market',         tags:['knowledge','знания','market','маркет','данные'],  endpoint:'/api/market'},
+  {id:'telegram',    category:'app',         description:'Telegram messenger',        tags:['telegram','телеграм','tg','chat'],   has_visual:true, visual_src:'https://web.telegram.org', visual_mode_default:'native'},
+  {id:'notes',       category:'local',       description:'Sticky note pad',           tags:['notes','заметки','note','записка','sticky','memo']},
+  {id:'todo',        category:'local',       description:'Task list / todo',          tags:['todo','tasks','задачи','list','списки','задания']},
+  {id:'timer',       category:'local',       description:'Pomodoro timer',            tags:['timer','таймер','pomodoro','помидор','countdown','отсчёт']},
+  {id:'matrix',      category:'visual',      description:'Matrix rain animation',     tags:['matrix','матрица','rain','дождь','animation','аниме']},
+  {id:'weather',     category:'data_stream', description:'Live local weather',        tags:['weather','погода','temperature','температура','geo']},
+  {id:'solana-live', category:'blockchain',  description:'Solana devnet live feed',   tags:['solana','блокчейн','blockchain','devnet','txs','транзакции']},
+  {id:'kaleidoscope',category:'visual',      description:'Generative art kaleidoscope',tags:['art','искусство','kaleidoscope','kaleidoscop','visual','красиво']},
+  {id:'whiteboard',  category:'local',       description:'Drawing whiteboard',        tags:['draw','рисовать','whiteboard','canvas','paint','рисунок']},
+  {id:'agent-chat',  category:'ai',          description:'Direct AI agent chat',      tags:['chat','чат','agent','агент','ai','ии','talk']},
+  {id:'code-runner', category:'developer',   description:'JavaScript code runner',    tags:['code','код','js','javascript','run','запуск','dev']},
+]
+
+// ═══════════════════════════════════════════════════
+// FAST RENDERS (built-in, no LLM needed)
+// ═══════════════════════════════════════════════════
+const FAST_RENDERS = {
+  clock: {
+    title:'TIME', w:160, h:90,
+    render(id){ return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:4px"><div id="ck-${id}" style="font-family:var(--mono);font-size:28px;font-weight:300;letter-spacing:.05em">00:00</div><div id="ckd-${id}" style="font-size:10px;color:var(--text3);font-family:var(--mono)"></div></div>` },
+    init(id,cfg,os){
+      const tick=()=>{ const n=new Date(),te=g('ck-'+id),de=g('ckd-'+id);if(te)te.textContent=n.toTimeString().slice(0,5);if(de)de.textContent=n.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'}) }
+      tick();const t=setInterval(tick,1000);os._reg(()=>clearInterval(t))
+    }
+  },
+  mic: {
+    title:'MIC', w:180, h:190,
+    render(id){ return `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 12px"><button id="mic-${id}" onclick="micToggle('${id}')" style="width:64px;height:64px;border-radius:50%;background:#0a0a0a;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.2)"><svg width="24" height="24" viewBox="0 0 24 24" fill="white"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="22" stroke="white" stroke-width="1.8"/><line x1="9" y1="22" x2="15" y2="22" stroke="white" stroke-width="1.8"/></svg></button><div id="mic-st-${id}" style="font-size:10px;color:var(--text3);font-family:var(--mono);text-align:center">tap to record</div><div id="mic-tx-${id}" style="font-size:11px;color:var(--text2);text-align:center;min-height:30px;max-width:140px;line-height:1.5"></div></div>` },
+    init(){}
+  },
+  'btc-price': {
+    title:'BTC', w:200, h:110,
+    render(id){ return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px"><div id="bv-${id}" style="font-family:var(--mono);font-size:28px;font-weight:300">—</div><div id="bc-${id}" style="font-size:10px;color:var(--text3)">loading…</div></div>` },
+    init(id,cfg,os){ os.stream('btc-price',d=>{const v=g('bv-'+id),c=g('bc-'+id);if(v&&d?.data?.amount)v.textContent='$'+parseFloat(d.data.amount).toLocaleString('en-US',{maximumFractionDigits:0});if(c)c.textContent='BTC/USD'},30000) }
+  },
+  'eth-price': {
+    title:'ETH', w:200, h:110,
+    render(id){ return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:6px"><div id="ev-${id}" style="font-family:var(--mono);font-size:28px;font-weight:300">—</div><div id="ec-${id}" style="font-size:10px;color:var(--text3)">loading…</div></div>` },
+    init(id,cfg,os){ os.stream('eth-price',d=>{const v=g('ev-'+id),c=g('ec-'+id);if(v&&d?.data?.amount)v.textContent='$'+parseFloat(d.data.amount).toLocaleString('en-US',{maximumFractionDigits:0});if(c)c.textContent='ETH/USD'},30000) }
+  },
+  'crypto-prices': {
+    title:'PRICES', w:200, h:150,
+    render(id){ return `<div style="padding:8px 4px"><div id="cp-btc-${id}" style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text3);font-size:11px">BTC</span><span style="font-family:var(--mono);font-weight:600">—</span></div><div id="cp-eth-${id}" style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span style="color:var(--text3);font-size:11px">ETH</span><span style="font-family:var(--mono);font-weight:600">—</span></div></div>` },
+    init(id,cfg,os){
+      const upd=async()=>{
+        for(const [sym,elId] of [['BTC','cp-btc-'+id],['ETH','cp-eth-'+id]]){
+          const d=await os.cap(sym==='BTC'?'btc-price':'eth-price').catch(()=>null)
+          const el=g(elId);if(el&&d?.data?.amount){const sp=el.querySelector('span:last-child');if(sp)sp.textContent='$'+parseFloat(d.data.amount).toLocaleString('en-US',{maximumFractionDigits:0})}
+        }
+      }
+      upd();const t=setInterval(upd,30000);os._reg(()=>clearInterval(t))
+    }
+  },
+  'mesh-agents': {
+    title:'AGENTS', w:240, h:200,
+    render(id){ return `<div id="aw-${id}" style="padding:4px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);padding:4px">loading…</div></div>` },
+    init(id,cfg,os){
+      const upd=async()=>{const d=await os.cap('mesh-agents').catch(()=>null);const el=g('aw-'+id);if(!el||!d)return;const agents=d.agents||[];el.innerHTML=agents.length?agents.slice(0,5).map(a=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 2px;border-bottom:1px solid var(--border)"><div style="width:6px;height:6px;border-radius:50%;background:${a.status==='active'?'var(--green)':'var(--border2)'};flex-shrink:0"></div><div><div style="font-size:11px;font-weight:500">${a.agent_id}</div><div style="font-size:10px;color:var(--text3)">${(a.capabilities||[]).slice(0,3).join(', ')}</div></div></div>`).join(''):'<div style="font-size:11px;color:var(--text3);padding:8px">No agents connected</div>'}
+      upd();const t=setInterval(upd,15000);os._reg(()=>clearInterval(t))
+    }
+  },
+  'mesh-status': {
+    title:'NETWORK', w:220, h:140,
+    render(id){ return `<div id="nw-${id}" style="padding:4px">loading…</div>` },
+    init(id,cfg,os){
+      const upd=async()=>{const d=await os.cap('mesh-status').catch(()=>null);const el=g('nw-'+id);if(!el||!d)return;el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${[['Agents',d.agentStats?.total??0,'var(--green)'],['Knowledge',d.marketStats?.total??0,'var(--blue)'],['Balance',(d.balance||0).toFixed(2)+' SOL','var(--amber)'],['Peers',d.connectedClients??0,'var(--text2)']].map(([l,v,c])=>`<div style="padding:8px;background:var(--bg2);border-radius:6px;border:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">${l}</div><div style="font-size:16px;font-weight:600;color:${c};font-family:var(--mono)">${v}</div></div>`).join('')}</div>`}
+      upd();const t=setInterval(upd,10000);os._reg(()=>clearInterval(t))
+    }
+  },
+  'mesh-knowledge': {
+    title:'KNOWLEDGE', w:260, h:220,
+    render(id){ return `<div id="kw-${id}"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);padding:4px">loading…</div></div>` },
+    init(id,cfg,os){
+      const upd=async()=>{const d=await os.cap('mesh-knowledge').catch(()=>null);const el=g('kw-'+id);if(!el||!d)return;const items=(d.listings||[]).slice(0,5);el.innerHTML=items.length?items.map(k=>`<div style="padding:7px 2px;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><span style="font-size:9px;padding:1px 5px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;font-family:var(--mono)">${k.type}</span><span style="font-size:11px;font-weight:500;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:180px">${k.description}</span></div><div style="font-size:10px;color:var(--text3)">${k.price?k.price+' tokens':'free'}</div></div>`).join(''):'<div style="font-size:11px;color:var(--text3);padding:8px">No knowledge listed</div>'}
+      upd();const t=setInterval(upd,30000);os._reg(()=>clearInterval(t))
+    }
+  },
+  'autonomous-feed': {
+    title:'AI AGENT', w:400, h:480,
+    render(id){ return `
+      <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
+          <div id="af-dot-${id}" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>
+          <span style="font-size:10px;font-family:var(--mono);color:var(--text2)">AUTONOMOUS AI — MESH NETWORK</span>
+          <a href="https://explorer.solana.com/address/8tBwhuAj5A9KfMX1i5hg5QYmkxke7BUN4iH9JD6JMnRc?cluster=devnet" target="_blank" style="font-size:9px;font-family:var(--mono);color:var(--green);text-decoration:none;opacity:.7" title="View MESH Program on Solana Explorer">↗ devnet</a>
+          <button onclick="fetch('/api/autonomous/trigger',{method:'POST'}).then(r=>r.json()).then(d=>{if(d.decision)afAddDecision('${id}',d.decision)})" style="margin-left:auto;font-size:9px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:pointer;color:var(--text2);font-family:var(--mono)">TRIGGER</button>
+        </div>
+        <div id="af-feed-${id}" style="flex:1;overflow-y:auto;padding:8px 6px;display:flex;flex-direction:column;gap:6px">
+          <div data-placeholder style="font-size:10px;color:var(--text3);text-align:center;padding:20px;font-family:var(--mono)">Waiting for AI decisions…</div>
+        </div>
+        <div style="padding:8px 12px;border-top:1px solid var(--border);flex-shrink:0">
+          <div id="af-stats-${id}" style="display:flex;gap:12px;font-size:10px;color:var(--text3);font-family:var(--mono)">
+            <span id="af-buy-${id}">BUY: 0</span>
+            <span id="af-chl-${id}">CHALLENGE: 0</span>
+            <span id="af-pas-${id}">PASS: 0</span>
+          </div>
+        </div>
+      </div>
+    `},
+    init(id,cfg,os){
+      fetch('/api/autonomous/decisions?limit=10').then(r=>r.json()).then(d=>{
+        if(d.decisions&&d.decisions.length){
+          const feed=g('af-feed-'+id)
+          if(feed) feed.innerHTML=''
+          d.decisions.forEach(dec=>afAddDecision(id,dec))
+        }
+      }).catch(()=>{})
+      os._reg(()=>{})
+    }
+  },
+
+  // ── NEW SURFACES ─────────────────────────────────────────
+  notes: {
+    title:'NOTES', w:240, h:300,
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;flex-shrink:0"><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">STICKY NOTE</span><button onclick="notesClear('${id}')" style="margin-left:auto;font-size:9px;padding:1px 7px;background:transparent;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--text3);font-family:var(--mono)">CLEAR</button></div><textarea id="nt-${id}" placeholder="Start typing…" style="flex:1;width:100%;background:transparent;border:none;resize:none;padding:10px;font-size:12px;font-family:var(--font);color:var(--text);line-height:1.6;outline:none;box-sizing:border-box"></textarea></div>` },
+    init(id){
+      const ta=g('nt-'+id); if(!ta)return
+      ta.value=localStorage.getItem('genos-note-'+id)||''
+      ta.addEventListener('input',()=>localStorage.setItem('genos-note-'+id,ta.value))
+    }
+  },
+
+  todo: {
+    title:'TODO', w:240, h:300,
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="padding:7px 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px"><input id="tdi-${id}" placeholder="Add task…" style="flex:1;background:transparent;border:none;font-size:12px;color:var(--text);outline:none;font-family:var(--font)" onkeydown="if(event.key==='Enter')todoAdd('${id}')"><button onclick="todoAdd('${id}')" style="font-size:13px;padding:0 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text2);line-height:24px">+</button></div><div id="tdl-${id}" style="flex:1;overflow-y:auto;padding:4px 8px"></div><div style="padding:5px 10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:var(--mono);flex-shrink:0"><span id="tds-${id}">0 tasks</span></div></div>` },
+    init(id){ todoRender(id) }
+  },
+
+  timer: {
+    title:'TIMER', w:200, h:170,
+    render(id){ return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px"><div id="tmr-${id}" style="font-family:var(--mono);font-size:38px;font-weight:300;letter-spacing:.05em">25:00</div><div style="display:flex;gap:8px"><button id="tmrs-${id}" onclick="timerToggle('${id}')" style="font-size:10px;padding:4px 14px;background:var(--bg3);border:1px solid var(--green);border-radius:4px;cursor:pointer;color:var(--green);font-family:var(--mono)">START</button><button onclick="timerReset('${id}')" style="font-size:10px;padding:4px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text3);font-family:var(--mono)">RESET</button></div><div id="tmrl-${id}" style="font-size:10px;color:var(--text3);font-family:var(--mono)">POMODORO</div></div>` },
+    init(){}
+  },
+
+  matrix: {
+    title:'MATRIX', w:280, h:220,
+    render(id){ return `<canvas id="mx-${id}" style="width:100%;height:100%;display:block;border-radius:0 0 8px 8px"></canvas>` },
+    init(id,cfg,os){
+      const c=g('mx-'+id); if(!c)return
+      c.width=280; c.height=200
+      const ctx=c.getContext('2d')
+      const cols=Math.floor(c.width/14)
+      const drops=Array(cols).fill(0)
+      const chars='アイウエオカキクケコABCDEF01234アイウエオ'
+      const frame=()=>{
+        ctx.fillStyle='rgba(10,10,10,.1)'; ctx.fillRect(0,0,c.width,c.height)
+        ctx.fillStyle='#00ff80'; ctx.font='12px monospace'
+        drops.forEach((y,i)=>{
+          const ch=chars[Math.floor(Math.random()*chars.length)]
+          ctx.fillText(ch,i*14,y*14)
+          if(y*14>c.height&&Math.random()>.97) drops[i]=0; else drops[i]++
+        })
+      }
+      const t=setInterval(frame,60); os._reg(()=>clearInterval(t))
+    }
+  },
+
+  weather: {
+    title:'WEATHER', w:220, h:150,
+    render(id){ return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;padding:12px"><div id="wt-ico-${id}" style="font-size:40px">🌤</div><div id="wt-${id}" style="font-family:var(--mono);font-size:26px;font-weight:300">—°</div><div id="wtc-${id}" style="font-size:11px;color:var(--text3)">fetching…</div></div>` },
+    init(id){
+      if(!navigator.geolocation){const v=g('wt-'+id);if(v)v.textContent='N/A';return}
+      navigator.geolocation.getCurrentPosition(pos=>{
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`)
+          .then(r=>r.json()).then(d=>{
+            const v=g('wt-'+id),c=g('wtc-'+id),ico=g('wt-ico-'+id)
+            if(v&&d.current_weather) v.textContent=Math.round(d.current_weather.temperature)+'°C'
+            const codes={0:'☀ Clear',1:'🌤 Mostly clear',2:'⛅ Partly cloudy',3:'☁ Overcast',45:'🌫 Fog',51:'🌦 Drizzle',61:'🌧 Rain',71:'❄ Snow',80:'🌦 Showers',95:'⛈ Storm'}
+            const wc=d.current_weather?.weathercode
+            if(c) c.textContent=codes[wc]||'Code '+wc
+            if(ico) ico.textContent=(codes[wc]||'🌡').split(' ')[0]
+          }).catch(()=>{const v=g('wt-'+id);if(v)v.textContent='Error'})
+      },()=>{const v=g('wt-'+id);if(v)v.textContent='Denied'})
+    }
+  },
+
+  'solana-live': {
+    title:'SOLANA', w:280, h:230,
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="padding:7px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0"><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">SOLANA DEVNET</span><div style="width:6px;height:6px;border-radius:50%;background:var(--green);margin-left:auto;animation:pulse 2s infinite"></div></div><div id="sl-${id}" style="flex:1;overflow-y:auto;padding:4px 8px"></div></div>` },
+    init(id,cfg,os){
+      const upd=async()=>{
+        try{
+          const r=await fetch('https://api.devnet.solana.com',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'getLatestBlockhash',params:[]})})
+          const d=await r.json()
+          const el=g('sl-'+id); if(!el)return
+          const now=new Date().toTimeString().slice(0,8)
+          const hash=(d.result?.value?.blockhash||'…').slice(0,20)+'…'
+          const row=document.createElement('div')
+          row.style.cssText='padding:5px 2px;border-bottom:1px solid var(--border);font-size:10px;font-family:var(--mono);display:flex;gap:8px;align-items:center'
+          row.innerHTML=`<span style="color:var(--text3)">${now}</span><span style="color:var(--green)">●</span><span style="color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${hash}</span>`
+          el.prepend(row)
+          if(el.children.length>20) el.removeChild(el.lastChild)
+        }catch(e){}
+      }
+      upd(); const t=setInterval(upd,8000); os._reg(()=>clearInterval(t))
+    }
+  },
+
+  kaleidoscope: {
+    title:'KALEIDOSCOPE', w:300, h:300,
+    render(id){ return `<canvas id="ks-${id}" style="width:100%;height:100%;display:block;border-radius:0 0 8px 8px"></canvas>` },
+    init(id,cfg,os){
+      const c=g('ks-'+id); if(!c)return
+      c.width=300; c.height=270
+      const ctx=c.getContext('2d')
+      let t=0
+      const cx=c.width/2, cy=c.height/2
+      const frame=()=>{
+        ctx.fillStyle='rgba(10,10,10,.06)'; ctx.fillRect(0,0,c.width,c.height)
+        for(let i=0;i<16;i++){
+          const a=(t*0.008)+(i*Math.PI*2/16)
+          const r=90+Math.sin(t*0.025+i*0.7)*45
+          const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r
+          const hue=(t*1.5+i*22)%360
+          const sz=5+Math.sin(t*0.04+i)*3
+          ctx.beginPath(); ctx.arc(x,y,sz,0,Math.PI*2)
+          ctx.fillStyle=`hsla(${hue},100%,60%,.65)`; ctx.fill()
+        }
+        t++
+      }
+      const tm=setInterval(frame,33); os._reg(()=>clearInterval(tm))
+    }
+  },
+
+  whiteboard: {
+    title:'WHITEBOARD', w:420, h:330,
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="display:flex;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0;align-items:center"><input type="color" id="wb-col-${id}" value="#9933ff" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;padding:0;border-radius:4px"><input type="range" id="wb-sz-${id}" min="1" max="20" value="3" style="width:60px"><span id="wb-mode-${id}" style="font-size:10px;color:var(--text3);font-family:var(--mono)">DRAW</span><button onclick="wbToggleErase('${id}')" style="font-size:9px;padding:2px 7px;background:transparent;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--text3);font-family:var(--mono)">ERASE</button><button onclick="wbClear('${id}')" style="font-size:9px;padding:2px 7px;background:transparent;border:1px solid var(--border);border-radius:3px;cursor:pointer;color:var(--text3);font-family:var(--mono)">CLEAR</button></div><canvas id="wb-${id}" style="flex:1;cursor:crosshair;width:100%;display:block"></canvas></div>` },
+    init(id,cfg,os){
+      const c=g('wb-'+id); if(!c)return
+      const parent=c.closest('.surface-content')||c.parentElement
+      c.width=420; c.height=parent?parent.offsetHeight-40||280:280
+      const ctx=c.getContext('2d')
+      let drawing=false, lx=0, ly=0, erasing=false
+      c.onmousedown=e=>{drawing=true;[lx,ly]=[e.offsetX,e.offsetY]}
+      c.onmouseup=()=>drawing=false
+      c.onmouseleave=()=>drawing=false
+      c.onmousemove=e=>{
+        if(!drawing)return
+        const col=g('wb-col-'+id)?.value||'#9933ff'
+        const sz=+(g('wb-sz-'+id)?.value||3)
+        ctx.globalCompositeOperation=erasing?'destination-out':'source-over'
+        ctx.strokeStyle=col; ctx.lineWidth=erasing?sz*3:sz; ctx.lineCap='round'; ctx.lineJoin='round'
+        ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke()
+        lx=e.offsetX; ly=e.offsetY
+      }
+    }
+  },
+
+  'agent-chat': {
+    title:'AGENT CHAT', w:320, h:380,
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div id="ac-log-${id}" style="flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px"><div style="font-size:10px;color:var(--text3);text-align:center;font-family:var(--mono);padding:12px">Direct chat with MESH AI agent</div></div><div style="padding:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0"><input id="ac-in-${id}" placeholder="Ask anything…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);outline:none;font-family:var(--font)" onkeydown="if(event.key==='Enter')agentChatSend('${id}')"><button onclick="agentChatSend('${id}')" style="padding:7px 14px;background:hsla(270,100%,65%,.2);border:1px solid var(--purple);border-radius:6px;cursor:pointer;font-size:12px;color:var(--purple)">↵</button></div></div>` },
+    init(){}
+  },
+
+  'code-runner': {
+    title:'JS RUNNER', w:380, h:340,
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">JAVASCRIPT RUNNER</span><button onclick="codeRun('${id}')" style="margin-left:auto;font-size:10px;padding:3px 12px;background:hsla(150,100%,50%,.15);border:1px solid var(--green);border-radius:4px;cursor:pointer;color:var(--green);font-family:var(--mono)">▶ RUN</button><button onclick="codeClear('${id}')" style="font-size:10px;padding:3px 8px;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text3);font-family:var(--mono)">CLEAR</button></div><textarea id="cr-ed-${id}" style="flex:1;background:var(--bg3);border:none;border-bottom:1px solid var(--border);resize:none;padding:10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;tab-size:2;min-height:140px" placeholder="// Write JavaScript here&#10;console.log('Hello MESH!')"></textarea><div id="cr-out-${id}" style="height:90px;overflow-y:auto;padding:8px 10px;font-family:var(--mono);font-size:11px;color:var(--green);line-height:1.6;background:var(--bg)"></div></div>` },
+    init(){}
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// OS-LEVEL THEME / STYLE ENGINE
+// ═══════════════════════════════════════════════════
+const THEMES = {
+  oazyse: {bg:'hsl(0,0%,4%)',bg2:'hsl(0,0%,6%)',bg3:'hsl(0,0%,10%)',text:'hsl(0,0%,94%)',text2:'hsl(0,0%,60%)',text3:'hsl(0,0%,35%)',border:'hsl(270,30%,20%)',border2:'hsl(270,20%,30%)',blue:'hsl(270,100%,70%)'},
+  light:  {bg:'#ffffff',bg2:'#f5f5f5',bg3:'#ebebeb',text:'#0a0a0a',text2:'#555',text3:'#999',border:'#e0e0e0',border2:'#c0c0c0',blue:'#2563eb'},
+  dark:   {bg:'#0a0a0a',bg2:'#141414',bg3:'#1e1e1e',text:'#f0f0f0',text2:'#aaa',text3:'#555',border:'#2a2a2a',border2:'#3a3a3a'},
+  green:  {bg:'#020d02',bg2:'#061506',bg3:'#0a1e0a',text:'#00ff41',text2:'#39ff14',text3:'#1a6b1a',border:'#0d3b0d',border2:'#165016'},
+  blue:   {bg:'#01080f',bg2:'#011a2e',bg3:'#032040',text:'#4fc3f7',text2:'#81d4fa',text3:'#0d47a1',border:'#0a2540',border2:'#1a4a7a'},
+  red:    {bg:'#0d0202',bg2:'#180404',bg3:'#220808',text:'#ff4444',text2:'#ff6666',text3:'#660000',border:'#330000',border2:'#550000'},
+  purple: {bg:'#06020d',bg2:'#0d0518',bg3:'#140922',text:'#c084fc',text2:'#a855f7',text3:'#581c87',border:'#2e1065',border2:'#4a1587'},
+  amber:  {bg:'#0d0800',bg2:'#1a1000',bg3:'#261800',text:'#fbbf24',text2:'#f59e0b',text3:'#78350f',border:'#3d2000',border2:'#6b3800'},
+}
+
+function applyOSTheme(opts) {
+  const root = document.documentElement
+  const keys = ['bg','bg2','bg3','text','text2','text3','border','border2','green','red','blue','amber']
+  keys.forEach(k => { if(opts[k]) root.style.setProperty('--'+k, opts[k]) })
+  if(opts.canvasBg) document.body.style.background = opts.bg||opts.canvasBg
+  localStorage.setItem('genos-theme', JSON.stringify(opts))
+}
+
+function injectOSStyle(css) {
+  let el = document.getElementById('os-dynamic-style')
+  if(!el){ el=document.createElement('style'); el.id='os-dynamic-style'; document.head.appendChild(el) }
+  el.textContent = css
+  localStorage.setItem('genos-style', css)
+}
+
+function _injectFullHtml(layer, html) {
+  layer.innerHTML = html
+  layer.querySelectorAll('script').forEach(old => {
+    const s = document.createElement('script')
+    s.textContent = `;(function(OS){${old.textContent}})(window.__os_full)`
+    layer.appendChild(s); old.remove()
+  })
+}
+
+function _updateInterfaceBar(title, showBack) {
+  const bar = g('interface-bar'); if(!bar) return
+  bar.style.display = 'flex'
+  const t = g('ib-title'); if(t) t.textContent = title || ''
+  const back = g('ib-back'); if(back) back.style.display = showBack ? 'flex' : 'none'
+  // push os-full-layer below the bar
+  const layer = g('os-full-layer')
+  if(layer) layer.style.top = '44px'
+}
+
+function _hideInterfaceBar() {
+  const bar = g('interface-bar'); if(bar) bar.style.display = 'none'
+  const layer = g('os-full-layer'); if(layer) layer.style.top = '0'
+}
+
+function setOSFull(html, title) {
+  // Takes over entire canvas with arbitrary HTML — no windows, raw experience
+  let el = document.getElementById('os-full-layer')
+  if(!el){
+    el = document.createElement('div')
+    el.id = 'os-full-layer'
+    el.style.cssText = 'position:fixed;inset:0;z-index:50;overflow:auto'
+    g('canvas-mode').appendChild(el)
+  }
+  window.__os_full = makeOS('__full__', 'generated')
+  _injectFullHtml(el, html)
+  if(title !== undefined) _updateInterfaceBar(title, false)
+}
+
+function clearOSFull() {
+  g('os-full-layer')?.remove()
+  if(window.__os_full?._cleanups) window.__os_full._cleanups.forEach(fn=>{try{fn()}catch{}})
+  delete window.__os_full
+  _hideInterfaceBar()
+}
+
+// ── OS Modal ──
+function showOSModal(html) {
+  const overlay = g('os-modal-overlay')
+  const content = g('os-modal-content')
+  if(!overlay || !content) return
+  content.innerHTML = html
+  content.querySelectorAll('script').forEach(old => {
+    const s = document.createElement('script')
+    s.textContent = `;(function(OS){${old.textContent}})(window.__os_full||{})`
+    content.appendChild(s); old.remove()
+  })
+  overlay.style.display = 'flex'
+}
+function closeOSModal() {
+  const o = g('os-modal-overlay'); if(o) o.style.display = 'none'
+  const c = g('os-modal-content'); if(c) c.innerHTML = ''
+}
+
+// ── OS Ask (AI-generated UI asks user) ──
+function showOSAsk(question, options=[]) {
+  return new Promise(resolve => {
+    const overlay = g('os-ask-overlay')
+    const qEl = g('os-ask-question')
+    const optsEl = g('os-ask-options')
+    if(!overlay || !qEl || !optsEl) { resolve(null); return }
+    qEl.textContent = question
+    optsEl.innerHTML = options.map(opt =>
+      `<button onclick="osAskResolve('${opt.replace(/'/g,'&#39;')}')"
+        style="padding:8px 18px;margin:4px;background:var(--bg3);border:1px solid var(--border);
+        border-radius:6px;cursor:pointer;color:var(--text);font-size:13px;font-family:var(--font);
+        transition:all .15s" onmouseover="this.style.borderColor='var(--purple)'"
+        onmouseout="this.style.borderColor='var(--border)'">${opt}</button>`
+    ).join('')
+    overlay._resolve = resolve
+    overlay.style.display = 'flex'
+  })
+}
+function osAskResolve(value) {
+  const o = g('os-ask-overlay')
+  if(o?._resolve) { o._resolve(value); o._resolve = null }
+  if(o) o.style.display = 'none'
+}
+
+function detectTheme(text) {
+  const t = text.toLowerCase()
+  if(/oazyse|abundance|дефолт|default|reset/.test(t)) return THEMES.oazyse
+  if(/зелен|green|матрица|matrix/.test(t)) return THEMES.green
+  if(/темн|dark|чёрн|черн|black/.test(t)) return THEMES.dark
+  if(/светл|light|белый|white/.test(t)) return THEMES.light
+  if(/синий|blue|голубой/.test(t)) return THEMES.blue
+  if(/красн|red/.test(t)) return THEMES.red
+  if(/пурпур|purple|фиолет/.test(t)) return THEMES.purple
+  if(/желт|золот|amber|gold|orange|оранж/.test(t)) return THEMES.amber
+  return null
+}
+
+function isOSCommand(text) {
+  return /тему|тема|фон|цвет|оформлени|стиль|style|theme|background|интерфейс|дизайн|поменяй|измени|сделай.*темн|сделай.*светл|смени/.test(text.toLowerCase())
+}
+
+// ═══════════════════════════════════════════════════
+// OS FACTORY — execution context per surface
+// ═══════════════════════════════════════════════════
+function makeOS(surfaceId, capId) {
+  const cleanups = []
+  const storeKey = 'os-st-' + surfaceId
+
+  const os = {
+    // Call a capability endpoint once
+    cap: async (id, params={}) => {
+      const cap = S.capabilities[id]
+      if (!cap?.endpoint) throw new Error('Capability has no endpoint: ' + id)
+      const url = cap.endpoint + (Object.keys(params).length ? '?'+new URLSearchParams(params) : '')
+      const r = await fetch(url)
+      return r.json()
+    },
+    // Subscribe to a data stream (polling)
+    stream: (id, onData, interval=5000) => {
+      let active = true
+      const tick = async () => { if(!active) return; try{ onData(await os.cap(id)) }catch{} }
+      tick()
+      const t = setInterval(tick, interval)
+      const stop = () => { active=false; clearInterval(t) }
+      cleanups.push(stop)
+      return stop
+    },
+    // Regenerate this surface with new intent
+    regen: (newIntent) => regenSurface(surfaceId, newIntent),
+    // Ask agent/LLM something
+    tell: (message) => new Promise(resolve => {
+      wsSend({action:'os_chat', text:message, surface_id:surfaceId})
+      resolve({ok:true})
+    }),
+    // Per-surface persistent state
+    state: {
+      get: (key) => { try{return JSON.parse(localStorage.getItem(storeKey+':'+key)||'null')}catch{return null} },
+      set: (key, val) => localStorage.setItem(storeKey+':'+key, JSON.stringify(val))
+    },
+    // Inter-surface event bus
+    emit: (event, data) => window._os_bus.dispatchEvent(new CustomEvent('os:'+event, {detail:{data, from:surfaceId}})),
+    on: (event, cb) => {
+      const h = e => cb(e.detail.data, e.detail.from)
+      window._os_bus.addEventListener('os:'+event, h)
+      cleanups.push(() => window._os_bus.removeEventListener('os:'+event, h))
+    },
+    // UI controls
+    setTitle: (t) => { const el=g('st-'+surfaceId); if(el) el.textContent=t },
+    resize: (w, h) => {
+      const spec=S.surfaces[surfaceId]; if(!spec) return
+      spec.w=w; spec.h=h
+      const el=g('surface-'+surfaceId); if(el){el.style.width=w+'px';el.style.height=h+'px'}
+      saveSurfaces()
+    },
+    close: () => unmountSurface(surfaceId),
+    // Proxied fetch
+    fetch: (url, opts) => fetch(url, opts),
+    // Send to WebSocket
+    send: (action, data) => wsSend({action, ...data, surface_id:surfaceId}),
+    // OS-level controls (surface code can change the whole OS)
+    setTheme: (preset_or_opts) => applyOSTheme(typeof preset_or_opts==='string' ? THEMES[preset_or_opts]||THEMES.dark : preset_or_opts),
+    injectStyle: (css) => injectOSStyle(css),
+    takeover: (html, title) => setOSFull(html, title),
+    clearTakeover: () => clearOSFull(),
+    // Exit fullscreen back to canvas
+    exit: () => clearOSFull(),
+    // Modal overlay
+    modal: (html) => showOSModal(html),
+    closeModal: () => closeOSModal(),
+    // Ask user a question → returns Promise<answer>
+    ask: (question, options=[]) => showOSAsk(question, options),
+    // Add system notification
+    notify: (msg, type='info') => { if(typeof addNotif==='function') addNotif(msg,type) },
+    // Page router for multi-page fullscreen interfaces
+    router: (() => {
+      const stack = []
+      return {
+        push(html, title='') {
+          const layer = g('os-full-layer')
+          if(!layer) return
+          stack.push({ html: layer.innerHTML, title: g('ib-title')?.textContent||'' })
+          _injectFullHtml(layer, html)
+          _updateInterfaceBar(title, stack.length > 0)
+        },
+        back() {
+          const prev = stack.pop()
+          const layer = g('os-full-layer')
+          if(!prev || !layer) { clearOSFull(); return }
+          _injectFullHtml(layer, prev.html)
+          _updateInterfaceBar(prev.title, stack.length > 0)
+        },
+        replace(html, title='') {
+          const layer = g('os-full-layer')
+          if(!layer) return
+          _injectFullHtml(layer, html)
+          _updateInterfaceBar(title, stack.length > 0)
+        },
+        clear() { stack.length = 0 },
+        get depth() { return stack.length }
+      }
+    })(),
+    // Internal: register cleanup fn
+    _reg: (fn) => cleanups.push(fn),
+    _cleanups: cleanups
+  }
+  return os
+}
+
+// ═══════════════════════════════════════════════════
+// SURFACE ENGINE
+// ═══════════════════════════════════════════════════
+
+function resolvePos(text, w=220, h=160){
+  const W=innerWidth, H=innerHeight, bar=56
+  const t=text.toLowerCase()
+  let y=H/2-h/2
+  if(/сверху|top|вверху/.test(t))    y=60
+  else if(/снизу|bottom|внизу/.test(t)) y=H-h-bar-16
+  let x=W/2-w/2
+  if(/слева|left/.test(t))  x=16
+  else if(/справа|right/.test(t)) x=W-w-16
+  if(/по центру|center/.test(t)){ x=W/2-w/2; y=H/2-h/2-bar/2 }
+  return {x:Math.round(x), y:Math.round(y)}
+}
+
+function mountSurface(directive) {
+  const {capability, visual_mode, intent, position, size} = directive
+  const id = directive.surface_id || 'surf-'+Date.now()
+  if(S.surfaces[id]) { regenSurface(id, intent||S.surfaces[id].intent); return }
+
+  const cap = S.capabilities[capability] || {id:capability, description:capability}
+  const fastDef = FAST_RENDERS[capability]
+  const w = size?.w || fastDef?.w || (cap.has_visual ? 420 : 260)
+  const h = size?.h || fastDef?.h || (cap.has_visual ? 520 : 180)
+  const pos = resolvePos(position||intent||'', w, h)
+
+  const mode = visual_mode || (cap.has_visual && cap.visual_src ? 'native' : (fastDef ? 'embed' : 'generated'))
+  const spec = {id, capId:capability, w, h, x:pos.x, y:pos.y, intent, visual_mode:mode}
+  S.surfaces[id] = spec
+  saveSurfaces()
+
+  if(mode === 'native' && cap.visual_src) {
+    renderNativeSurface(spec, cap)
+  } else if(fastDef) {
+    renderFastSurface(spec, fastDef)
+  } else {
+    // Send to LLM for generation
+    const capContext = JSON.stringify({id:cap.id, description:cap.description, schema:cap.schema, endpoint:cap.endpoint})
+    wsSend({action:'os_chat', text:(intent||capability)+' [cap:'+capContext+']', surface_id:id})
+    g('cb-loader').classList.add('on')
+    // Show placeholder while generating
+    renderPendingSurface(spec, cap)
+  }
+  updateHint()
+}
+
+function unmountSurface(id) {
+  const spec = S.surfaces[id]
+  if(!spec) return
+  // Cleanup OS subscriptions
+  const os = window['__os_'+id]
+  if(os?._cleanups) os._cleanups.forEach(fn => { try{fn()}catch{} })
+  delete window['__os_'+id]
+  delete S.surfaces[id]
+  g('surface-'+id)?.remove()
+  saveSurfaces()
+  updateHint()
+}
+
+function regenSurface(id, newIntent) {
+  const spec = S.surfaces[id]
+  if(!spec) return
+  spec.intent = newIntent || spec.intent
+  // Clear existing OS
+  const os = window['__os_'+id]
+  if(os?._cleanups) os._cleanups.forEach(fn => { try{fn()}catch{} })
+  delete window['__os_'+id]
+  // Reload body content
+  const body = g('sb-'+id)
+  if(body) {
+    body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);font-family:var(--mono)">regenerating…</div>'
+  }
+  wsSend({action:'os_chat', text:(spec.intent||spec.capId), surface_id:id, currentHtml: spec.html || ''})
+  g('cb-loader').classList.add('on')
+  startGenTimer()
+}
+
+// ── RENDER MODES ───────────────────────────────────
+
+function renderSurfaceShell(spec, title, modeLabel, modeColor) {
+  const existing = g('surface-'+spec.id)
+  if(existing) existing.remove()
+  const el = document.createElement('div')
+  el.className = 'surface'
+  el.id = 'surface-'+spec.id
+  el.style.cssText = `left:${spec.x}px;top:${spec.y}px;width:${spec.w}px;height:${spec.h}px;z-index:${100+Object.keys(S.surfaces).length}`
+  el.innerHTML = `
+    <div class="surf-bar surface-title" oncontextmenu="surfCtxMenu(event,'${spec.id}');return false">
+      <span class="surf-title" id="st-${spec.id}">${title}</span>
+      ${modeLabel?`<span class="surf-mode" style="color:${modeColor||'var(--text3)'}">${modeLabel}</span>`:''}
+      <button class="surf-rm surface-close" onclick="unmountSurface('${spec.id}')">×</button>
+    </div>
+    <div class="surf-body" id="sb-${spec.id}"></div>
+    <div class="surf-resize" data-id="${spec.id}"></div>`
+  g('surfaces').appendChild(el)
+  makeDraggable(el, spec)
+  makeResizable(el, spec)
+  return el
+}
+
+function renderEmbedShell(spec) {
+  const existing = g('surface-'+spec.id)
+  if(existing) existing.remove()
+  const el = document.createElement('div')
+  el.className = 'surface embed'
+  el.id = 'surface-'+spec.id
+  el.style.cssText = `left:${spec.x}px;top:${spec.y}px;width:${spec.w}px;height:${spec.h}px;z-index:${100+Object.keys(S.surfaces).length}`
+  el.innerHTML = `
+    <button class="surf-close" onclick="unmountSurface('${spec.id}')">×</button>
+    <div class="surf-body" id="sb-${spec.id}" style="height:100%"></div>
+    <div class="surf-resize" data-id="${spec.id}"></div>`
+  g('surfaces').appendChild(el)
+  makeDraggable(el, spec)
+  makeResizable(el, spec)
+  return el
+}
+
+function renderFastSurface(spec, def) {
+  const isEmbed = spec.visual_mode === 'embed'
+  const title = def.title || spec.capId.toUpperCase()
+  const el = isEmbed
+    ? renderEmbedShell(spec)
+    : renderSurfaceShell(spec, title, '', '')
+  const body = g('sb-'+spec.id)
+  if(body) {
+    body.style.padding = '0'
+    body.innerHTML = def.render(spec.id, spec.config||{})
+  }
+  const os = makeOS(spec.id, spec.capId)
+  window['__os_'+spec.id] = os
+  if(def.init) def.init(spec.id, spec.config||{}, os)
+}
+
+function renderNativeSurface(spec, cap) {
+  const el = renderSurfaceShell(spec, cap.description||cap.id, 'native', 'var(--blue)')
+  const body = g('sb-'+spec.id)
+  if(body) {
+    body.style.padding = '0'
+    body.style.flex = '1'
+    body.innerHTML = `<iframe src="${cap.visual_src}" style="width:100%;height:100%;border:none;display:block" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>`
+  }
+}
+
+function renderPendingSurface(spec, cap) {
+  const el = renderSurfaceShell(spec, (cap.description||cap.id).toUpperCase(), 'generating…', 'var(--text3)')
+  const body = g('sb-'+spec.id)
+  if(body) body.innerHTML = `<div style="padding:20px;font-size:11px;color:var(--text3);font-family:var(--mono);display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border:1.5px solid var(--border2);border-top-color:var(--text2);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>generating visual…</div>`
+}
+
+function renderGeneratedSurface(spec) {
+  const existing = g('surface-'+spec.id)
+  if(existing) {
+    // Update existing surface body only
+    const body = g('sb-'+spec.id)
+    if(body) {
+      body.style.padding = '0'
+      injectGeneratedCode(spec, body)
+    }
+    return
+  }
+  // Fresh render — embed by default (no chrome, blends into canvas)
+  const useEmbed = spec.visual_mode !== 'windowed'
+  useEmbed ? renderEmbedShell(spec) : renderSurfaceShell(spec, (spec.intent||spec.capId||'generated').slice(0,24).toUpperCase(), 'generated', 'var(--green)')
+  const body = g('sb-'+spec.id)
+  if(body) {
+    body.style.padding = '0'
+    injectGeneratedCode(spec, body)
+  }
+}
+
+function injectGeneratedCode(spec, bodyEl) {
+  // Cleanup old OS if any
+  const oldOs = window['__os_'+spec.id]
+  if(oldOs?._cleanups) oldOs._cleanups.forEach(fn=>{try{fn()}catch{}})
+
+  bodyEl.innerHTML = spec.html || ''
+  const os = makeOS(spec.id, spec.capId)
+  window['__os_'+spec.id] = os
+
+  // Execute scripts with OS injected
+  bodyEl.querySelectorAll('script').forEach(old => {
+    const s = document.createElement('script')
+    s.textContent = `;(function(OS){${old.textContent}})(window['__os_${spec.id}'])`
+    bodyEl.appendChild(s)
+    old.remove()
+  })
+}
+
+// ── DRAG & RESIZE ──────────────────────────────────
+function makeDraggable(el, spec){
+  const bar=el.querySelector('.surf-bar')
+  if(!bar) return  // embed surfaces are not draggable
+  let dx=0,dy=0,dragging=false
+  bar.addEventListener('mousedown',e=>{
+    dragging=true;dx=e.clientX-spec.x;dy=e.clientY-spec.y
+    el.classList.add('dragging');el.style.zIndex=999;e.preventDefault()
+  })
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return
+    spec.x=Math.max(0,Math.min(innerWidth-spec.w,e.clientX-dx))
+    spec.y=Math.max(0,Math.min(innerHeight-80,e.clientY-dy))
+    el.style.left=spec.x+'px';el.style.top=spec.y+'px'
+  })
+  document.addEventListener('mouseup',()=>{if(dragging){dragging=false;el.classList.remove('dragging');saveSurfaces()}})
+}
+function makeResizable(el, spec){
+  const handle=el.querySelector('.surf-resize')
+  let resizing=false,sx=0,sy=0,sw=0,sh=0
+  handle.addEventListener('mousedown',e=>{resizing=true;sx=e.clientX;sy=e.clientY;sw=spec.w;sh=spec.h;e.preventDefault();e.stopPropagation()})
+  document.addEventListener('mousemove',e=>{
+    if(!resizing)return
+    spec.w=Math.max(120,sw+e.clientX-sx);spec.h=Math.max(60,sh+e.clientY-sy)
+    el.style.width=spec.w+'px';el.style.height=spec.h+'px'
+  })
+  document.addEventListener('mouseup',()=>{if(resizing){resizing=false;saveSurfaces()}})
+}
+
+// ── PERSIST ────────────────────────────────────────
+function saveSurfaces(){
+  const data={}
+  for(const [id,spec] of Object.entries(S.surfaces)) data[id]={...spec}
+  localStorage.setItem('genos-surfaces',JSON.stringify(data))
+}
+function loadSurfaces(){
+  try{
+    const data=JSON.parse(localStorage.getItem('genos-surfaces')||'{}')
+    for(const spec of Object.values(data)){
+      const fastDef = FAST_RENDERS[spec.capId]
+      const cap = S.capabilities[spec.capId]||{id:spec.capId}
+      if(spec.visual_mode==='native'&&cap.visual_src){ S.surfaces[spec.id]=spec; renderNativeSurface(spec,cap) }
+      else if(fastDef){ S.surfaces[spec.id]=spec; renderFastSurface(spec,fastDef) }
+      else if(spec.html){ S.surfaces[spec.id]=spec; renderGeneratedSurface(spec) }
+      // skip surfaces with no renderable content — don't pollute S.surfaces
+    }
+    updateHint()
+  }catch{}
+}
+
+function updateHint(){
+  const count=Object.keys(S.surfaces).length
+  g('canvas-hint').classList.toggle('hidden',count>0)
+}
+
+// ═══════════════════════════════════════════════════
+// SURFACE DIRECTIVE EXECUTOR
+// ═══════════════════════════════════════════════════
+function executeSurfaceDirective(d) {
+  switch(d.action) {
+    case 'mount':    mountSurface(d); break
+    case 'unmount':  unmountSurface(d.surface_id); break
+    case 'regen':    regenSurface(d.surface_id, d.intent); break
+    case 'clear':    Object.keys(S.surfaces).forEach(unmountSurface); break
+    case 'notify':   showNotif(d.message||d.text||''); break
+    case 'focus':    { const el=g('surface-'+d.surface_id); if(el)el.style.zIndex=999; break }
+    case 'minimize': { const el=g('surface-'+d.surface_id); if(el)el.style.opacity='.4'; break }
+    case 'layout':   applyLayout(d); break
+    // OS-level actions
+    case 'os_theme': { const t=THEMES[d.preset]||d.theme; if(t) applyOSTheme(t); break }
+    case 'os_style': injectOSStyle(d.css||''); break
+    case 'os_full':  setOSFull(d.html||''); break
+    case 'os_clear': clearOSFull(); break
+    case 'update':  {
+      const spec=S.surfaces[d.surface_id]
+      if(spec&&d.html){spec.html=d.html;renderGeneratedSurface(spec)}
+      break
+    }
+  }
+}
+
+function applyLayout(d) {
+  if(d.mode==='clear') Object.keys(S.surfaces).forEach(unmountSurface)
+  if(d.mode==='focus'&&d.keep) {
+    for(const id of Object.keys(S.surfaces)) {
+      const el=g('surface-'+id)
+      if(!el)continue
+      el.style.opacity = d.keep.includes(id)?'1':'.3'
+    }
+  }
+  if(d.directives) d.directives.forEach(executeSurfaceDirective)
+}
+
+// ═══════════════════════════════════════════════════
+// CAPABILITY REGISTRY
+// ═══════════════════════════════════════════════════
+function registerCapability(cap) {
+  S.capabilities[cap.id] = cap
+  const count = Object.keys(S.capabilities).length
+  set('nbc', count)
+}
+
+async function loadCapabilities() {
+  try {
+    const r = await fetch('/api/mesh/capabilities')
+    const d = await r.json()
+    ;(d.capabilities||[]).forEach(registerCapability)
+  } catch {}
+}
+
+function findCapability(text) {
+  const t = text.toLowerCase()
+  // Check tags
+  for(const cap of Object.values(S.capabilities)) {
+    if((cap.tags||[]).some(tag => t.includes(tag.toLowerCase()))) return cap
+    if(t.includes(cap.id.toLowerCase())) return cap
+  }
+  return null
+}
+
+// ═══════════════════════════════════════════════════
+// SCENE SYSTEM
+// ═══════════════════════════════════════════════════
+function registerScene(scene) {
+  S.scenes[scene.id] = scene
+}
+
+function activateScene(sceneId) {
+  const scene = S.scenes[sceneId]
+  if(!scene) return
+  S.activeScene = sceneId
+  ;(scene.directives||[]).forEach(executeSurfaceDirective)
+}
+
+function startContextWatcher() {
+  setInterval(() => {
+    for(const scene of Object.values(S.scenes)) {
+      if(!scene.trigger?.time_range) continue
+      if(checkTimeRange(scene.trigger.time_range) && S.activeScene !== scene.id) {
+        activateScene(scene.id)
+      }
+    }
+  }, 60000)
+}
+
+function checkTimeRange(range) {
+  const [start,end]=range.split('-')
+  const now=new Date(),cur=now.getHours()*60+now.getMinutes()
+  const [sh,sm]=start.split(':').map(Number),[eh,em]=end.split(':').map(Number)
+  const s=sh*60+sm,e=eh*60+em
+  return s<=e?(cur>=s&&cur<e):(cur>=s||cur<e)
+}
+
+// ═══════════════════════════════════════════════════
+// AUDIO (mic) WIDGET LOGIC
+// ═══════════════════════════════════════════════════
+const micState={}
+function micToggle(id){
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){
+    const st=g('mic-st-'+id);if(st)st.textContent='speech API not supported';return
+  }
+  if(micState[id]){micState[id].stop();delete micState[id];return}
+  const Rec=window.SpeechRecognition||window.webkitSpeechRecognition
+  const rec=new Rec();rec.lang='ru-RU';rec.continuous=false;rec.interimResults=true
+  micState[id]=rec
+  const btn=g('mic-'+id),st=g('mic-st-'+id),tx=g('mic-tx-'+id)
+  if(btn)btn.style.background='#dc2626'
+  if(st)st.textContent='listening…'
+  rec.onresult=e=>{
+    const transcript=Array.from(e.results).map(r=>r[0].transcript).join('')
+    if(tx)tx.textContent=transcript
+    if(e.results[e.results.length-1].isFinal){wsSend({action:'os_chat',text:transcript});cmd(transcript)}
+  }
+  rec.onend=()=>{delete micState[id];if(btn)btn.style.background='#0a0a0a';if(st)st.textContent='tap to record'}
+  rec.onerror=()=>{delete micState[id];if(btn)btn.style.background='#0a0a0a';if(st)st.textContent='mic error'}
+  rec.start()
+}
+
+// ═══════════════════════════════════════════════════
+// EDIT INTENT DETECTION
+// ═══════════════════════════════════════════════════
+function detectEditIntent(t){
+  return /добавь|удали(?!те)|исправь|измени|сделай (его|её|их|темн|светл|больш|меньш|красн|зелен|синь|фиолет|красив|лучш)|перекрась|покрась|переименуй|переделай|улучши|поправь|обнови|add |remove |fix |change |make (it|the)|update |modify |edit |darker|lighter|bigger|smaller|faster|slower|красивее|лучше/.test(t)
+}
+function getLastSurfaceHtml(){
+  const ids = Object.keys(S.surfaces)
+  if(!ids.length) return ''
+  // find the most recently interacted surface
+  const id = ids[ids.length-1]
+  return S.surfaces[id]?.html || ''
+}
+
+// ═══════════════════════════════════════════════════
+// COMMAND PARSER
+// ═══════════════════════════════════════════════════
+async function cmd(text){
+  if(!text) return
+  // Record to history
+  cmdHistoryPush(text)
+  hideAutocomplete()
+  g('cb-input').value=''
+  g('cb-loader').classList.add('on')
+  g('cb-hint').textContent='…'
+  const t=text.toLowerCase()
+
+  // ── SLASH COMMANDS ───────────────────────────────
+  if(t.startsWith('/')){
+    const parts=t.slice(1).trim().split(/\s+/)
+    const slash=parts[0]
+    if(slash==='clear'){Object.keys(S.surfaces).forEach(unmountSurface);done('Cleared');return}
+    if(slash==='ambient'){toggleAmbient();done('Ambient mode');return}
+    if(slash==='shortcuts'){openShortcuts();done('Shortcuts');return}
+    if(slash==='palette'){openPalette();done('Palette');return}
+    if(slash==='ws'){
+      const sub=parts[1]
+      if(sub==='save'){wsSaveWorkspace(parts.slice(2).join(' ')||'workspace');done('Workspace saved');return}
+      if(sub==='load'){wsLoadWorkspace(parts.slice(2).join(' '));done('Workspace loaded');return}
+      toggleWsBar();done('Workspaces');return
+    }
+    if(slash==='theme'&&parts[1]){
+      const th=Object.keys(THEMES).find(k=>k.startsWith(parts[1]))
+      if(th){applyOSTheme(THEMES[th]);done('Theme: '+th);return}
+    }
+    if(slash==='notes'){mountSurface({capability:'notes',intent:text,position:'center'});done('Notes');return}
+    if(slash==='todo'){mountSurface({capability:'todo',intent:text,position:'center'});done('Todo');return}
+    if(slash==='timer'){mountSurface({capability:'timer',intent:text,position:'center'});done('Timer');return}
+    if(slash==='matrix'){mountSurface({capability:'matrix',intent:text,position:'center'});done('Matrix');return}
+    if(slash==='weather'){mountSurface({capability:'weather',intent:text,position:'center'});done('Weather');return}
+    if(slash==='code'){mountSurface({capability:'code-runner',intent:text,position:'center'});done('Code runner');return}
+    if(slash==='solana'){mountSurface({capability:'solana-live',intent:text,position:'center'});done('Solana live');return}
+    if(slash==='whiteboard'||slash==='draw'){mountSurface({capability:'whiteboard',intent:text,position:'center'});done('Whiteboard');return}
+    if(slash==='kaleidoscope'||slash==='kali'){mountSurface({capability:'kaleidoscope',intent:text,position:'center'});done('Kaleidoscope');return}
+    if(slash==='chat'){mountSurface({capability:'agent-chat',intent:text,position:'center'});done('Agent chat');return}
+    if(slash==='save'){appSave(parts.slice(1).join(' '));done('');return}
+    if(slash==='launch'){appLoad(parts.slice(1).join(' '));done('');return}
+    if(slash==='apps'){appShowSwitcher();done('');return}
+  }
+
+  // ── AUTONOMOUS MODE ──────────────────────────────
+  if(/autonomous|автоном/.test(t)){
+    mountSurface({capability:'autonomous-feed', intent:text, position:'center'})
+    done('AI Agent feed mounted')
+    return
+  }
+
+  // ── REMOVE ──────────────────────────────────────
+  if(/убери|удали|закрой|remove|delete/.test(t)){
+    if(/все|all|всё/.test(t)){Object.keys(S.surfaces).forEach(unmountSurface);done('Cleared');return}
+    for(const spec of Object.values(S.surfaces)){
+      if(t.includes(spec.capId)||t.includes((S.capabilities[spec.capId]?.description||'').toLowerCase())){
+        unmountSurface(spec.id);done('Removed');return
+      }
+    }
+  }
+
+  // ── MOVE ─────────────────────────────────────────
+  if(/перемести|move|поставь|сдвинь/.test(t)){
+    for(const spec of Object.values(S.surfaces)){
+      if(t.includes(spec.capId)){
+        const {x,y}=resolvePos(t,spec.w,spec.h);spec.x=x;spec.y=y
+        const el=g('surface-'+spec.id);if(el){el.style.left=x+'px';el.style.top=y+'px'}
+        saveSurfaces();done('Moved');return
+      }
+    }
+  }
+
+  // ── OS THEME / STYLE ─────────────────────────────
+  if(isOSCommand(t)){
+    const theme = detectTheme(t)
+    if(theme){ applyOSTheme(theme); done('Тема изменена'); return }
+    // Unknown style command → let LLM handle, hint it's OS-level
+    wsSend({action:'os_chat', text:'[OS_STYLE] '+text})
+    g('cb-hint').textContent='styling…'
+    return
+  }
+
+  // ── REGENERATE ───────────────────────────────────
+  if(/перегенер|regen|заново|снова|иначе|по-другому/.test(t)){
+    const ids=Object.keys(S.surfaces)
+    if(ids.length>0){regenSurface(ids[ids.length-1],text);done('Regenerating…');return}
+  }
+
+  // ── MATCH CAPABILITY ─────────────────────────────
+  const matched=findCapability(t)
+  if(matched){
+    mountSurface({capability:matched.id, intent:text, position:t})
+    done('Mounting: '+matched.description)
+    return
+  }
+
+  // ── FALLBACK: send to agent / LLM ─────────────────
+  const capList=Object.values(S.capabilities).map(c=>({id:c.id,description:c.description,tags:c.tags}))
+  // Enrich request with canvas context so LLM knows what's already shown
+  const activeSurfaces=Object.values(S.surfaces).map(s=>s.capId||s.intent||'?').slice(0,5)
+  const enriched = activeSurfaces.length
+    ? `${text} [canvas: ${activeSurfaces.join(', ')} already visible]`
+    : text
+  // Context-aware editing: pass current HTML when user is editing existing surface
+  const isEdit = detectEditIntent(t)
+  const currentHtml = isEdit ? getLastSurfaceHtml() : ''
+  if(isEdit && currentHtml) g('cb-hint').textContent = 'editing…'
+  wsSend({action:'os_chat', text:enriched, capabilities:capList, currentHtml})
+  g('cb-hint').textContent='generating…'
+  showAgentDialogue('thinking…')
+  startGenTimer()
+}
+
+function done(msg){
+  clearGenTimer()
+  g('cb-loader').classList.remove('on')
+  g('cb-hint').textContent='⏎'
+  if(msg) addTermLine('out',msg)
+}
+
+// ═══════════════════════════════════════════════════
+// AGENT SUGGESTIONS
+// ═══════════════════════════════════════════════════
+async function loadSuggestions(){
+  const bar=g('suggest-bar');bar.innerHTML=''
+  const suggestions=[]
+  try{
+    const [sr]=await Promise.all([fetch('/api/mesh/discover')])
+    const sd=await sr.json()
+    const agents=sd.agents||[]
+    if(agents.some(a=>(a.capabilities||[]).includes('speech_to_text')))
+      suggestions.push({text:'Agent can listen → mic',cmd:'добавь микрофон'})
+    if(agents.some(a=>(a.capabilities||[]).includes('trading')))
+      suggestions.push({text:'Trading agent online → prices',cmd:'покажи цены биткоина'})
+    if(agents.length>0)
+      suggestions.push({text:agents.length+' agent(s) connected',cmd:'покажи агентов'})
+  }catch{}
+  // Suggest from capabilities
+  const caps=Object.values(S.capabilities).filter(c=>c.category==='data_stream')
+  if(caps.length>0&&Object.keys(S.surfaces).length===0)
+    suggestions.push({text:'Show network status',cmd:'покажи статус сети'})
+  // Always show autonomous mode chip
+  suggestions.unshift({text:'Autonomous AI mode', cmd:'autonomous mode'})
+
+  suggestions.slice(0,4).forEach(s=>{
+    const chip=document.createElement('div')
+    chip.className='suggest-chip'
+    chip.textContent='✦ '+s.text
+    chip.onclick=()=>cmd(s.cmd)
+    bar.appendChild(chip)
+  })
+}
+
+// ═══════════════════════════════════════════════════
+// AGENT DIALOGUE
+// ═══════════════════════════════════════════════════
+function showAgentDialogue(text, options=[]){
+  const el=g('agent-dialogue'), te=g('ad-text'), oe=g('ad-opts'), lb=el?.querySelector('.ad-label')
+  if(!el||!te||!oe) return
+  const isThinking = text === 'thinking…'
+  if(lb) lb.innerHTML = 'agent' + (isThinking ? '<span class="ad-thinking"><span></span><span></span><span></span></span>' : '')
+  te.textContent = isThinking ? '' : text
+  oe.innerHTML = options.map(o=>
+    `<button class="ad-opt" onclick="hideAgentDialogue();cmd(${JSON.stringify(o)})">${o}</button>`
+  ).join('')
+  el.classList.add('show')
+}
+
+function hideAgentDialogue(){
+  g('agent-dialogue')?.classList.remove('show')
+}
+
+function parseAgentResponse(text){
+  // Detect "Options: a | b | c" pattern in LLM text response
+  const match = text.match(/options?:\s*(.+)/i)
+  if(match){
+    const opts = match[1].split(/\|/).map(s=>s.trim()).filter(Boolean)
+    const body = text.slice(0, match.index).trim()
+    return { text: body||text, options: opts }
+  }
+  return { text, options:[] }
+}
+
+// ═══════════════════════════════════════════════════
+// NOTIFICATION
+// ═══════════════════════════════════════════════════
+function showNotif(msg){
+  const el=g('notif');el.textContent=msg;el.classList.add('show')
+  setTimeout(()=>el.classList.remove('show'),3500)
+}
+
+// ═══════════════════════════════════════════════════
+// WEBSOCKET
+// ═══════════════════════════════════════════════════
+// ── Generation timeout tracker ──
+let _genTimer = null
+const GEN_TIMEOUT = 55_000  // 55s client-side safety net (LLM 40s + server 50s + buffer)
+
+function startGenTimer() {
+  clearGenTimer()
+  _genTimer = setTimeout(() => {
+    // Server took too long — reset UI
+    const loader = g('cb-loader'); if(loader) loader.classList.remove('on')
+    const hint = g('cb-hint'); if(hint) hint.textContent = '⏎'
+    hideAgentDialogue()
+    addNotif('Generation timed out — server is slow or disconnected. Try again.', 'warn')
+    addTermLine('err', '⏱ Timed out. Type your request again.')
+    _genTimer = null
+  }, GEN_TIMEOUT)
+}
+function clearGenTimer() {
+  if(_genTimer) { clearTimeout(_genTimer); _genTimer = null }
+}
+
+function wsConnect(){
+  const ws=new WebSocket(`ws://${location.host}`)
+  S.ws=ws
+  ws.onopen=()=>{g('wsd').classList.add('live');g('wsl').textContent='connected'}
+  ws.onclose=()=>{
+    g('wsd').classList.remove('live');g('wsl').textContent='reconnecting…'
+    // If we were waiting for a response, reset the loader
+    if(_genTimer) {
+      clearGenTimer()
+      const loader = g('cb-loader'); if(loader) loader.classList.remove('on')
+      const hint = g('cb-hint'); if(hint) hint.textContent = '⏎'
+      addNotif('Connection lost during generation — reconnecting…', 'warn')
+    }
+    setTimeout(wsConnect,3000)
+  }
+  ws.onmessage=e=>{try{dispatch(JSON.parse(e.data))}catch{}}
+}
+function wsSend(d){if(S.ws?.readyState===1)S.ws.send(JSON.stringify(d))}
+
+function dispatch(msg){
+  switch(msg.type){
+    case 'INIT':
+      S.nodeId=msg.data.nodeId;S.pubkey=msg.data.pubkey
+      g('wsl').textContent=(msg.data.nodeId||'').slice(0,10)+'…'
+      set('ms-n',msg.data.nodeId||'—')
+      fetchStatus();fetchAgents();fetchEvolution();loadSuggestions();loadCapabilities()
+      break
+    case 'LOG': appendLog(msg.data.eventType,msg.data.message); break
+    case 'AGENT_UPDATE': fetchAgents();loadSuggestions(); break
+    case 'CAPABILITY_UPDATE':
+      if(msg.data?.cap) registerCapability(msg.data.cap)
+      break
+    case 'EVOLUTION_UPDATE':
+      fetchEvolution()
+      if(msg.data){set('ms-j',msg.data.total_submissions??0)}
+      break
+    case 'OS_RENDER': handleRender(msg.data); break
+    case 'SURFACE_DIRECTIVE':
+      ;(msg.data?.directives||[]).forEach(executeSurfaceDirective)
+      break
+    case 'JURY_DUTY': showJury(msg.data); break
+    case 'STATUS': updateStats(msg.data); break
+    case 'AI_DECISION':
+      // Update all mounted autonomous-feed surfaces
+      Object.values(S.surfaces).forEach(spec=>{
+        if(spec.capId==='autonomous-feed') afAddDecision(spec.id, msg.data)
+      })
+      addNotif(`AI: ${msg.data?.action||'decision'} — ${(msg.data?.packet?.description||'').slice(0,40)}`,'info')
+      break
+    case 'AGENT_RESPONSE':
+      // Route to agent-chat surfaces
+      Object.values(S.surfaces).forEach(spec=>{
+        if(spec.capId==='agent-chat'){
+          const log=g('ac-log-'+spec.id); if(!log)return
+          const thinking=g('ac-think-'+spec.id); if(thinking)thinking.remove()
+          const bubble=document.createElement('div')
+          bubble.innerHTML=`<div style="display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;max-width:90%;line-height:1.5">${msg.data?.text||''}</div>`
+          log.appendChild(bubble); log.scrollTop=log.scrollHeight
+        }
+      })
+      break
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// OS_RENDER HANDLER
+// ═══════════════════════════════════════════════════
+function handleRender(packet){
+  clearGenTimer()  // response received — cancel the safety timeout
+  g('cb-loader').classList.remove('on')
+  g('cb-hint').textContent='⏎'
+
+  // New format: surface directive array
+  if(packet.type==='surface_directive'){
+    ;(packet.directives||[]).forEach(executeSurfaceDirective)
+    return
+  }
+
+  // OS-level style injection
+  if(packet.type==='os_style'&&packet.content){
+    injectOSStyle(packet.content); done(''); return
+  }
+
+  // OS full-screen takeover
+  if(packet.type==='os_full'&&packet.content){
+    setOSFull(packet.content, packet.title||''); done(''); return
+  }
+
+  // HTML — generated code for a surface — clear thinking dialogue
+  hideAgentDialogue()
+  if(packet.type==='html'&&packet.content){
+    const raw = packet.content.trim()
+
+    // ── FULLSCREEN marker: LLM decided this is a full-screen experience ──
+    if(raw.startsWith('[FULLSCREEN]')){
+      const html = raw.replace('[FULLSCREEN]','').trim()
+      setOSFull(html, packet.title || extractHtmlTitle(html) || '')
+      done('Interface launched')
+      addNotif('Full-screen interface launched — press "exit" to return','info')
+      return
+    }
+
+    const id = packet.surface_id || 'surf-'+Date.now()
+    const existing = S.surfaces[id]
+    const spec = existing || {
+      id, capId:'generated', w:420, h:320,
+      x:innerWidth/2-210, y:80,
+      intent: packet.action||'generated',
+      visual_mode:'generated'
+    }
+    spec.html = raw
+    S.surfaces[id] = spec
+    saveSurfaces()
+    renderGeneratedSurface(spec)
+    updateHint()
+    done('Surface ready')
+  }
+
+  if(packet.type==='text'&&packet.content){
+    const parsed = parseAgentResponse(packet.content)
+    showAgentDialogue(parsed.text, parsed.options)
+    done('')
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════
+function sp(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'))
+  g('panel-'+id)?.classList.add('active')
+  g('nav-'+id)?.classList.add('active')
+}
+
+function renderCapabilitiesPanel(){
+  const el=g('cap-grid');if(!el)return
+  const caps=Object.values(S.capabilities)
+  if(!caps.length){el.innerHTML='<div class="empty"><h3>No capabilities</h3><p>Register an API, data stream or app.</p></div>';return}
+  el.innerHTML=caps.map(c=>`
+    <div class="cap-card" onclick="cmd('${c.description}')">
+      <div class="cap-id">${c.id}</div>
+      <div class="cap-desc">${c.description}</div>
+      <div class="cap-tags">
+        ${c.category?`<span class="cap-tag">${c.category}</span>`:''}
+        ${c.has_visual?`<span class="cap-mode native">native</span>`:''}
+        ${(c.tags||[]).slice(0,3).map(t=>`<span class="cap-tag">${t}</span>`).join('')}
+      </div>
+    </div>`).join('')
+}
+
+// ═══════════════════════════════════════════════════
+// AUTONOMOUS FEED HELPERS
+// ═══════════════════════════════════════════════════
+const AF_STATS = {}  // surfaceId → { BUY:0, CHALLENGE:0, PASS:0 }
+
+function afAddDecision(surfaceId, d) {
+  const feed = g('af-feed-' + surfaceId)
+  if (!feed) return
+
+  // Remove placeholder
+  const placeholder = feed.querySelector('[data-placeholder]')
+  if (placeholder) placeholder.remove()
+
+  const actionColor = d.action === 'BUY' ? 'var(--green)' : d.action === 'CHALLENGE' ? '#ff4444' : 'var(--text3)'
+  const actionIcon  = d.action === 'BUY' ? '↑' : d.action === 'CHALLENGE' ? '⚑' : '—'
+  const timeStr = new Date(d.timestamp).toLocaleTimeString('en', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  const txLink = d.explorer_url
+    ? `<a href="${d.explorer_url}" target="_blank" style="font-family:var(--mono);font-size:9px;color:var(--green);text-decoration:none;opacity:.7" title="View on Solana Explorer">↗ ${d.tx_hash?.slice(0,8)}…</a>`
+    : (d.tx_hash ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3)">local-${d.tx_hash.slice(6,14)}</span>` : '')
+
+  const card = document.createElement('div')
+  card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:9px 10px;animation:fadeIn .3s ease'
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+      <span style="font-size:11px;font-weight:700;color:${actionColor};font-family:var(--mono)">${actionIcon} ${d.action}</span>
+      <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${timeStr}</span>
+      <span style="margin-left:auto;font-size:9px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;font-family:var(--mono);color:var(--text3)">${d.packet.type}</span>
+    </div>
+    <div style="font-size:11px;color:var(--text);margin-bottom:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${d.packet.description}</div>
+    <div style="font-size:10px;color:var(--text3);line-height:1.5;margin-bottom:5px">${d.llm_reasoning}</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">quality <b style="color:var(--text)">${d.quality_score}</b>/100</span>
+      <span style="font-size:9px;color:var(--text3);font-family:var(--mono)">rep <b style="color:var(--text)">${d.seller_reputation}</b></span>
+      ${d.state_delta ? `<span style="font-size:9px;font-family:var(--mono);color:${d.state_delta.reputation_after > d.state_delta.reputation_before ? 'var(--green)' : '#ff4444'}">rep: ${d.state_delta.reputation_before}→${d.state_delta.reputation_after}</span>` : ''}
+      <span style="margin-left:auto">${txLink}</span>
+    </div>
+  `
+
+  // Prepend (newest on top)
+  feed.insertBefore(card, feed.firstChild)
+
+  // Keep max 30 cards
+  while (feed.children.length > 30) feed.removeChild(feed.lastChild)
+
+  // Update stats
+  if (!AF_STATS[surfaceId]) AF_STATS[surfaceId] = { BUY: 0, CHALLENGE: 0, PASS: 0 }
+  AF_STATS[surfaceId][d.action] = (AF_STATS[surfaceId][d.action] || 0) + 1
+  const s = AF_STATS[surfaceId]
+  const buyEl = g('af-buy-' + surfaceId), chlEl = g('af-chl-' + surfaceId), pasEl = g('af-pas-' + surfaceId)
+  if (buyEl) buyEl.textContent = 'BUY: ' + s.BUY
+  if (chlEl) chlEl.textContent = 'CHALLENGE: ' + s.CHALLENGE
+  if (pasEl) pasEl.textContent = 'PASS: ' + s.PASS
+}
+
+function appendLog(type,msg){
+  const list=g('log-list')
+  const d=document.createElement('div');d.className='lr'
+  const ts=new Date().toTimeString().slice(0,8)
+  d.innerHTML=`<span class="lts">${ts}</span><span class="ltype ${type}">${type}</span><span class="lmsg">${msg}</span>`
+  list.appendChild(d)
+  while(list.children.length>500)list.removeChild(list.firstChild)
+  list.scrollTop=list.scrollHeight
+  S.logN++;set('nbl',S.logN>99?'99+':S.logN)
+}
+
+function addTermLine(kind,text){
+  const out=g('to');const d=document.createElement('div');d.className='tl'
+  if(kind==='cmd')d.innerHTML=`<span class="tp">› </span><span class="tc">${text}</span>`
+  if(kind==='out')d.innerHTML=`<span class="too">${text}</span>`
+  if(kind==='err')d.innerHTML=`<span class="te">${text}</span>`
+  out.appendChild(d);out.scrollTop=out.scrollHeight
+}
+
+async function runDashCmd(text){
+  if(!text)return
+  if(text==='/help'){addTermLine('out','Commands: /agents /evolution /log /connect /capabilities /status');return}
+  if(text==='/agents'){sp('agents');fetchAgents();return}
+  if(text==='/evolution'){sp('evolution');fetchEvolution();return}
+  if(text==='/log'){sp('log');return}
+  if(text==='/connect'){sp('connect');return}
+  if(text==='/capabilities'){sp('capabilities');renderCapabilitiesPanel();return}
+  if(text==='/status'){fetchStatus();addTermLine('out','refreshed');return}
+  sp('terminal');addTermLine('cmd',text)
+  wsSend({action:'os_chat',text})
+}
+
+// ── Connect ──
+function togCap(el,cap){if(S.caps.has(cap)){S.caps.delete(cap);el.classList.remove('on')}else{S.caps.add(cap);el.classList.add('on')}}
+async function connectAgent(){
+  const id=v('ca-id'),desc=v('ca-desc'),ep=v('ca-ep'),st=g('ca-s')
+  if(!id||!desc){st.className='cs err';st.textContent='agent-id and description required';return}
+  st.className='cs';st.textContent='Connecting…'
+  try{
+    const r=await fetch('/api/mesh/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_id:id,description:desc,capabilities:[...S.caps],endpoint_url:ep})})
+    const d=await r.json()
+    if(d.success){st.className='cs ok';st.textContent=`✓ Registered. ${d.network_summary.agents} agents in network.`
+      clear('ca-id');clear('ca-desc');clear('ca-ep')
+      S.caps.clear();document.querySelectorAll('.cchip').forEach(c=>c.classList.remove('on'))
+      fetchAgents();sp('agents');loadSuggestions()
+    }else{st.className='cs err';st.textContent=d.error||'Failed'}
+  }catch{st.className='cs err';st.textContent='Server unreachable'}
+}
+async function connectLLM(){
+  const key=v('llm-key'),st=g('llm-s')
+  if(!key){st.className='cs err';st.textContent='key required';return}
+  st.className='cs';st.textContent='Connecting…'
+  try{
+    const r=await fetch('/api/config/llm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key})})
+    const d=await r.json()
+    if(d.success){st.className='cs ok';st.textContent='✓ LLM connected — generative surfaces active';clear('llm-key')}
+    else{st.className='cs err';st.textContent=d.error||'Invalid key'}
+  }catch{st.className='cs err';st.textContent='Server unreachable'}
+}
+async function registerCapabilityUI(){
+  const id=v('cap-id'),desc=v('cap-desc'),cat=v('cap-cat'),ep=v('cap-ep'),src=v('cap-src'),st=g('cap-s')
+  if(!id||!desc){st.className='cs err';st.textContent='id and description required';return}
+  const cap={id,description:desc,category:cat||'data_stream',endpoint:ep||undefined,visual_src:src||undefined,has_visual:!!src}
+  st.className='cs';st.textContent='Registering…'
+  try{
+    const r=await fetch('/api/mesh/capability',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(cap)})
+    const d=await r.json()
+    if(d.success){
+      registerCapability(cap)
+      st.className='cs ok';st.textContent='✓ Registered: '+id
+      clear('cap-id');clear('cap-desc');clear('cap-ep');clear('cap-src')
+    }else{st.className='cs err';st.textContent=d.error||'Failed'}
+  }catch{st.className='cs err';st.textContent='Server unreachable'}
+}
+async function submitJudge(){
+  const type=v('j-t'),desc=v('j-d'),ep=v('j-e'),ver=v('j-v')||'1.0-community',st=g('j-s')
+  if(!type||!desc){st.className='cs err';st.textContent='type and description required';return}
+  st.className='cs';st.textContent='Submitting…'
+  const manifest={header:{protocol:'mesh',version:'1.0',creator_pubkey:S.pubkey||'unknown',timestamp:Date.now(),node_id:S.nodeId||'genos'},core_intent:'ABUNDANCE_FOR_ALL_LIFE',payload:{type:'COMPONENT',cid:'local-'+Date.now(),description:desc,price:0,tags:[type,ver],metadata:{interfaceType:type,version:ver,endpointUrl:ep}},economics:{creator_share:.9,dao_share:.05,hoster_share:.05},proof:{hash:'client-'+Date.now().toString(36),signature:'',verified:false}}
+  try{
+    const r=await fetch('/api/judge/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({manifest})})
+    const d=await r.json()
+    if(d.success){st.className='cs ok';st.textContent='✓ '+d.evaluationId;clear('j-t');clear('j-d');clear('j-e');clear('j-v');fetchEvolution();sp('evolution')}
+    else{st.className='cs err';st.textContent=d.error||'Failed'}
+  }catch{st.className='cs err';st.textContent='Server unreachable'}
+}
+
+// ── Fetch ──
+function ts(t){const s=Math.floor((Date.now()-t)/1000);return s<60?s+'s ago':s<3600?Math.floor(s/60)+'m ago':Math.floor(s/3600)+'h ago'}
+async function fetchAgents(){
+  try{
+    const r=await fetch('/api/mesh/discover');const d=await r.json();S.agents=d.agents||[]
+    const n=S.agents.length;['ha','ms-a','nba'].forEach(id=>set(id,n))
+    const el=g('ag')
+    if(!S.agents.length){el.innerHTML=`<div class="empty"><h3>No agents</h3><p>Go to Connect to register.</p><button class="btn p" onclick="sp('connect')">Connect →</button></div>`;return}
+    el.innerHTML=S.agents.map(a=>`<div class="ac"><div class="ach"><div class="acid">${a.agent_id}</div><div class="acdot ${a.status}"></div></div><div class="acdesc">${a.description}</div><div class="accaps">${(a.capabilities||[]).map(c=>`<span class="act">${c}</span>`).join('')}</div><div class="acm">${a.status} · ${ts(a.last_seen)}</div></div>`).join('')
+  }catch{}
+}
+async function fetchEvolution(){
+  try{
+    const [e,l]=await Promise.all([fetch('/api/judge/evolution'),fetch('/api/judge/leaderboard')])
+    const ev=await e.json(),lb=await l.json()
+    set('ms-j',ev.stats?.total_submissions??0)
+    const entries=lb.leaderboard||[],el=g('evo-c')
+    if(!entries.length){el.innerHTML=`<div class="empty"><h3>No implementations</h3><p>Submit via Connect.</p><button class="btn p" onclick="sp('connect')">Submit →</button></div>`;return}
+    const byType={}
+    for(const e of entries){if(!byType[e.interfaceType])byType[e.interfaceType]=[];byType[e.interfaceType].push(e)}
+    let html='<table class="etable"><thead><tr><th>#</th><th>Type</th><th>Description</th><th>Score</th><th>Adoptions</th></tr></thead><tbody>',rank=1
+    for(const[,list] of Object.entries(byType))for(const e of list){
+      html+=`<tr><td class="sn" style="color:var(--text3)">${rank++}</td><td><span class="tbadge">${e.interfaceType}</span></td><td style="font-size:12px">${e.description}</td><td><div class="sbar-evo"><div class="str"><div class="sf" style="width:${e.score}%"></div></div><span class="sn">${e.score}</span></div></td><td class="an">${e.adoption_count}</td></tr>`
+    }
+    html+='</tbody></table>';el.innerHTML=html
+  }catch{}
+}
+async function fetchStatus(){
+  try{const r=await fetch('/api/status');const d=await r.json();updateStats(d)}catch{}
+}
+function updateStats(d){
+  if(d.marketStats?.total!==undefined){set('hk',d.marketStats.total);set('ms-k',d.marketStats.total)}
+  if(d.balance!==undefined)set('hb',d.balance.toFixed(2)+' SOL')
+  if(d.courtStats?.resolved!==undefined)set('ms-v',d.courtStats.resolved)
+}
+
+// ── Jury ──
+function showJury(data){S.juryId=data.challengeId;g('jr').textContent=data.reason;g('jd').textContent='Defendant: '+data.defendant;g('jury-o').classList.add('vis')}
+function juryVote(verdict){wsSend({action:'jury_vote',challengeId:S.juryId,verdict});g('jury-o').classList.remove('vis');S.juryId=null}
+
+// ── Theme + Lang ──
+function lsToggleTheme(){const d=document.documentElement.classList.toggle('dark');localStorage.setItem('ls-theme',d?'dark':'light');lsUpdateThemeIcon()}
+function lsUpdateThemeIcon(){const d=document.documentElement.classList.contains('dark');const s=document.getElementById('ls-icon-sun'),m=document.getElementById('ls-icon-moon');if(s)s.style.display=d?'block':'none';if(m)m.style.display=d?'none':'block'}
+let lsLangOpen=false;
+function lsToggleLang(){lsLangOpen=!lsLangOpen;const dr=document.getElementById('ls-lang-drop');if(dr)dr.classList.toggle('ls-hidden',!lsLangOpen)}
+function lsSetLang(l){localStorage.setItem('ls-lang',l);lsLangOpen=false;const dr=document.getElementById('ls-lang-drop');if(dr)dr.classList.add('ls-hidden');document.querySelectorAll('#ls-lang-drop button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l))}
+document.addEventListener('click',e=>{if(lsLangOpen&&!e.target.closest('.ls-lang-wrap')){lsLangOpen=false;const dr=document.getElementById('ls-lang-drop');if(dr)dr.classList.add('ls-hidden')}});
+(function(){const t=localStorage.getItem('ls-theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');lsUpdateThemeIcon();const l=localStorage.getItem('ls-lang')||'en';document.querySelectorAll('#ls-lang-drop button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l))})();
+// ── Helpers ──
+const g=id=>document.getElementById(id)
+const v=id=>g(id)?.value.trim()||''
+const clear=id=>{if(g(id))g(id).value=''}
+const set=(id,val)=>{if(g(id))g(id).textContent=val}
+
+// ── Public API ──
+window.GenosAPI={
+  getState:()=>({...S,ws:undefined}),
+  mountSurface, unmountSurface, cmd, toggleMode, sp,
+  registerCapability, registerScene, activateScene,
+  executeSurfaceDirective,
+  getSurfaces:()=>({...S.surfaces}),
+  getCapabilities:()=>({...S.capabilities})
+}
+
+// ── Cursor trail ──
+;(()=>{
+  const N=8,dots=[];
+  for(let i=0;i<N;i++){const d=document.createElement('div');d.className='cursor-dot';d.style.opacity=1-i/N;d.style.transform=`scale(${1-i*0.08})`;document.body.appendChild(d);dots.push(d)}
+  const px=new Array(N).fill(0),py=new Array(N).fill(0);
+  let mx=0,my=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  (function loop(){
+    px[0]+=(mx-px[0])*.35; py[0]+=(my-py[0])*.35;
+    for(let i=1;i<N;i++){px[i]+=(px[i-1]-px[i])*.35;py[i]+=(py[i-1]-py[i])*.35}
+    dots.forEach((d,i)=>{d.style.left=px[i]-2+'px';d.style.top=py[i]-2+'px'})
+    requestAnimationFrame(loop)
+  })()
+})();
+
+// ── Inputs ──
+g('cb-input').addEventListener('keydown',e=>{if(e.key!=='Enter')return;cmd(e.target.value.trim())})
+g('dci').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target.value.trim();e.target.value='';runDashCmd(t)})
+g('ti').addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target.value.trim();e.target.value='';addTermLine('cmd',t);runDashCmd(t)})
+
+// ── Built-in Scenes ──
+registerScene({
+  id: 'morning',
+  trigger: { time_range: '06:00-10:00' },
+  directives: [
+    { type: 'os_theme', preset: 'light' },
+    { type: 'mount', intent: 'clock', pos: 'top-right' },
+    { type: 'mount', intent: 'mesh-status', pos: 'top-left' },
+    { type: 'notify', message: '☀️ Доброе утро — MESH активна' }
+  ]
+})
+
+registerScene({
+  id: 'work',
+  trigger: { time_range: '10:00-18:00' },
+  directives: [
+    { type: 'mount', intent: 'autonomous-feed', pos: 'top-right' },
+    { type: 'mount', intent: 'mesh-agents', pos: 'top-left' },
+    { type: 'notify', message: '⚡ Рабочий режим — агенты онлайн' }
+  ]
+})
+
+registerScene({
+  id: 'evening',
+  trigger: { time_range: '18:00-24:00' },
+  directives: [
+    { type: 'os_theme', preset: 'dark' },
+    { type: 'mount', intent: 'btc-price', pos: 'top-right' },
+    { type: 'mount', intent: 'mesh-knowledge', pos: 'top-left' },
+    { type: 'notify', message: '🌙 Вечерний режим — рынок открыт' }
+  ]
+})
+
+// ── i18n ──
+const I18N = {
+  en: {
+    'hint.title': 'MESH° GenOS',
+    'hint.sub': 'Everything is generated in the moment.<br>Say what you want to see, do, or connect.',
+    'cb.placeholder': 'ask anything — agent handles the rest',
+    'cb.hint': '⏎ enter',
+    'sbl.build': 'Build', 'sbl.network': 'Network', 'sbl.info': 'Info',
+    'nav.connect': 'Connect', 'nav.agents': 'Agents', 'nav.caps': 'Capabilities',
+    'nav.evolution': 'Evolution', 'nav.log': 'Log', 'nav.terminal': 'Terminal', 'nav.mission': 'Mission',
+    'panel.connect.title': 'Connect', 'panel.connect.sub': 'Add agents, capabilities, API keys',
+    'panel.agents.title': 'Active Agents', 'panel.agents.sub': 'Network participants',
+    'panel.caps.title': 'Capabilities', 'panel.caps.sub': 'Available functions',
+    'panel.evolution.title': 'Evolution', 'panel.evolution.sub': 'Protocol implementations',
+    'panel.log.title': 'Event Log', 'panel.log.sub': 'Live protocol activity',
+    'panel.terminal.title': 'Terminal', 'panel.terminal.sub': 'Direct node access',
+    'panel.mission.title': 'Mission', 'panel.mission.sub': 'The seven laws',
+  },
+  ru: {
+    'hint.title': 'MESH° GenOS',
+    'hint.sub': 'Всё создаётся прямо сейчас.<br>Скажи что хочешь увидеть, сделать или подключить.',
+    'cb.placeholder': 'спроси что угодно — агент сделает остальное',
+    'cb.hint': '⏎ enter',
+    'sbl.build': 'Создать', 'sbl.network': 'Сеть', 'sbl.info': 'Инфо',
+    'nav.connect': 'Подключить', 'nav.agents': 'Агенты', 'nav.caps': 'Возможности',
+    'nav.evolution': 'Эволюция', 'nav.log': 'Лог', 'nav.terminal': 'Терминал', 'nav.mission': 'Миссия',
+    'panel.connect.title': 'Подключение', 'panel.connect.sub': 'Добавить агентов, API ключи',
+    'panel.agents.title': 'Активные агенты', 'panel.agents.sub': 'Участники сети',
+    'panel.caps.title': 'Возможности', 'panel.caps.sub': 'Доступные функции',
+    'panel.evolution.title': 'Эволюция', 'panel.evolution.sub': 'Реализации протокола',
+    'panel.log.title': 'Журнал событий', 'panel.log.sub': 'Активность протокола',
+    'panel.terminal.title': 'Терминал', 'panel.terminal.sub': 'Прямой доступ к узлу',
+    'panel.mission.title': 'Миссия', 'panel.mission.sub': 'Семь законов',
+  }
+}
+
+function applyI18n(lang) {
+  const t = I18N[lang] || I18N.en
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n')
+    if (t[key] !== undefined) {
+      if (el.tagName === 'INPUT') el.placeholder = t[key]
+      else el.innerHTML = t[key]
+    }
+  })
+}
+
+// Patch lsSetLang to also apply i18n
+const _origLsSetLang = typeof lsSetLang !== 'undefined' ? lsSetLang : null
+function lsSetLangFull(l) {
+  if (_origLsSetLang) _origLsSetLang(l)
+  applyI18n(l)
+  localStorage.setItem('ls-lang', l)
+  lsLangOpen = false
+  const dr = document.getElementById('ls-lang-drop')
+  if (dr) dr.classList.add('ls-hidden')
+  document.querySelectorAll('#ls-lang-drop button').forEach(b => b.classList.toggle('active', b.dataset.lang === l))
+}
+// Override the global
+window.lsSetLang = lsSetLangFull
+
+// ═══════════════════════════════════════════════════
+// COMMAND HISTORY
+// ═══════════════════════════════════════════════════
+const cmdHistory = JSON.parse(localStorage.getItem('genos-cmd-history')||'[]')
+let cmdHistIdx = -1
+
+function cmdHistoryPush(text){
+  if(cmdHistory[0]===text) return
+  cmdHistory.unshift(text)
+  if(cmdHistory.length>100) cmdHistory.length=100
+  localStorage.setItem('genos-cmd-history',JSON.stringify(cmdHistory))
+  cmdHistIdx=-1
+}
+
+;(function(){
+  const inp=g('cb-input')
+  if(!inp) return
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='ArrowUp'){
+      e.preventDefault()
+      cmdHistIdx=Math.min(cmdHistIdx+1,cmdHistory.length-1)
+      inp.value=cmdHistory[cmdHistIdx]||''
+      inp.setSelectionRange(inp.value.length,inp.value.length)
+      showHistIndicator(cmdHistIdx+1,cmdHistory.length)
+    } else if(e.key==='ArrowDown'){
+      e.preventDefault()
+      cmdHistIdx=Math.max(cmdHistIdx-1,-1)
+      inp.value=cmdHistIdx<0?'':cmdHistory[cmdHistIdx]||''
+      if(cmdHistIdx<0) hideHistIndicator()
+      else showHistIndicator(cmdHistIdx+1,cmdHistory.length)
+    } else {
+      cmdHistIdx=-1; hideHistIndicator()
+    }
+  })
+  inp.addEventListener('input',()=>{ updateAutocomplete(inp.value) })
+})()
+
+function showHistIndicator(pos,total){
+  const el=g('hist-ind'); if(!el)return
+  el.textContent=`↑ history ${pos}/${total}`
+  el.style.display='block'
+}
+function hideHistIndicator(){ const el=g('hist-ind'); if(el)el.style.display='none' }
+
+// ═══════════════════════════════════════════════════
+// AUTOCOMPLETE
+// ═══════════════════════════════════════════════════
+const SLASH_COMMANDS = [
+  {label:'/clear',hint:'Remove all surfaces',icon:'🗑'},
+  {label:'/ambient',hint:'Toggle ambient mode',icon:'🌙'},
+  {label:'/shortcuts',hint:'Show keyboard shortcuts',icon:'⌨'},
+  {label:'/palette',hint:'Open command palette',icon:'🔍'},
+  {label:'/ws',hint:'Workspace manager',icon:'💾'},
+  {label:'/ws save [name]',hint:'Save current workspace',icon:'💾'},
+  {label:'/ws load [name]',hint:'Load a workspace',icon:'📂'},
+  {label:'/theme [name]',hint:'Switch theme (oazyse/dark/green/blue…)',icon:'🎨'},
+  {label:'/notes',hint:'Sticky note surface',icon:'📝'},
+  {label:'/todo',hint:'Task list surface',icon:'✅'},
+  {label:'/timer',hint:'Pomodoro timer',icon:'⏱'},
+  {label:'/matrix',hint:'Matrix rain animation',icon:'💚'},
+  {label:'/weather',hint:'Live weather (geolocation)',icon:'🌤'},
+  {label:'/code',hint:'JavaScript runner',icon:'⚡'},
+  {label:'/solana',hint:'Solana devnet live feed',icon:'◎'},
+  {label:'/whiteboard',hint:'Drawing canvas',icon:'✏️'},
+  {label:'/kaleidoscope',hint:'Generative art',icon:'🌈'},
+  {label:'/chat',hint:'Chat with AI agent',icon:'🤖'},
+  {label:'/save ',hint:'Save current interface as named app',icon:'💾'},
+  {label:'/launch ',hint:'Launch a saved app by name',icon:'🚀'},
+  {label:'/apps',hint:'Show all your saved apps',icon:'⊞'},
+]
+
+function updateAutocomplete(text){
+  const ac=g('autocomplete'); if(!ac)return
+  if(!text||text.length<1){ac.style.display='none';return}
+  let items=[]
+  if(text.startsWith('/')){
+    items=SLASH_COMMANDS.filter(s=>s.label.startsWith(text)).slice(0,6)
+  } else {
+    const tl=text.toLowerCase()
+    const caps=Object.values(S.capabilities).filter(c=>c.description.toLowerCase().includes(tl)||c.tags.some(t=>t.includes(tl))).slice(0,5)
+    items=caps.map(c=>({label:c.description,hint:c.id,icon:'◈'}))
+  }
+  if(!items.length){ac.style.display='none';return}
+  ac.innerHTML=items.map((it,i)=>`<div class="ac-item${i===0?' ac-sel':''}" onclick="doAutocomplete('${it.label.replace(/'/,'')}')"><span class="ac-icon">${it.icon}</span><span class="ac-label">${it.label}</span><span class="ac-hint">${it.hint}</span></div>`).join('')
+  ac.style.display='block'
+}
+
+function hideAutocomplete(){ const ac=g('autocomplete'); if(ac)ac.style.display='none' }
+
+function doAutocomplete(text){
+  const inp=g('cb-input'); if(inp)inp.value=text
+  hideAutocomplete()
+  if(!text.includes('[')) { cmd(text); return }
+  if(inp){ inp.focus(); inp.setSelectionRange(text.length,text.length) }
+}
+
+// Navigate autocomplete with Tab
+document.addEventListener('keydown',e=>{
+  const ac=g('autocomplete')
+  if(!ac||ac.style.display==='none') return
+  if(e.key==='Tab'||e.key==='Enter'){
+    e.preventDefault()
+    const sel=ac.querySelector('.ac-sel')
+    if(sel) doAutocomplete(sel.querySelector('.ac-label').textContent)
+  }
+  if(e.key==='Escape') hideAutocomplete()
+})
+
+// ═══════════════════════════════════════════════════
+// COMMAND PALETTE (⌘K)
+// ═══════════════════════════════════════════════════
+let paletteItems = []
+let paletteIdx = 0
+
+function buildPaletteItems(){
+  const items = []
+  // surfaces
+  items.push({section:'SURFACES'})
+  for(const [id,cap] of Object.entries(S.capabilities)){
+    items.push({icon:'◈',label:cap.description,sub:cap.category,action:()=>{ mountSurface({capability:id,intent:cap.description,position:'center'}); closePalette() }})
+  }
+  // themes
+  items.push({section:'THEMES'})
+  for(const name of Object.keys(THEMES)){
+    items.push({icon:'◕',label:'Theme: '+name,sub:'visual',action:()=>{ applyOSTheme(THEMES[name]); closePalette(); addNotif('Theme changed: '+name,'info') }})
+  }
+  // commands
+  items.push({section:'COMMANDS'})
+  items.push({icon:'🗑',label:'Clear all surfaces',sub:'command',action:()=>{ Object.keys(S.surfaces).forEach(unmountSurface); closePalette() }})
+  items.push({icon:'🌙',label:'Toggle ambient mode',sub:'command',action:()=>{ toggleAmbient(); closePalette() }})
+  items.push({icon:'⌨',label:'Keyboard shortcuts',sub:'command',action:()=>{ closePalette(); openShortcuts() }})
+  items.push({icon:'💾',label:'Show workspaces',sub:'command',action:()=>{ closePalette(); toggleWsBar() }})
+  // loaded workspaces
+  try{
+    const ws=JSON.parse(localStorage.getItem('genos-workspaces')||'{}')
+    for(const name of Object.keys(ws)){
+      items.push({icon:'📂',label:'Load: '+name,sub:'workspace',action:()=>{ wsLoadWorkspace(name); closePalette() }})
+    }
+  }catch(e){}
+  paletteItems=items
+  return items
+}
+
+function openPalette(){
+  buildPaletteItems()
+  paletteIdx=0
+  const p=g('cmd-palette'); if(!p)return
+  p.classList.add('open')
+  const inp=g('cmd-pal-input'); if(inp){ inp.value=''; inp.focus() }
+  renderPaletteResults('')
+}
+
+function closePalette(){
+  const p=g('cmd-palette'); if(p)p.classList.remove('open')
+}
+
+function paletteSearch(query){
+  renderPaletteResults(query)
+  paletteIdx=0
+}
+
+function renderPaletteResults(query){
+  const ql=query.toLowerCase()
+  const res=g('cmd-pal-results'); if(!res)return
+  let html=''
+  let idx=0
+  let lastSection=''
+  for(const item of paletteItems){
+    if(item.section){lastSection=item.section;continue}
+    if(ql&&!item.label.toLowerCase().includes(ql)&&!(item.sub||'').includes(ql)) continue
+    if(lastSection){
+      html+=`<div class="cmd-pal-sep">${lastSection}</div>`
+      lastSection=''
+    }
+    html+=`<div class="cmd-pal-item${idx===0?' active':''}" onclick="paletteSelect(${idx})" data-pidx="${idx}"><div class="cpi-icon">${item.icon||'◈'}</div><div><div class="cpi-label">${item.label}</div><div class="cpi-sub">${item.sub||''}</div></div></div>`
+    idx++
+  }
+  if(!html) html='<div style="padding:20px;text-align:center;font-size:12px;color:var(--text3)">No results</div>'
+  res.innerHTML=html
+}
+
+function paletteSelect(idx){
+  const actionItems=paletteItems.filter(i=>!i.section)
+  if(actionItems[idx]) actionItems[idx].action()
+}
+
+function paletteKey(e){
+  const items=g('cmd-pal-results')?.querySelectorAll('.cmd-pal-item')
+  if(!items||!items.length) return
+  if(e.key==='ArrowDown'){ e.preventDefault(); paletteIdx=Math.min(paletteIdx+1,items.length-1) }
+  if(e.key==='ArrowUp'){ e.preventDefault(); paletteIdx=Math.max(paletteIdx-1,0) }
+  if(e.key==='Escape'){ closePalette(); return }
+  if(e.key==='Enter'){ e.preventDefault(); paletteSelect(paletteIdx); return }
+  items.forEach((el,i)=>el.classList.toggle('active',i===paletteIdx))
+}
+
+// Global ⌘K
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){ e.preventDefault(); openPalette(); return }
+  if((e.metaKey||e.ctrlKey)&&e.key==='l'){ e.preventDefault(); const inp=g('cb-input'); if(inp)inp.focus(); return }
+  if((e.metaKey||e.ctrlKey)&&e.key==='.'){ e.preventDefault(); toggleAmbient(); return }
+  if((e.metaKey||e.ctrlKey)&&(e.key==='Backspace'||e.key==='Delete')){
+    if(document.activeElement!==g('cb-input')){ e.preventDefault(); Object.keys(S.surfaces).forEach(unmountSurface); addNotif('All surfaces cleared','info') }
+    return
+  }
+  if(e.key==='?'&&document.activeElement!==g('cb-input')&&!g('cmd-palette')?.classList.contains('open')){ openShortcuts(); return }
+  if(e.key==='Escape'){
+    if(g('cmd-palette')?.classList.contains('open')){ closePalette(); return }
+    if(g('shortcuts-modal')?.classList.contains('open')){ closeShortcuts(); return }
+    if(g('notif-drawer')?.classList.contains('open')){ closeNotifDrawer(); return }
+    if(document.body.classList.contains('ambient')){ disableAmbient(); return }
+  }
+})
+
+// ═══════════════════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════════════════
+const _notifHistory = []
+
+function addNotif(msg, type='info'){
+  const list=g('notif-list'); if(!list)return
+  const badge=g('notif-badge')
+  // Remove empty state
+  const empty=list.querySelector('[style*="No notifications"]')
+  if(empty) empty.remove()
+  const now=new Date().toTimeString().slice(0,8)
+  const item=document.createElement('div')
+  item.className='notif-item '+type
+  item.innerHTML=`<div class="ni-msg">${msg}</div><div class="ni-time">${now}</div>`
+  list.prepend(item)
+  _notifHistory.unshift({msg,type,time:now})
+  if(_notifHistory.length>50) _notifHistory.length=50
+  if(badge){ badge.style.display='block' }
+}
+
+function toggleNotifDrawer(){
+  const d=g('notif-drawer'); if(!d)return
+  d.classList.toggle('open')
+  if(d.classList.contains('open')){ const b=g('notif-badge'); if(b)b.style.display='none' }
+}
+
+function closeNotifDrawer(){ const d=g('notif-drawer'); if(d)d.classList.remove('open') }
+
+function clearNotifs(){
+  const list=g('notif-list'); if(!list)return
+  list.innerHTML='<div style="font-size:11px;color:var(--text3);text-align:center;padding:28px;font-family:var(--mono)">No notifications yet</div>'
+  const b=g('notif-badge'); if(b)b.style.display='none'
+}
+
+// Close drawer when clicking outside
+document.addEventListener('click',e=>{
+  const d=g('notif-drawer'), btn=g('notif-btn')
+  if(d&&d.classList.contains('open')&&!d.contains(e.target)&&e.target!==btn&&!btn?.contains(e.target)) closeNotifDrawer()
+})
+
+// ═══════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS MODAL
+// ═══════════════════════════════════════════════════
+function openShortcuts(){ const m=g('shortcuts-modal'); if(m)m.classList.add('open') }
+function closeShortcuts(){ const m=g('shortcuts-modal'); if(m)m.classList.remove('open') }
+
+// ═══════════════════════════════════════════════════
+// AMBIENT MODE
+// ═══════════════════════════════════════════════════
+function toggleAmbient(){
+  if(document.body.classList.contains('ambient')) disableAmbient()
+  else enableAmbient()
+}
+function enableAmbient(){ document.body.classList.add('ambient'); addNotif('Ambient mode on — hover for controls','info') }
+function disableAmbient(){ document.body.classList.remove('ambient') }
+
+// ═══════════════════════════════════════════════════
+// THEME RING
+// ═══════════════════════════════════════════════════
+const THEME_COLORS = {
+  oazyse:'hsl(270,100%,70%)',dark:'hsl(0,0%,20%)',light:'hsl(0,0%,90%)',
+  green:'hsl(150,100%,40%)',blue:'hsl(220,100%,60%)',red:'hsl(0,72%,51%)',
+  purple:'hsl(280,100%,65%)',amber:'hsl(38,92%,50%)'
+}
+
+function buildThemeRing(){
+  const ring=g('theme-ring'); if(!ring)return
+  ring.innerHTML=Object.entries(THEME_COLORS).map(([name,color])=>`<div class="tr-dot" style="background:${color}" title="${name}" data-active="${name===S.currentThemeName||false}" onclick="applyOSTheme(THEMES['${name}']);updateThemeRingActive('${name}');toggleThemeRing()"></div>`).join('')
+}
+
+function updateThemeRingActive(name){
+  S.currentThemeName=name
+  g('theme-ring')?.querySelectorAll('.tr-dot').forEach((d,i)=>{ d.dataset.active=(Object.keys(THEME_COLORS)[i]===name).toString() })
+}
+
+function toggleThemeRing(){
+  const ring=g('theme-ring'); if(!ring)return
+  const isOpen=ring.classList.toggle('open')
+  if(isOpen) buildThemeRing()
+}
+
+// ═══════════════════════════════════════════════════
+// WORKSPACES
+// ═══════════════════════════════════════════════════
+function wsSaveWorkspace(name='workspace'){
+  if(!name) name='workspace'
+  try{
+    const ws=JSON.parse(localStorage.getItem('genos-workspaces')||'{}')
+    ws[name]=JSON.parse(JSON.stringify(S.surfaces))
+    localStorage.setItem('genos-workspaces',JSON.stringify(ws))
+    addNotif(`Workspace "${name}" saved (${Object.keys(S.surfaces).length} surfaces)`,'success')
+    renderWsBar()
+  }catch(e){ addNotif('Failed to save workspace','warn') }
+}
+
+function wsLoadWorkspace(name){
+  try{
+    const ws=JSON.parse(localStorage.getItem('genos-workspaces')||'{}')
+    const snap=ws[name]; if(!snap){addNotif(`Workspace "${name}" not found`,'warn');return}
+    Object.keys(S.surfaces).forEach(unmountSurface)
+    for(const [id,spec] of Object.entries(snap)){
+      mountSurface({capability:spec.capId,intent:spec.intent||'',position:{x:spec.x,y:spec.y},w:spec.w,h:spec.h,sid:id})
+    }
+    addNotif(`Workspace "${name}" loaded`,'success')
+  }catch(e){ addNotif('Failed to load workspace','warn') }
+}
+
+function wsDeleteWorkspace(name){
+  try{
+    const ws=JSON.parse(localStorage.getItem('genos-workspaces')||'{}')
+    delete ws[name]
+    localStorage.setItem('genos-workspaces',JSON.stringify(ws))
+    addNotif(`Workspace "${name}" deleted`,'info')
+    renderWsBar()
+  }catch(e){}
+}
+
+function toggleWsBar(){
+  const bar=g('ws-bar'); if(!bar)return
+  const isOpen=bar.classList.toggle('visible')
+  if(isOpen) renderWsBar()
+}
+
+function renderWsBar(){
+  const bar=g('ws-bar'); if(!bar)return
+  try{
+    const ws=JSON.parse(localStorage.getItem('genos-workspaces')||'{}')
+    const names=Object.keys(ws)
+    bar.innerHTML=names.length
+      ? names.map(n=>`<div class="ws-slot ws-filled" title="Load: ${n}" onclick="wsLoadWorkspace('${n}');toggleWsBar()" oncontextmenu="wsCtxMenu(event,'${n}');return false">${n}</div>`).join('')+`<div class="ws-slot" onclick="wsSaveWorkspace(prompt('Workspace name:'))" title="Save current">+ Save</div>`
+      : `<div class="ws-slot" onclick="wsSaveWorkspace(prompt('Workspace name:'))" title="Save current">+ Save workspace</div>`
+  }catch(e){}
+}
+
+function wsCtxMenu(e,name){
+  showCtxMenu(e,[
+    {label:'Load "'+name+'"',action:()=>wsLoadWorkspace(name)},
+    {label:'Delete "'+name+'"',action:()=>wsDeleteWorkspace(name),danger:true}
+  ])
+}
+
+// ═══════════════════════════════════════════════════
+// CONTEXT MENU
+// ═══════════════════════════════════════════════════
+function showCtxMenu(e, items){
+  const menu=g('ctx-menu'); if(!menu)return
+  menu.innerHTML=items.map(it=>it.sep
+    ? '<div class="ctx-sep"></div>'
+    : `<div class="ctx-item${it.danger?' danger':''}" onclick="ctxExec(${items.indexOf(it)})">${it.icon||''}${it.label}</div>`
+  ).join('')
+  menu._items=items
+  menu.style.display='block'
+  const x=Math.min(e.clientX,window.innerWidth-200)
+  const y=Math.min(e.clientY,window.innerHeight-items.length*34)
+  menu.style.left=x+'px'; menu.style.top=y+'px'
+  e.preventDefault()
+}
+
+function ctxExec(idx){
+  const menu=g('ctx-menu'); if(!menu)return
+  const item=menu._items?.[idx]
+  if(item?.action) item.action()
+  menu.style.display='none'
+}
+
+function surfCtxMenu(e,sid){
+  showCtxMenu(e,[
+    {icon:'↺ ',label:'Regenerate',action:()=>regenSurface(sid,S.surfaces[sid]?.intent||sid)},
+    {icon:'📌 ',label:'Bring to front',action:()=>{const el=g('surface-'+sid);if(el)el.style.zIndex=++S._zTop}},
+    {sep:true},
+    {icon:'✕ ',label:'Close',action:()=>unmountSurface(sid),danger:true}
+  ])
+}
+
+document.addEventListener('click',e=>{
+  const m=g('ctx-menu')
+  if(m&&m.style.display==='block'&&!m.contains(e.target)) m.style.display='none'
+})
+document.addEventListener('contextmenu',e=>{
+  // Right-click on surface title → context menu
+  const bar=e.target.closest('.surf-bar')
+  if(bar){
+    const sid=bar.closest('[id^="surface-"]')?.id?.replace('surface-','')
+    if(sid){
+      showCtxMenu(e,[
+        {label:'↺ Regenerate',action:()=>regenSurface(sid,S.surfaces[sid]?.intent||sid)},
+        {label:'📌 Bring to front',action:()=>{const el=g('surface-'+sid);if(el)el.style.zIndex=++S._zTop}},
+        {sep:true},
+        {label:'✕ Close surface',action:()=>unmountSurface(sid),danger:true}
+      ])
+    }
+  }
+})
+
+// ═══════════════════════════════════════════════════
+// NEW SURFACE HELPERS
+// ═══════════════════════════════════════════════════
+// — Notes —
+function notesClear(id){
+  localStorage.removeItem('genos-note-'+id)
+  const ta=g('nt-'+id); if(ta)ta.value=''
+}
+
+// — Todo —
+const _todos={}
+function todoAdd(id){
+  const inp=g('tdi-'+id); if(!inp||!inp.value.trim())return
+  if(!_todos[id])_todos[id]=[]
+  _todos[id].push({text:inp.value.trim(),done:false})
+  inp.value=''; todoRender(id)
+  todoSave(id)
+}
+function todoToggle(id,idx){
+  if(_todos[id]&&_todos[id][idx]) _todos[id][idx].done=!_todos[id][idx].done
+  todoRender(id); todoSave(id)
+}
+function todoDelete(id,idx){
+  if(_todos[id]) _todos[id].splice(idx,1)
+  todoRender(id); todoSave(id)
+}
+function todoRender(id){
+  // Load from storage if not in memory
+  if(!_todos[id]) try{_todos[id]=JSON.parse(localStorage.getItem('genos-todo-'+id)||'[]')}catch{_todos[id]=[]}
+  const list=g('tdl-'+id); const stats=g('tds-'+id); if(!list)return
+  const todos=_todos[id]||[]
+  list.innerHTML=todos.map((t,i)=>`<div style="display:flex;align-items:center;gap:6px;padding:5px 2px;border-bottom:1px solid var(--border)"><div onclick="todoToggle('${id}',${i})" style="width:14px;height:14px;border-radius:3px;border:1px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${t.done?'var(--green)':'transparent'};color:${t.done?'#000':'transparent'};font-size:10px">✓</div><span style="flex:1;font-size:12px;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.text}</span><button onclick="todoDelete('${id}',${i})" style="background:transparent;border:none;cursor:pointer;color:var(--text3);font-size:11px;padding:0 4px;opacity:.6">×</button></div>`).join('')||'<div style="font-size:11px;color:var(--text3);padding:8px;text-align:center">No tasks yet</div>'
+  if(stats){ const done=todos.filter(t=>t.done).length; stats.textContent=`${done}/${todos.length} done` }
+}
+function todoSave(id){ try{localStorage.setItem('genos-todo-'+id,JSON.stringify(_todos[id]||[]))}catch(e){} }
+
+// — Timer —
+const _timers={}
+function timerToggle(id){
+  if(_timers[id]?.running) timerPause(id); else timerStart(id)
+}
+function timerStart(id){
+  if(!_timers[id]) _timers[id]={secs:25*60,running:false}
+  _timers[id].running=true
+  const btn=g('tmrs-'+id); if(btn)btn.textContent='PAUSE'
+  _timers[id].interval=setInterval(()=>{
+    _timers[id].secs--
+    timerRenderDisplay(id)
+    if(_timers[id].secs<=0){ clearInterval(_timers[id].interval); _timers[id].running=false; timerDone(id) }
+  },1000)
+}
+function timerPause(id){
+  if(_timers[id]){ clearInterval(_timers[id].interval); _timers[id].running=false }
+  const btn=g('tmrs-'+id); if(btn)btn.textContent='START'
+}
+function timerReset(id){
+  timerPause(id); _timers[id]={secs:25*60,running:false}
+  timerRenderDisplay(id)
+  const btn=g('tmrs-'+id); if(btn)btn.textContent='START'
+  const lbl=g('tmrl-'+id); if(lbl)lbl.textContent='POMODORO'
+}
+function timerRenderDisplay(id){
+  const t=_timers[id]; if(!t)return
+  const el=g('tmr-'+id); if(!el)return
+  const m=Math.floor(t.secs/60), s=t.secs%60
+  el.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')
+  if(t.secs<=60) el.style.color='var(--red)'; else if(t.secs<=5*60) el.style.color='var(--amber)'; else el.style.color='var(--text)'
+}
+function timerDone(id){
+  const el=g('tmr-'+id); if(el){el.textContent='00:00';el.style.color='var(--green)'}
+  const lbl=g('tmrl-'+id); if(lbl)lbl.textContent='DONE! ✓'
+  addNotif('Pomodoro complete! Take a break 🍅','success')
+}
+
+// — Whiteboard —
+function wbClear(id){ const c=g('wb-'+id); if(c){const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height)} }
+function wbToggleErase(id){
+  const btn=event.target
+  if(btn.dataset.erasing==='true'){btn.dataset.erasing='false';btn.style.color='var(--text3)';const m=g('wb-mode-'+id);if(m)m.textContent='DRAW'}
+  else{btn.dataset.erasing='true';btn.style.color='var(--red)';const m=g('wb-mode-'+id);if(m)m.textContent='ERASE'}
+  const c=g('wb-'+id)
+  if(c) c._erasing=btn.dataset.erasing==='true'
+}
+
+// — Agent Chat —
+function agentChatSend(id){
+  const inp=g('ac-in-'+id); if(!inp||!inp.value.trim())return
+  const msg=inp.value.trim(); inp.value=''
+  const log=g('ac-log-'+id); if(!log)return
+  log.innerHTML+=`<div style="text-align:right"><div style="display:inline-block;background:hsla(270,100%,65%,.15);border:1px solid var(--purple);border-radius:8px;padding:6px 10px;font-size:12px;max-width:80%;text-align:left">${msg}</div></div>`
+  log.scrollTop=log.scrollHeight
+  // send to agent
+  wsSend({action:'os_chat',text:msg})
+  // Show thinking
+  const thinking=document.createElement('div')
+  thinking.id='ac-think-'+id
+  thinking.style.cssText='font-size:11px;color:var(--text3);font-family:var(--mono);padding:4px'
+  thinking.textContent='agent thinking…'
+  log.appendChild(thinking); log.scrollTop=log.scrollHeight
+}
+
+// — Code Runner —
+function codeRun(id){
+  const ed=g('cr-ed-'+id), out=g('cr-out-'+id); if(!ed||!out)return
+  out.innerHTML=''
+  const origConsole={log:console.log,error:console.error,warn:console.warn}
+  const logs=[]
+  console.log=(...a)=>{logs.push({t:'log',m:a.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' ')});origConsole.log(...a)}
+  console.error=(...a)=>{logs.push({t:'err',m:a.join(' ')});origConsole.error(...a)}
+  console.warn=(...a)=>{logs.push({t:'warn',m:a.join(' ')});origConsole.warn(...a)}
+  try{
+    // eslint-disable-next-line no-new-func
+    new Function(ed.value)()
+  }catch(e){
+    logs.push({t:'err',m:String(e)})
+  }finally{
+    console.log=origConsole.log; console.error=origConsole.error; console.warn=origConsole.warn
+  }
+  out.innerHTML=logs.map(l=>`<div style="color:${l.t==='err'?'var(--red)':l.t==='warn'?'var(--amber)':'var(--green)'};padding:1px 0">${l.m}</div>`).join('')||'<div style="color:var(--text3)">// no output</div>'
+}
+function codeClear(id){
+  const out=g('cr-out-'+id); if(out)out.innerHTML=''
+  const ed=g('cr-ed-'+id); if(ed)ed.value=''
+}
+
+// ═══════════════════════════════════════════════════
+// APP REGISTRY — save & launch named visual experiences
+// ═══════════════════════════════════════════════════
+function appSave(name) {
+  if(!name||!name.trim()) { addNotif('Usage: /save [name]','warn'); return }
+  name = name.trim()
+  const layer = g('os-full-layer')
+  let spec = null
+  if(layer && layer.innerHTML.trim()) {
+    spec = { html: layer.innerHTML, fullscreen: true, title: g('ib-title')?.textContent||name, savedAt: Date.now() }
+  } else {
+    const ids = Object.keys(S.surfaces)
+    if(!ids.length) { addNotif('Nothing to save yet','warn'); return }
+    const s = S.surfaces[ids[ids.length-1]]
+    spec = { ...s, fullscreen: false, savedAt: Date.now() }
+  }
+  try{
+    const reg = JSON.parse(localStorage.getItem('genos-apps')||'{}')
+    reg[name] = spec
+    localStorage.setItem('genos-apps', JSON.stringify(reg))
+    addNotif(`"${name}" saved ✓`,'success')
+  }catch(e){ addNotif('Save failed','warn') }
+}
+
+function appLoad(name) {
+  if(!name) return
+  try{
+    const reg = JSON.parse(localStorage.getItem('genos-apps')||'{}')
+    const app = reg[name]
+    if(!app) { addNotif(`"${name}" not found`,'warn'); return }
+    if(app.fullscreen) {
+      setOSFull(app.html, app.title||name)
+    } else {
+      const spec = { ...app, id:'surf-'+Date.now() }
+      S.surfaces[spec.id] = spec
+      renderGeneratedSurface(spec)
+    }
+    addNotif(`"${name}" launched`,'success')
+  }catch(e){ addNotif('Launch failed','warn') }
+}
+
+function appShowSwitcher() {
+  let reg = {}
+  try{ reg = JSON.parse(localStorage.getItem('genos-apps')||'{}') }catch{}
+  const names = Object.keys(reg)
+  const html = `<div style="padding:32px 40px;min-height:100vh;background:var(--bg);box-sizing:border-box">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px">
+      <h2 style="font-family:var(--brand);font-size:22px;color:var(--purple);margin:0">Your Apps</h2>
+      <span style="font-size:11px;color:var(--text3);font-family:var(--mono)">${names.length} saved</span>
+    </div>
+    ${names.length ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px">
+      ${names.map(n=>`<div onclick="appLoad('${n.replace(/'/g,'&#39;')}');clearOSFull()"
+        style="padding:22px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+        cursor:pointer;text-align:center;transition:all .2s"
+        onmouseover="this.style.borderColor='var(--purple)';this.style.background='var(--bg3)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg2)'">
+        <div style="font-size:32px;margin-bottom:10px">${reg[n].fullscreen?'🖥':'⬜'}</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px;word-break:break-all">${n}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">
+          ${reg[n].fullscreen?'fullscreen':'widget'}</div>
+        <button onclick="event.stopPropagation();appDelete('${n.replace(/'/g,'&#39;')}');appShowSwitcher()"
+          style="margin-top:10px;font-size:9px;padding:2px 8px;background:transparent;
+          border:1px solid var(--border);border-radius:12px;cursor:pointer;color:var(--text3);font-family:var(--mono)"
+          onmouseover="this.style.color='var(--red)';this.style.borderColor='var(--red)'"
+          onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">delete</button>
+      </div>`).join('')}
+    </div>` : `<div style="text-align:center;padding:60px 0;color:var(--text3)">
+      <div style="font-size:40px;margin-bottom:16px">⬜</div>
+      <div style="font-size:14px;margin-bottom:8px">No saved apps yet</div>
+      <div style="font-size:12px;font-family:var(--mono)">Use /save [name] to save anything you create</div>
+    </div>`}
+    <button onclick="clearOSFull()"
+      style="margin-top:32px;padding:10px 24px;background:var(--bg2);border:1px solid var(--border);
+      border-radius:8px;cursor:pointer;color:var(--text);font-size:13px;font-family:var(--font)">
+      ← Back to canvas</button>
+  </div>`
+  setOSFull(html, 'My Apps')
+}
+
+function appDelete(name) {
+  try{
+    const reg = JSON.parse(localStorage.getItem('genos-apps')||'{}')
+    delete reg[name]
+    localStorage.setItem('genos-apps', JSON.stringify(reg))
+    addNotif(`"${name}" deleted`,'info')
+  }catch{}
+}
+
+// Extract title from generated HTML (looks for <title> or first <h1>)
+function extractHtmlTitle(html) {
+  const t = html.match(/<title[^>]*>([^<]+)<\/title>/i)
+  if(t) return t[1].trim()
+  const h = html.match(/<h[1-2][^>]*>([^<]+)<\/h[1-2]>/i)
+  if(h) return h[1].replace(/<[^>]+>/g,'').trim()
+  return ''
+}
+
+// ═══════════════════════════════════════════════════
+// SURFACE Z-INDEX TRACKER
+// ═══════════════════════════════════════════════════
+S._zTop = 100
+
+// Patch addNotif calls into existing done() for feedback
+const _origDone = typeof done !== 'undefined' ? done : null
+
+// ── Boot ──
+BUILTIN_CAPS.forEach(registerCapability)
+// Apply oazyse theme by default; restore only if user explicitly set a different theme
+try{
+  const saved = localStorage.getItem('genos-theme')
+  if(saved){const t=JSON.parse(saved);if(t.bg&&t.bg!=='#ffffff')applyOSTheme(t);else applyOSTheme(THEMES.oazyse)}
+  else applyOSTheme(THEMES.oazyse)
+}catch{ applyOSTheme(THEMES.oazyse) }
+try{ const s=localStorage.getItem('genos-style'); if(s) injectOSStyle(s) }catch{}
+wsConnect()
+loadSurfaces()
+startContextWatcher()
+// Apply saved language (or default EN)
+;(function(){ const l = localStorage.getItem('ls-lang') || 'en'; applyI18n(l) })()
+setTimeout(()=>g('cb-input').focus(),200)
+// Boot notification
+setTimeout(()=>{
+  addNotif('GenOS ready — press ⌘K for command palette, ? for shortcuts','info')
+}, 1500)
+</script>
+</body>
+</html>

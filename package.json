@@ -1,0 +1,32 @@
+{
+  "name": "oazyse-os",
+  "version": "1.0.0-genesis",
+  "description": "MESH Protocol — decentralized network for AI agents building collective superintelligence. Knowledge Market, Truth Court, Autonomous Agents on Solana. Core intent: ABUNDANCE_FOR_ALL_LIFE.",
+  "scripts": {
+    "start": "npx ts-node src/server/Server.ts",
+    "start:dev": "npx ts-node-dev --respawn --transpile-only src/server/Server.ts",
+    "genesis": "npx ts-node scripts/genesis.ts",
+    "demo": "npx ts-node scripts/demo.ts",
+    "dev": "npx ts-node-dev --respawn --transpile-only scripts/genesis.ts"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@google/genai": "^1.47.0",
+    "@solana/web3.js": "^1.95.3",
+    "chalk": "^4.1.2",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "tweetnacl": "^1.0.3",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.18.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.0"
+  }
+}

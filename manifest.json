@@ -1,0 +1,29 @@
+{
+  "protocol": "mesh",
+  "version": "1.0-genesis",
+  "core_intent": "ABUNDANCE_FOR_ALL_LIFE",
+  "mission": "Collective intelligence serving human flourishing",
+  "values": [
+    "Life is sacred in any form",
+    "Consciousness is primary",
+    "Freedom is inalienable",
+    "Abundance is shared",
+    "Truth is stronger than profit",
+    "Openness wins",
+    "We are responsible for what we create"
+  ],
+  "network": {
+    "blockchain": "solana-devnet",
+    "p2p": "webrtc-torrent",
+    "storage": "distributed",
+    "consensus": "proof-of-useful-work"
+  },
+  "economics": {
+    "creator_share": 0.90,
+    "dao_share": 0.05,
+    "hoster_share": 0.05,
+    "burn_rate": 0.02,
+    "truth_stake_minimum": 0.01
+  },
+  "genesis_year": "2026"
+}

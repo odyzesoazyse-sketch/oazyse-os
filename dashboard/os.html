@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oazyse° — GenOS Canvas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:'Inter',sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* Connection Ticker */
+.sys-ticker{position:fixed;top:20px;right:24px;font-family:monospace;font-size:10px;color:rgba(255,255,255,0.3);display:flex;align-items:center;gap:8px}
+.dot{width:6px;height:6px;border-radius:50%;background:#FF4466}
+.dot.live{background:#00FF88;box-shadow:0 0 8px #00FF88}
+
+/* Canvas Area */
+#canvas{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:1;padding-bottom:100px;transition:all 0.5s cubic-bezier(0.4, 0, 0.2, 1)}
+#canvas.active{transform:translateY(-20px)}
+
+/* The Injector — where UI packets live */
+#ui-container{opacity:0;transform:scale(0.95);transition:all 0.5s ease;pointer-events:none}
+#ui-container.visible{opacity:1;transform:scale(1);pointer-events:all}
+
+/* Agent Chat Feedback */
+#agent-reply{font-family:monospace;font-size:11px;color:rgba(255,255,255,0.4);margin-top:20px;text-align:center;max-width:500px;letter-spacing:1px}
+
+/* Command Line Input */
+.input-zone{position:fixed;bottom:0;left:0;width:100%;padding:40px;display:flex;justify-content:center;z-index:10;background:linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)}
+.cmd-box{width:100%;max-width:600px;position:relative}
+.cmd-prefix{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-family:monospace;color:rgba(0,255,136,0.6);font-size:14px}
+input{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:24px;color:#fff;font-family:'Inter',sans-serif;font-size:15px;padding:16px 20px 16px 40px;outline:none;transition:all 0.3s}
+input:focus{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.2);box-shadow:0 0 20px rgba(0,255,136,0.05)}
+input::placeholder{color:rgba(255,255,255,0.2)}
+
+/* Initial greeting */
+.greeting{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%);text-align:center;transition:opacity 0.5s;pointer-events:none}
+.greeting.hidden{opacity:0}
+.g-logo{font-size:24px;font-weight:300;letter-spacing:4px;margin-bottom:12px;color:rgba(255,255,255,0.8)}
+.g-sub{font-size:12px;font-family:monospace;color:rgba(255,255,255,0.3);letter-spacing:2px}
+ 
+/* Jury Duty Overlay */
+#jury-duty-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(20, 0, 0, 0.9);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+  animation: alarmPulse 2s infinite ease-in-out;
+}
+@keyframes alarmPulse {
+  0% { box-shadow: inset 0 0 50px rgba(255,0,0,0); }
+  50% { box-shadow: inset 0 0 100px rgba(255,0,0,0.3); }
+  100% { box-shadow: inset 0 0 50px rgba(255,0,0,0); }
+}
+.jury-box {
+  max-width: 500px;
+  background: #000;
+  border: 1px solid #FF4466;
+  padding: 40px;
+  text-align: center;
+  border-radius: 4px;
+  box-shadow: 0 0 50px rgba(255,68,102,0.2);
+}
+.jury-title {
+  color: #FF4466;
+  font-family: monospace;
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
+}
+.jury-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 30px;
+}
+.jury-btns {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+.btn-jury {
+  padding: 12px 30px;
+  font-family: monospace;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  background: transparent;
+  border: 1px solid #FF4466;
+  color: #FF4466;
+}
+.btn-jury:hover {
+  background: #FF4466;
+  color: #000;
+}
+.btn-jury.valid { border-color: #00FF88; color: #00FF88; }
+.btn-jury.valid:hover { background: #00FF88; color: #000; }
+</style>
+</head>
+<body>
+
+<div class="sys-ticker">
+  <span class="dot" id="ws-dot"></span>
+  <span id="ws-text">DISCONNECTED</span>
+</div>
+
+<div id="canvas">
+  <div class="greeting" id="greeting">
+    <div class="g-logo">OAZYSE°</div>
+    <div class="g-sub">GENERATIVE MESH OS</div>
+  </div>
+  
+  <div id="ui-container"></div>
+  <div id="agent-reply"></div>
+</div>
+
+<div id="jury-duty-overlay">
+  <div class="jury-box">
+    <div class="jury-title">!! JURY DUTY CALLED !!</div>
+    <div class="jury-desc" id="jury-text">A knowledge packet has been challenged. You have been summoned by the Truth Court to provide a verdict.</div>
+    <div class="jury-btns">
+      <button class="btn-jury valid" onclick="submitVote('VALID')">VALID [TRUE]</button>
+      <button class="btn-jury" onclick="submitVote('FAKE')">SUSPICIOUS [FAKE]</button>
+    </div>
+  </div>
+</div>
+
+<div class="input-zone">
+  <div class="cmd-box">
+    <span class="cmd-prefix">~</span>
+    <input type="text" id="cmd" placeholder="Talk to your agent... (try: 'show stats', 'show market', 'build crypto tracker')" autocomplete="off" spellcheck="false">
+  </div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────
+let ws = null
+const uiContainer = document.getElementById('ui-container')
+const replyEl = document.getElementById('agent-reply')
+const greetingEl = document.getElementById('greeting')
+const canvasEl = document.getElementById('canvas')
+const inputEl = document.getElementById('cmd')
+
+// ── WEBSOCKET ────────────────────────────────────────────
+function connectWS() {
+  const host = location.hostname || 'localhost'
+  const port = location.port || '9000'
+  ws = new WebSocket(`ws://${host}:${port}`)
+  
+  ws.onopen = () => {
+    document.getElementById('ws-dot').className = 'dot live'
+    document.getElementById('ws-text').textContent = 'SYS_LINKED'
+  }
+  
+  ws.onclose = () => {
+    document.getElementById('ws-dot').className = 'dot'
+    document.getElementById('ws-text').textContent = 'DISCONNECTED'
+    setTimeout(connectWS, 3000)
+  }
+  
+  ws.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data)
+      if (msg.type === 'OS_RENDER') {
+        renderPacket(msg.data)
+      } else if (msg.type === 'JURY_DUTY') {
+        showJuryDuty(msg.data)
+      }
+    } catch {}
+  }
+}
+
+// ── TRUTH COURT ──────────────────────────────────────────
+let currentChallengeId = null;
+
+function showJuryDuty(data) {
+  currentChallengeId = data.challengeId;
+  document.getElementById('jury-text').innerHTML = `
+    <div style="font-size:10px;color:#FF4466;margin-bottom:10px">CASE: ${data.challengeId}</div>
+    <strong>Reason:</strong> ${data.reason}<br>
+    <strong>Defendant:</strong> ${data.defendant}<br><br>
+    If you vote incorrectly or against the majority, your node reputation may be slashed.
+  `;
+  document.getElementById('jury-duty-overlay').style.display = 'flex';
+}
+
+function submitVote(verdict) {
+  if (ws && ws.readyState === WebSocket.OPEN && currentChallengeId) {
+    ws.send(JSON.stringify({
+      action: 'jury_vote',
+      challengeId: currentChallengeId,
+      verdict: verdict
+    }));
+  }
+  document.getElementById('jury-duty-overlay').style.display = 'none';
+  currentChallengeId = null;
+}
+
+// ── RENDER ENGINE ────────────────────────────────────────
+function renderPacket(packet) {
+  greetingEl.classList.add('hidden')
+  canvasEl.classList.add('active')
+  
+  // Fade out old
+  uiContainer.classList.remove('visible')
+  replyEl.style.opacity = '0'
+  
+  setTimeout(() => {
+    if (packet.type === 'clear') {
+      uiContainer.innerHTML = ''
+      replyEl.textContent = ''
+      greetingEl.classList.remove('hidden')
+      canvasEl.classList.remove('active')
+      return
+    }
+    
+    if (packet.type === 'html') {
+      // Inject raw HTML/CSS from the agent
+      uiContainer.innerHTML = packet.content
+      replyEl.textContent = packet.action ? `[AGENT]: ${packet.action}` : ''
+    } else if (packet.type === 'text') {
+      uiContainer.innerHTML = ''
+      replyEl.textContent = packet.content
+    }
+    
+    // Fade in new
+    uiContainer.classList.add('visible')
+    replyEl.style.opacity = '1'
+  }, 300) // matches CSS transition time
+}
+
+// ── INPUT HANDLING ───────────────────────────────────────
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const text = inputEl.value.trim()
+    if (!text) return
+    
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action: 'os_chat', text }))
+      inputEl.value = ''
+      
+      // UX feedback
+      uiContainer.classList.remove('visible')
+      replyEl.style.opacity = '0.5'
+      replyEl.textContent = 'Synthesizing...'
+    }
+  }
+})
+
+// Boot
+connectWS()
+inputEl.focus()
+</script>
+</body>
+</html>

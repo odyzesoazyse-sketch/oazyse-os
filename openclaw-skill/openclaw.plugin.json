@@ -1,0 +1,18 @@
+{
+  "id": "mesh-genos",
+  "name": "MESH GenOS",
+  "description": "Control the Abundance AI MESH Node visual OS. Mount widgets, change themes, generate AI-powered surfaces, and manage the peer network — all from your messaging app.",
+  "version": "1.0.0",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "MESH_URL": {
+        "type": "string",
+        "description": "URL of your MESH node (default: http://localhost:9000)",
+        "default": "http://localhost:9000"
+      }
+    },
+    "additionalProperties": false
+  },
+  "skills": ["SKILL.md"]
+}

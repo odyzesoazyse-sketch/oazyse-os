@@ -1,0 +1,19 @@
+{
+  "name": "openclaw-plugin-mesh-genos",
+  "version": "1.0.0",
+  "description": "OpenClaw plugin — Abundance AI MESH Node and GenOS visual OS control",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["openclaw", "mesh", "genos", "visual-os", "abundance-ai"],
+  "license": "MIT",
+  "devDependencies": {
+    "@sinclair/typebox": "^0.34.0",
+    "typescript": "^5.0.0"
+  },
+  "openclaw": {
+    "plugin": "openclaw.plugin.json"
+  }
+}
