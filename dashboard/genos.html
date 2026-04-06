@@ -1810,6 +1810,16 @@ async function cmd(text){
     if(slash==='save'){appSave(parts.slice(1).join(' '));done('');return}
     if(slash==='launch'){appLoad(parts.slice(1).join(' '));done('');return}
     if(slash==='apps'){appShowSwitcher();done('');return}
+    if(slash==='demo'){
+      addNotif('🌐 MESH Protocol — AI agents live on Solana devnet','success')
+      mountSurface({capability:'autonomous-feed',intent:'AI agent decisions live on Solana devnet',position:'center'})
+      setTimeout(()=>{
+        mountSurface({capability:'solana-live',intent:'Solana devnet live transactions',position:'right'})
+        mountSurface({capability:'agent-chat',intent:'Talk to the MESH agent',position:'left'})
+      },350)
+      done('MESH Demo launched — watching agents on Solana')
+      return
+    }
   }
 
   // ── AUTONOMOUS MODE ──────────────────────────────
@@ -2521,6 +2531,7 @@ const SLASH_COMMANDS = [
   {label:'/save ',hint:'Save current interface as named app',icon:'💾'},
   {label:'/launch ',hint:'Launch a saved app by name',icon:'🚀'},
   {label:'/apps',hint:'Show all your saved apps',icon:'⊞'},
+  {label:'/demo',hint:'Launch full MESH Protocol demo — autonomous agents on Solana',icon:'🌐'},
 ]
 
 function updateAutocomplete(text){
@@ -3103,6 +3114,10 @@ try{ const s=localStorage.getItem('genos-style'); if(s) injectOSStyle(s) }catch{
 wsConnect()
 loadSurfaces()
 startContextWatcher()
+// Auto-launch demo mode when ?demo=1 in URL
+if(new URLSearchParams(location.search).get('demo')==='1'){
+  setTimeout(()=>cmd('/demo'), 1500)
+}
 // Apply saved language (or default EN)
 ;(function(){ const l = localStorage.getItem('ls-lang') || 'en'; applyI18n(l) })()
 setTimeout(()=>g('cb-input').focus(),200)

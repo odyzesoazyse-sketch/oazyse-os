@@ -297,6 +297,31 @@ openclaw-skill/
 
 ---
 
+## Hackathon Submission
+
+**National Solana Hackathon 2026 — AI + Blockchain: Autonomous Smart Contracts**
+
+| Criterion | Points | How We Address It |
+|-----------|--------|-------------------|
+| Product & Idea | 20 | MESH Protocol: constitutional infrastructure for distributed superintelligence. Seven Laws encoded into every packet, vote, and transaction. Core intent: `ABUNDANCE_FOR_ALL_LIFE` |
+| Technical Implementation | 25 | Anchor smart contract (4 instructions) · autonomous 60s agent loop · real Solana devnet PDAs · NaCL ed25519 signed packets · Truth Court on-chain slashing |
+| Use of Solana | 15 | `NodeState PDA` · `PacketRecord PDA` · `VerdictRecord PDA` · every AI decision = real on-chain tx · reputation changes enforced by smart contract |
+| Innovation | 15 | Truth Court (reputation slashing without human moderator) · GenOS (Lovable-style AI visual OS) · 90/5/5 token economics · OpenClaw (control from Telegram/Discord) |
+| UX & Product Thinking | 10 | GenOS: natural language → any interface instantly · `/demo` command loads full live demo · auto-launch via `?demo=1` · 19 built-in surfaces |
+| Demo & Presentation | 10 | `npm start` → `localhost:9000/genos?demo=1` → AI agents make real Solana transactions visible on Explorer in real time |
+| Documentation | 5 | [MANIFESTO.md](./MANIFESTO.md) (constitutional vision) · [PROTOCOL.md](./PROTOCOL.md) (open spec) · README.md (full implementation guide) |
+
+**Judge demo path:**
+```bash
+npm start
+# open http://localhost:9000/genos?demo=1
+# → 3 surfaces auto-mount: autonomous feed + solana live + agent chat
+# → click TRIGGER → watch AI make a real Solana devnet transaction
+# → click the ↗ explorer link → verify on-chain
+```
+
+---
+
 ## Quick Start
 
 ```bash
