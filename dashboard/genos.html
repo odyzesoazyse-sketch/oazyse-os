@@ -1140,6 +1140,28 @@ const FAST_RENDERS = {
     title:'JS RUNNER', w:380, h:340,
     render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">JAVASCRIPT RUNNER</span><button onclick="codeRun('${id}')" style="margin-left:auto;font-size:10px;padding:3px 12px;background:hsla(150,100%,50%,.15);border:1px solid var(--green);border-radius:4px;cursor:pointer;color:var(--green);font-family:var(--mono)">▶ RUN</button><button onclick="codeClear('${id}')" style="font-size:10px;padding:3px 8px;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text3);font-family:var(--mono)">CLEAR</button></div><textarea id="cr-ed-${id}" style="flex:1;background:var(--bg3);border:none;border-bottom:1px solid var(--border);resize:none;padding:10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;tab-size:2;min-height:140px" placeholder="// Write JavaScript here&#10;console.log('Hello MESH!')"></textarea><div id="cr-out-${id}" style="height:90px;overflow-y:auto;padding:8px 10px;font-family:var(--mono);font-size:11px;color:var(--green);line-height:1.6;background:var(--bg)"></div></div>` },
     init(){}
+  },
+
+  'network-graph': {
+    title: 'MESH NETWORK', w: 460, h: 420,
+    render(id) { return `
+      <div style="width:100%;height:100%;background:var(--bg);position:relative;overflow:hidden;border-radius:0 0 8px 8px">
+        <canvas id="ng-c-${id}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+        <div style="position:absolute;top:8px;left:10px;font-family:var(--mono);font-size:9px;color:var(--green);display:flex;align-items:center;gap:5px;z-index:2">
+          <div style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite"></div>
+          ● LIVE · MESH NETWORK
+        </div>
+        <div id="ng-stats-${id}" style="position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:9px;color:var(--text3);z-index:2">
+          <span id="ng-nc-${id}">5</span> nodes · <span id="ng-pc-${id}">0</span> packets
+        </div>
+        <div id="ng-label-${id}" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);text-align:center;pointer-events:none;z-index:3;opacity:0;transition:opacity .6s"></div>
+        <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:2">
+          <button onclick="ngGrow('${id}')" style="font-size:9px;padding:4px 12px;background:hsla(270,100%,70%,.15);border:1px solid var(--purple);border-radius:4px;cursor:pointer;color:var(--purple);font-family:var(--mono)">+ JOIN NETWORK</button>
+          <button onclick="ngVision('${id}')" style="font-size:9px;padding:4px 12px;background:hsla(150,100%,50%,.1);border:1px solid var(--green);border-radius:4px;cursor:pointer;color:var(--green);font-family:var(--mono)">GLOBAL VISION ◈</button>
+        </div>
+      </div>
+    `},
+    init(id, cfg, os) { ngInitCanvas(id, os) }
   }
 }
 
@@ -1814,12 +1836,13 @@ async function cmd(text){
       addNotif('🌐 MESH Protocol — AI agents live on Solana devnet','success')
       mountSurface({capability:'autonomous-feed',intent:'AI agent decisions live on Solana devnet',position:'center'})
       setTimeout(()=>{
-        mountSurface({capability:'solana-live',intent:'Solana devnet live transactions',position:'right'})
+        mountSurface({capability:'network-graph',intent:'MESH network topology — force physics visualization',position:'right'})
         mountSurface({capability:'agent-chat',intent:'Talk to the MESH agent',position:'left'})
       },350)
       done('MESH Demo launched — watching agents on Solana')
       return
     }
+    if(slash==='network'){mountSurface({capability:'network-graph',intent:text,position:'center'});done('Network graph');return}
   }
 
   // ── AUTONOMOUS MODE ──────────────────────────────
@@ -2197,6 +2220,177 @@ function afAddDecision(surfaceId, d) {
   if (pasEl) pasEl.textContent = 'PASS: ' + s.PASS
 }
 
+// ═══════════════════════════════════════════════════
+// MESH NETWORK GRAPH — Force Physics Visualization
+// ═══════════════════════════════════════════════════
+const NG_STATE = {}
+const NG_ROLES = [
+  { role:'AGENT',   color:'#9933ff', label:'Agent'   },
+  { role:'MARKET',  color:'#00ff80', label:'Market'  },
+  { role:'TRUTH',   color:'#ff4444', label:'Truth'   },
+  { role:'COMPUTE', color:'#f59e0b', label:'Compute' },
+  { role:'DATA',    color:'#00ddff', label:'Data'    },
+  { role:'VIBE',    color:'#ff00aa', label:'Vibe'    },
+  { role:'ECO',     color:'#44ff44', label:'Eco'     },
+]
+
+function ngInitCanvas(surfaceId, os) {
+  const c = g('ng-c-' + surfaceId)
+  if (!c) return
+  const dpr = window.devicePixelRatio || 1
+  const W = c.offsetWidth || 460, H = c.offsetHeight || 390
+  c.width = W * dpr; c.height = H * dpr
+  const ctx = c.getContext('2d')
+  ctx.scale(dpr, dpr)
+  const state = { nodes:[], particles:[], edges:[], packetCount:0, visionMode:false, frame:null, W, H }
+  NG_STATE[surfaceId] = state
+  const initRoles = ['AGENT','MARKET','TRUTH','AGENT','DATA']
+  initRoles.forEach((role, i) => {
+    const angle = (i / initRoles.length) * Math.PI * 2
+    ngAddNode(surfaceId, { role, x: W/2 + Math.cos(angle)*(W*0.25), y: H/2 + Math.sin(angle)*(H*0.25) })
+  })
+  fetch('/api/mesh/discover').then(r=>r.json()).then(d=>{
+    const agents = d.agents||d||[]
+    agents.slice(0,4).forEach(a => ngAddNode(surfaceId, { role:'AGENT', label:a.id?.slice(0,8)||'agent' }))
+  }).catch(()=>{})
+  const pkt = setInterval(()=>ngSendPacket(surfaceId), 2200)
+  if (os) os._reg(()=>{ clearInterval(pkt); cancelAnimationFrame(state.frame) })
+  const loop = () => { state.frame = requestAnimationFrame(loop); ngRender(surfaceId, c, ctx, W, H) }
+  loop()
+}
+
+function ngAddNode(surfaceId, opts={}) {
+  const state = NG_STATE[surfaceId]; if (!state) return
+  const rd = NG_ROLES.find(r=>r.role===(opts.role||'AGENT'))||NG_ROLES[0]
+  const node = {
+    id: 'n'+Date.now()+Math.random(), role:rd.role, color:rd.color, label:opts.label||rd.label,
+    x: opts.x!==undefined ? opts.x : state.W/2+(Math.random()-.5)*state.W*0.6,
+    y: opts.y!==undefined ? opts.y : state.H/2+(Math.random()-.5)*state.H*0.5,
+    vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+    r:7+Math.random()*5, rep:50+Math.floor(Math.random()*60), born:Date.now(), pulse:0
+  }
+  state.nodes.push(node)
+  if (state.nodes.length>1) {
+    const picks = state.nodes.slice(0,-1).sort(()=>Math.random()-.5).slice(0,Math.min(2,state.nodes.length-1))
+    picks.forEach(t=>state.edges.push({a:node.id,b:t.id}))
+  }
+  const nc=g('ng-nc-'+surfaceId); if(nc) nc.textContent=state.nodes.length
+}
+
+function ngSendPacket(surfaceId) {
+  const state=NG_STATE[surfaceId]; if(!state||state.nodes.length<2) return
+  const from=state.nodes[Math.floor(Math.random()*state.nodes.length)]
+  const to=state.nodes[Math.floor(Math.random()*state.nodes.length)]
+  if(from===to) return
+  state.particles.push({ fx:from.x, fy:from.y, tx:to.x, ty:to.y, t:0, color:from.color, trail:[] })
+  state.packetCount++
+  const pc=g('ng-pc-'+surfaceId); if(pc) pc.textContent=state.packetCount
+  to.pulse=1.0
+}
+
+function ngPhysics(state) {
+  const {nodes,edges,W,H}=state
+  const REPULSE=1800,SPRING=0.015,REST=120,CENTER=0.002,DAMP=0.88
+  nodes.forEach(n=>{ n.vx+=(W/2-n.x)*CENTER; n.vy+=(H/2-n.y)*CENTER })
+  for(let i=0;i<nodes.length;i++) for(let j=i+1;j<nodes.length;j++){
+    const a=nodes[i],b=nodes[j],dx=a.x-b.x,dy=a.y-b.y
+    const f=REPULSE/(dx*dx+dy*dy+1)
+    a.vx+=dx*f;a.vy+=dy*f;b.vx-=dx*f;b.vy-=dy*f
+  }
+  edges.forEach(e=>{
+    const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b); if(!a||!b) return
+    const dx=b.x-a.x,dy=b.y-a.y,dist=Math.sqrt(dx*dx+dy*dy)||1,f=(dist-REST)*SPRING
+    a.vx+=dx/dist*f;a.vy+=dy/dist*f;b.vx-=dx/dist*f;b.vy-=dy/dist*f
+  })
+  nodes.forEach(n=>{
+    n.vx*=DAMP;n.vy*=DAMP;n.x+=n.vx;n.y+=n.vy
+    n.x=Math.max(n.r+8,Math.min(W-n.r-8,n.x))
+    n.y=Math.max(n.r+8,Math.min(H-n.r-30,n.y))
+    if(n.pulse>0) n.pulse=Math.max(0,n.pulse-0.04)
+  })
+  state.particles.forEach(p=>{
+    p.trail.push({x:p.fx+(p.tx-p.fx)*p.t, y:p.fy+(p.ty-p.fy)*p.t})
+    if(p.trail.length>8) p.trail.shift()
+    p.t+=0.025
+  })
+  state.particles=state.particles.filter(p=>p.t<1.0)
+}
+
+function ngRender(surfaceId, c, ctx, W, H) {
+  const state=NG_STATE[surfaceId]; if(!state) return
+  const {nodes,particles,edges}=state
+  ctx.clearRect(0,0,W,H)
+  const bg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.7)
+  bg.addColorStop(0,'rgba(30,10,50,.95)'); bg.addColorStop(1,'rgba(10,10,10,.98)')
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H)
+  ngPhysics(state)
+  edges.forEach(e=>{
+    const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b); if(!a||!b) return
+    const grad=ctx.createLinearGradient(a.x,a.y,b.x,b.y)
+    grad.addColorStop(0,a.color+'44'); grad.addColorStop(1,b.color+'44')
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y)
+    ctx.strokeStyle=grad; ctx.lineWidth=0.8; ctx.stroke()
+  })
+  particles.forEach(p=>{
+    const cx=p.fx+(p.tx-p.fx)*p.t, cy=p.fy+(p.ty-p.fy)*p.t
+    p.trail.forEach((pt,i)=>{
+      ctx.beginPath(); ctx.arc(pt.x,pt.y,2,0,Math.PI*2)
+      ctx.fillStyle=p.color+Math.floor((i/p.trail.length)*120).toString(16).padStart(2,'0')
+      ctx.fill()
+    })
+    ctx.beginPath(); ctx.arc(cx,cy,3.5,0,Math.PI*2)
+    ctx.fillStyle=p.color; ctx.shadowColor=p.color; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0
+  })
+  const now=Date.now()
+  nodes.forEach(n=>{
+    const age=Math.min(1,(now-n.born)/600)
+    const alpha=Math.floor(age*255).toString(16).padStart(2,'0')
+    if(n.pulse>0.05){
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.r+n.pulse*6+4,0,Math.PI*2)
+      ctx.strokeStyle=n.color+Math.floor(n.pulse*180).toString(16).padStart(2,'0')
+      ctx.lineWidth=2; ctx.stroke()
+    }
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2)
+    ctx.fillStyle=n.color+alpha; ctx.shadowColor=n.color; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2)
+    ctx.strokeStyle=n.color+'cc'; ctx.lineWidth=1.2; ctx.stroke()
+    if(age>0.5&&nodes.length<25){
+      ctx.fillStyle='rgba(200,200,220,'+(age*.75)+')'
+      ctx.font='8px monospace'; ctx.textAlign='center'
+      ctx.fillText(n.label,n.x,n.y+n.r+10)
+    }
+  })
+}
+
+function ngGrow(surfaceId) {
+  const state=NG_STATE[surfaceId]; if(!state) return
+  const roles=NG_ROLES.map(r=>r.role)
+  for(let i=0;i<3;i++) setTimeout(()=>ngAddNode(surfaceId,{role:roles[Math.floor(Math.random()*roles.length)]}), i*250)
+}
+
+function ngVision(surfaceId) {
+  const state=NG_STATE[surfaceId]; if(!state||state.visionMode) return
+  state.visionMode=true
+  const label=g('ng-label-'+surfaceId)
+  const msgs=[
+    '<div style="font-family:var(--mono);font-size:11px;color:#00ff80;letter-spacing:.15em;text-shadow:0 0 10px #00ff80">GLOBAL VISION ACTIVATED</div>',
+    '<div style="font-family:var(--mono);font-size:10px;color:#9933ff;letter-spacing:.1em;margin-top:6px;text-shadow:0 0 10px #9933ff">ABUNDANCE_FOR_ALL_LIFE</div>',
+    '<div style="font-family:var(--mono);font-size:12px;color:#fff;font-weight:700;letter-spacing:.05em;margin-top:8px">COLLECTIVE INTELLIGENCE EMERGING</div>',
+    '<div style="font-family:var(--mono);font-size:9px;color:rgba(200,200,220,.7);margin-top:10px">7.9B humans · infinite knowledge · one commons</div>'
+  ]
+  if(label){
+    label.innerHTML=msgs[0]; label.style.opacity='1'
+    let mi=1
+    const mi2=setInterval(()=>{ if(mi>=msgs.length){clearInterval(mi2);return}; label.innerHTML+=msgs[mi++] },700)
+    setTimeout(()=>{ label.style.opacity='0'; setTimeout(()=>{ if(label)label.innerHTML=''; state.visionMode=false },700) },5500)
+  }
+  const roles=NG_ROLES.map(r=>r.role)
+  let spawned=0
+  const sp=setInterval(()=>{ if(spawned>=50){clearInterval(sp);return}; ngAddNode(surfaceId,{role:roles[Math.floor(Math.random()*roles.length)]}); spawned++ },120)
+  const burst=setInterval(()=>ngSendPacket(surfaceId),400)
+  setTimeout(()=>clearInterval(burst),6000)
+}
+
 function appendLog(type,msg){
   const list=g('log-list')
   const d=document.createElement('div');d.className='lr'
@@ -2532,6 +2726,7 @@ const SLASH_COMMANDS = [
   {label:'/launch ',hint:'Launch a saved app by name',icon:'🚀'},
   {label:'/apps',hint:'Show all your saved apps',icon:'⊞'},
   {label:'/demo',hint:'Launch full MESH Protocol demo — autonomous agents on Solana',icon:'🌐'},
+  {label:'/network',hint:'MESH network topology — force physics visualization',icon:'◈'},
 ]
 
 function updateAutocomplete(text){
