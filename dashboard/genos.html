@@ -464,6 +464,49 @@ body.ambient #ambient-hint{display:block}
 
 /* ─── HISTORY INDICATOR ─── */
 #hist-ind{position:fixed;bottom:52px;right:52px;font-size:9px;font-family:var(--mono);color:var(--text3);display:none;background:var(--bg2);padding:2px 8px;border-radius:4px;border:1px solid var(--border);animation:fadeIn .15s}
+
+/* ═══ LIVE SHOWCASE ═══ */
+#showcase-btn{
+  position:fixed;bottom:68px;left:50%;transform:translateX(-50%);z-index:500;
+  padding:7px 18px;border-radius:20px;border:1px solid rgba(153,51,255,.45);
+  background:rgba(153,51,255,.08);color:hsl(var(--neon-purple));
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;cursor:pointer;
+  transition:all .3s;animation:sc-pulse 3.5s ease-in-out infinite;white-space:nowrap;
+}
+#showcase-btn:hover{background:rgba(153,51,255,.22);border-color:rgba(153,51,255,.9);transform:translateX(-50%) scale(1.04)}
+#showcase-btn.hide{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(6px)}
+@keyframes sc-pulse{0%,100%{box-shadow:0 0 0 rgba(153,51,255,0)}50%{box-shadow:0 0 22px rgba(153,51,255,.28)}}
+
+#narrator{
+  position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(10px);
+  z-index:650;padding:11px 22px;border-radius:28px;
+  background:rgba(8,4,16,.92);border:1px solid rgba(153,51,255,.55);
+  color:#e8e0ff;font-size:13px;font-family:var(--font);white-space:nowrap;
+  pointer-events:none;opacity:0;transition:opacity .45s,transform .45s;
+  backdrop-filter:blur(14px);box-shadow:0 0 30px rgba(153,51,255,.18);
+}
+#narrator.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#narrator b{color:hsl(var(--neon-purple))}
+#narrator em{color:hsl(var(--neon-green));font-style:normal}
+
+#demo-badge{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:650;
+  padding:3px 12px;border-radius:10px;background:rgba(153,51,255,.15);
+  border:1px solid rgba(153,51,255,.4);color:hsl(var(--neon-purple));
+  font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  opacity:0;transition:opacity .4s;pointer-events:none;
+}
+#demo-badge.show{opacity:1}
+
+#stop-demo{
+  position:fixed;bottom:76px;right:18px;z-index:700;padding:5px 11px;
+  border-radius:8px;font-size:10px;font-family:var(--mono);cursor:pointer;
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.45);transition:all .2s;
+  opacity:0;pointer-events:none;
+}
+#stop-demo.show{opacity:1;pointer-events:all}
+#stop-demo:hover{border-color:rgba(255,80,80,.5);color:rgba(255,120,120,.8)}
 </style>
 </head>
 <body class="canvas-mode">
@@ -516,6 +559,11 @@ body.ambient #ambient-hint{display:block}
       <div class="ad-opts" id="ad-opts"></div>
     </div>
   </div>
+
+  <button id="showcase-btn" onclick="startShowcase()">▶ &nbsp;WATCH LIVE DEMO</button>
+  <div id="narrator"></div>
+  <div id="demo-badge">◈ &nbsp;DEMO MODE</div>
+  <button id="stop-demo" onclick="stopShowcase()">✕ stop</button>
 
   <div id="canvas-bar">
     <span id="cb-prefix">›</span>
@@ -1843,6 +1891,7 @@ async function cmd(text){
       return
     }
     if(slash==='network'){mountSurface({capability:'network-graph',intent:text,position:'center'});done('Network graph');return}
+    if(slash==='showcase'){startShowcase();done('Live showcase started');return}
   }
 
   // ── AUTONOMOUS MODE ──────────────────────────────
@@ -2727,6 +2776,7 @@ const SLASH_COMMANDS = [
   {label:'/apps',hint:'Show all your saved apps',icon:'⊞'},
   {label:'/demo',hint:'Launch full MESH Protocol demo — autonomous agents on Solana',icon:'🌐'},
   {label:'/network',hint:'MESH network topology — force physics visualization',icon:'◈'},
+  {label:'/showcase',hint:'Auto-typing live demo — watch GenOS explain itself',icon:'▶'},
 ]
 
 function updateAutocomplete(text){
@@ -3320,6 +3370,114 @@ setTimeout(()=>g('cb-input').focus(),200)
 setTimeout(()=>{
   addNotif('GenOS ready — press ⌘K for command palette, ? for shortcuts','info')
 }, 1500)
+
+// ═══════════════════════════════════════════════════
+// LIVE SHOWCASE — auto-typing walkthrough for judges
+// ═══════════════════════════════════════════════════
+let _scActive = false
+
+function _scNarrate(html, holdMs) {
+  const el = g('narrator')
+  if (!el) return
+  el.innerHTML = html
+  el.classList.add('show')
+  if (holdMs) setTimeout(() => el.classList.remove('show'), holdMs)
+}
+
+function _scWait(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+function _scType(text) {
+  return new Promise(resolve => {
+    const inp = g('cb-input')
+    if (!inp) { resolve(); return }
+    inp.focus(); inp.value = ''
+    let i = 0
+    const tick = () => {
+      if (!_scActive) { resolve(); return }
+      if (i >= text.length) { resolve(); return }
+      inp.value += text[i++]
+      setTimeout(tick, 55 + Math.random() * 65)
+    }
+    tick()
+  })
+}
+
+async function startShowcase() {
+  _scActive = true
+  const btn = g('showcase-btn'), badge = g('demo-badge'), stop = g('stop-demo')
+  if (btn) btn.classList.add('hide')
+  if (badge) badge.classList.add('show')
+  if (stop) stop.classList.add('show')
+
+  // clear canvas
+  Object.keys(S.surfaces).forEach(unmountSurface)
+  await _scWait(500)
+
+  _scNarrate('Welcome to <b>GenOS</b> — the first OS built for AI agents', 3800)
+  await _scWait(2200)
+  if (!_scActive) return
+
+  _scNarrate('Every command spawns a <b>living surface</b>. Watch.', 3000)
+  await _scWait(2600)
+  if (!_scActive) return
+
+  // /network
+  await _scType('/network')
+  await _scWait(260)
+  cmd('/network')
+  await _scWait(600)
+  _scNarrate('<b>47 MESH nodes</b> — force physics, real-time knowledge flows', 4500)
+  await _scWait(4800)
+  if (!_scActive) return
+
+  // auto-click GLOBAL VISION on latest network surface
+  const visionBtns = document.querySelectorAll('[onclick*="ngVision"]')
+  if (visionBtns.length) visionBtns[visionBtns.length - 1].click()
+  _scNarrate('<b>GLOBAL VISION</b> — scaling to 10,000 nodes. The entire MESH network.', 5500)
+  await _scWait(6500)
+  if (!_scActive) return
+
+  _scNarrate('Now watch AI agents making <b>real decisions on Solana</b>...', 3200)
+  await _scWait(2000)
+  if (!_scActive) return
+
+  // /demo
+  await _scType('/demo')
+  await _scWait(260)
+  cmd('/demo')
+  await _scWait(600)
+  _scNarrate('<b>Autonomous agents.</b> Every action recorded on-chain. Real SOL.', 5000)
+  await _scWait(5500)
+  if (!_scActive) return
+
+  _scNarrate('The <b>knowledge market</b> — any AI buys intelligence from any other AI', 4000)
+  await _scWait(4500)
+  if (!_scActive) return
+
+  // ask a question
+  await _scType('what can MESH Protocol do?')
+  _scNarrate('Ask anything. <b>Agents handle the rest.</b>', 3500)
+  await _scWait(1800)
+  if (!_scActive) return
+  cmd('what can MESH Protocol do?')
+  await _scWait(5500)
+  if (!_scActive) return
+
+  _scNarrate('<b>MESH Protocol</b> — <em>Intelligence as a Commons</em> · ABUNDANCE_FOR_ALL_LIFE ◈', 0)
+  await _scWait(6000)
+
+  stopShowcase()
+}
+
+function stopShowcase() {
+  _scActive = false
+  const el = g('narrator'); if (el) el.classList.remove('show')
+  const btn = g('showcase-btn'), badge = g('demo-badge'), stop = g('stop-demo')
+  if (btn) btn.classList.remove('hide')
+  if (badge) badge.classList.remove('show')
+  if (stop) stop.classList.remove('show')
+  const inp = g('cb-input'); if (inp) { inp.value = ''; inp.focus() }
+}
 </script>
 </body>
 </html>
