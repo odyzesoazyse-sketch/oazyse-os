@@ -3367,31 +3367,11 @@ setTimeout(()=>g('cb-input').focus(),200)
 
 // ── AUTO-DEMO on first visit ────────────────────────
 ;(function(){
-  const hasSurfaces = Object.keys(JSON.parse(localStorage.getItem('genos-surfaces')||'{}')).length > 0
-  const isUrlDemo = new URLSearchParams(location.search).get('demo')==='1'
-  if(hasSurfaces || isUrlDemo) return
-  // No saved surfaces — auto-launch /demo after 3s countdown
-  let n = 3
+  // ALWAYS run demo on mobile-demo.html, no cancelling
   const countEl = g('demo-countdown')
-  let cancelled = false
-  const cancelDemo = () => { cancelled = true; clearInterval(t); if(countEl) countEl.style.opacity='0' }
-  // Cancel if user types anything
-  const inp = g('cb-input')
-  if(inp) inp.addEventListener('keydown', cancelDemo, {once:true})
-  // Cancel if showcase-btn clicked
-  const sbtn = g('showcase-btn')
-  if(sbtn) sbtn.addEventListener('click', cancelDemo, {once:true})
-  const t = setInterval(()=>{
-    if(cancelled) return
-    n--
-    if(countEl){
-      if(n>0) countEl.textContent = `launching demo in ${n}s — or type anything to take control`
-      else countEl.textContent = 'launching demo…'
-    }
-    if(n<=0){
-      clearInterval(t)
-      if(!cancelled) startMobileFakeDemo()
-    }
+  if(countEl) countEl.style.opacity='0'
+  setTimeout(() => {
+    startMobileFakeDemo()
   }, 1000)
 })()
 
