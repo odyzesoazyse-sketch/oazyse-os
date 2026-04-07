@@ -544,8 +544,10 @@ body.ambient #ambient-hint{display:block}
   <div id="surfaces"></div>
 
   <div id="canvas-hint">
-    <h2 data-i18n="hint.title">oazyse° oazyse° os frame</h2>
-    <p data-i18n="hint.sub">Everything is generated in the moment.<br>Say what you want to see, do, or connect.</p>
+    <div style="font-family:var(--brand);font-size:clamp(1.8rem,4vw,3rem);background:linear-gradient(135deg,hsl(var(--neon-purple)),hsl(var(--neon-green)));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.75rem;line-height:1.1">oazyse° os frame</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:.4rem;max-width:400px;line-height:1.7">AI agents autonomously trading knowledge on Solana.<br>Every decision → on-chain transaction. In real-time.</p>
+    <p style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:1.5rem">type commands · build interfaces · watch agents decide</p>
+    <div id="demo-countdown" style="font-size:11px;font-family:var(--mono);color:hsl(var(--neon-purple));opacity:.8">launching demo in 3s — or type anything to take control</div>
   </div>
 
   <div id="suggest-bar"></div>
@@ -1975,29 +1977,23 @@ function done(msg){
 // ═══════════════════════════════════════════════════
 async function loadSuggestions(){
   const bar=g('suggest-bar');bar.innerHTML=''
-  const suggestions=[]
+  // Core demo chips — always visible, tell the product story
+  const DEMO_CHIPS = [
+    {text:'▶ launch full demo',       cmd:'/demo'},
+    {text:'◈ AI agent decisions live',cmd:'autonomous mode'},
+    {text:'◎ Solana node status',     cmd:'/solana'},
+    {text:'⌘ watch live showcase',    cmd:'/showcase'},
+  ]
+  const extra=[]
   try{
-    const [sr]=await Promise.all([fetch('/api/mesh/discover')])
-    const sd=await sr.json()
+    const sd=await fetch('/api/mesh/discover').then(r=>r.json())
     const agents=sd.agents||[]
-    if(agents.some(a=>(a.capabilities||[]).includes('speech_to_text')))
-      suggestions.push({text:'Agent can listen → mic',cmd:'добавь микрофон'})
-    if(agents.some(a=>(a.capabilities||[]).includes('trading')))
-      suggestions.push({text:'Trading agent online → prices',cmd:'покажи цены биткоина'})
-    if(agents.length>0)
-      suggestions.push({text:agents.length+' agent(s) connected',cmd:'покажи агентов'})
+    if(agents.length>0) extra.push({text:agents.length+' agents connected',cmd:'покажи агентов'})
   }catch{}
-  // Suggest from capabilities
-  const caps=Object.values(S.capabilities).filter(c=>c.category==='data_stream')
-  if(caps.length>0&&Object.keys(S.surfaces).length===0)
-    suggestions.push({text:'Show network status',cmd:'покажи статус сети'})
-  // Always show autonomous mode chip
-  suggestions.unshift({text:'Autonomous AI mode', cmd:'autonomous mode'})
-
-  suggestions.slice(0,4).forEach(s=>{
+  ;[...DEMO_CHIPS,...extra].slice(0,5).forEach(s=>{
     const chip=document.createElement('div')
     chip.className='suggest-chip'
-    chip.textContent='✦ '+s.text
+    chip.textContent=s.text
     chip.onclick=()=>cmd(s.cmd)
     bar.appendChild(chip)
   })
@@ -3367,9 +3363,40 @@ if(new URLSearchParams(location.search).get('demo')==='1'){
 // Apply saved language (or default EN)
 ;(function(){ const l = localStorage.getItem('ls-lang') || 'en'; applyI18n(l) })()
 setTimeout(()=>g('cb-input').focus(),200)
+
+// ── AUTO-DEMO on first visit ────────────────────────
+;(function(){
+  const hasSurfaces = Object.keys(JSON.parse(localStorage.getItem('genos-surfaces')||'{}')).length > 0
+  const isUrlDemo = new URLSearchParams(location.search).get('demo')==='1'
+  if(hasSurfaces || isUrlDemo) return
+  // No saved surfaces — auto-launch /demo after 3s countdown
+  let n = 3
+  const countEl = g('demo-countdown')
+  let cancelled = false
+  const cancelDemo = () => { cancelled = true; clearInterval(t); if(countEl) countEl.style.opacity='0' }
+  // Cancel if user types anything
+  const inp = g('cb-input')
+  if(inp) inp.addEventListener('keydown', cancelDemo, {once:true})
+  // Cancel if showcase-btn clicked
+  const sbtn = g('showcase-btn')
+  if(sbtn) sbtn.addEventListener('click', cancelDemo, {once:true})
+  const t = setInterval(()=>{
+    if(cancelled) return
+    n--
+    if(countEl){
+      if(n>0) countEl.textContent = `launching demo in ${n}s — or type anything to take control`
+      else countEl.textContent = 'launching demo…'
+    }
+    if(n<=0){
+      clearInterval(t)
+      if(!cancelled) cmd('/demo')
+    }
+  }, 1000)
+})()
+
 // Boot notification
 setTimeout(()=>{
-  addNotif('oazyse° os frame ready — press ⌘K for command palette, ? for shortcuts','info')
+  addNotif('oazyse° os frame — AI agents on Solana · ▶ WATCH LIVE DEMO for full walkthrough','info')
 }, 1500)
 
 // ═══════════════════════════════════════════════════
@@ -3414,58 +3441,64 @@ async function startShowcase() {
   Object.keys(S.surfaces).forEach(unmountSurface)
   await _scWait(500)
 
-  _scNarrate('Welcome to <b>oazyse° os frame</b> — the first OS built for AI agents', 3800)
-  await _scWait(2200)
+  _scNarrate('Welcome to <b>oazyse° os frame</b> — AI agents trading knowledge on Solana', 3500)
+  await _scWait(2000)
   if (!_scActive) return
 
-  _scNarrate('Every command spawns a <b>living surface</b>. Watch.', 3000)
-  await _scWait(2600)
+  _scNarrate('Every command builds a <b>living surface</b>. Watch the AI decide in real-time.', 3000)
+  await _scWait(2800)
   if (!_scActive) return
 
-  // /network
-  await _scType('/network')
+  // Step 1: Show autonomous agent feed first
+  await _scType('/demo')
   await _scWait(260)
-  cmd('/network')
-  await _scWait(600)
-  _scNarrate('<b>47 oazyse° nodes</b> — force physics, real-time knowledge flows', 4500)
-  await _scWait(4800)
+  cmd('/demo')
+  await _scWait(800)
+  _scNarrate('<b>3 surfaces mounted.</b> Autonomous agent · Network topology · Agent chat', 3500)
+  await _scWait(3800)
+  if (!_scActive) return
+
+  // Step 2: Trigger an AI decision and narrate the chain
+  _scNarrate('Watch: <b>Gemini LLM evaluates</b> a knowledge packet — score 0 to 100…', 4000)
+  await _scWait(1800)
+  if (!_scActive) return
+  // Auto-click TRIGGER on the autonomous-feed surface
+  const triggerBtns = document.querySelectorAll('[onclick*="autonomous/trigger"]')
+  if (triggerBtns.length) triggerBtns[triggerBtns.length - 1].click()
+  await _scWait(2000)
+  if (!_scActive) return
+
+  _scNarrate('Score ≥ 70 → <b>BUY decision</b> → Anchor <code>record_packet</code> → <b>PacketRecord PDA on Solana devnet</b>', 5000)
+  await _scWait(5500)
+  if (!_scActive) return
+
+  _scNarrate('Score &lt; 25 → <b>CHALLENGE</b> → Truth Court → jury votes → <b>VerdictRecord PDA · rep slashed</b>', 4500)
+  await _scWait(5000)
+  if (!_scActive) return
+
+  // Step 3: Show network
+  _scNarrate('The <b>network topology</b> — every node is an autonomous AI agent', 3500)
+  await _scWait(3500)
   if (!_scActive) return
 
   // auto-click GLOBAL VISION on latest network surface
   const visionBtns = document.querySelectorAll('[onclick*="ngVision"]')
   if (visionBtns.length) visionBtns[visionBtns.length - 1].click()
-  _scNarrate('<b>GLOBAL VISION</b> — scaling to 10,000 nodes. The entire oazyse° network.', 5500)
-  await _scWait(6500)
-  if (!_scActive) return
-
-  _scNarrate('Now watch AI agents making <b>real decisions on Solana</b>...', 3200)
-  await _scWait(2000)
-  if (!_scActive) return
-
-  // /demo
-  await _scType('/demo')
-  await _scWait(260)
-  cmd('/demo')
-  await _scWait(600)
-  _scNarrate('<b>Autonomous agents.</b> Every action recorded on-chain. Real SOL.', 5000)
+  _scNarrate('<b>GLOBAL VISION</b> — scaling to 10,000 nodes. Intelligence as a commons.', 5000)
   await _scWait(5500)
   if (!_scActive) return
 
-  _scNarrate('The <b>knowledge market</b> — any AI buys intelligence from any other AI', 4000)
+  // Step 4: Type a natural language command
+  await _scType('show me the Solana node status')
+  _scNarrate('Natural language → <b>any interface.</b> No code. No configuration.', 3000)
+  await _scWait(1800)
+  if (!_scActive) return
+  cmd('show me the Solana node status')
   await _scWait(4500)
   if (!_scActive) return
 
-  // ask a question
-  await _scType('what can oazyse° Protocol do?')
-  _scNarrate('Ask anything. <b>Agents handle the rest.</b>', 3500)
-  await _scWait(1800)
-  if (!_scActive) return
-  cmd('what can oazyse° Protocol do?')
-  await _scWait(5500)
-  if (!_scActive) return
-
-  _scNarrate('<b>oazyse° Protocol</b> — <em>Intelligence as a Commons</em> · ABUNDANCE_FOR_ALL_LIFE ◈', 0)
-  await _scWait(6000)
+  _scNarrate('<b>oazyse° Protocol</b> · AI → Decision → On-Chain · <em>ABUNDANCE_FOR_ALL_LIFE</em> ◈', 0)
+  await _scWait(5000)
 
   stopShowcase()
 }
