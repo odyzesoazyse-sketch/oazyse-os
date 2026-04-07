@@ -44,7 +44,7 @@ export class SolanaAnchor {
   }
 
   async anchorGenesis(keypair: Keypair, nodeId: string): Promise<string> {
-    return this.anchor(keypair, `MESH|GENESIS|ABUNDANCE_FOR_ALL_LIFE|${nodeId}|2026`)
+    return this.anchor(keypair, `oazyse|genesis|ABUNDANCE_FOR_ALL_LIFE|${nodeId}|2026`)
   }
 
   explorerUrl(sig: string): string {

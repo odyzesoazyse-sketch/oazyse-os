@@ -1,11 +1,11 @@
 /**
- * SettlementLayer — Chain-agnostic abstraction for MESH Protocol.
+ * SettlementLayer — Chain-agnostic abstraction for oazyse° os net.
  *
- * The MESH Protocol (PROTOCOL.md) defines what the network does.
+ * The oazyse° os net (PROTOCOL.md) defines what the network does.
  * The SettlementLayer defines WHERE state is anchored.
  *
- * Current: Solana devnet (MeshProgram)
- * Future:  MESH own chain, Ethereum, Cosmos, or any IBlockchain implementor
+ * Current: Solana devnet (OazyseNetProgram)
+ * Future:  oazyse° os net chain, Ethereum, Cosmos, or any IBlockchain implementor
  *
  * Migration happens when Truth Court reaches consensus (section 7 of PROTOCOL.md).
  */
@@ -37,7 +37,7 @@ export const PROTOCOL = {
 
 /**
  * Any blockchain implementation must satisfy this interface.
- * To migrate MESH to a new chain: implement ISettlementLayer,
+ * To migrate oazyse° os net to a new chain: implement ISettlementLayer,
  * submit as COMPONENT packet to Judge, wait for adoption threshold.
  */
 export interface ISettlementLayer {
@@ -89,7 +89,7 @@ export class LayerRegistry {
   private registryPath: string
 
   constructor() {
-    this.registryPath = path.join(os.homedir(), '.mesh-node', 'brain', 'layers.json')
+    this.registryPath = path.join(os.homedir(), '.oazyse-os', 'brain', 'layers.json')
     this.load()
   }
 
@@ -157,7 +157,7 @@ export class LocalLayer implements ISettlementLayer {
   readonly chainId = 'local-0'
   readonly explorerBase = 'local://'
 
-  private logPath = path.join(os.homedir(), '.mesh-node', 'brain', 'local-chain.jsonl')
+  private logPath = path.join(os.homedir(), '.oazyse-os', 'brain', 'local-chain.jsonl')
 
   async anchor(data: AnchorData): Promise<AnchorResult> {
     const txHash = `local-${crypto.randomBytes(24).toString('hex')}`

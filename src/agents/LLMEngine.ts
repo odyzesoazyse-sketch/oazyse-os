@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as os from 'os';
 dotenv.config();
 
-const KEY_FILE = path.join(os.homedir(), '.mesh-node', 'llm.key');
+const KEY_FILE = path.join(os.homedir(), '.oazyse-os', 'llm.key');
 
 export class LLMEngine {
   private ai: GoogleGenAI | null = null;
@@ -46,7 +46,7 @@ export class LLMEngine {
   async generateWidget(prompt: string, conversationContext = '', currentHtml = ''): Promise<string> {
     // ── EDIT MODE: user is modifying an existing interface ──
     if (currentHtml && currentHtml.trim().length > 80) {
-      const editPrompt = `You are GenOS — editing an existing interface. Apply the requested change and return the COMPLETE modified HTML.
+      const editPrompt = `You are oazyse° os frame — editing an existing interface. Apply the requested change and return the COMPLETE modified HTML.
 
 CURRENT HTML (edit this):
 ${currentHtml.slice(0, 7000)}
@@ -90,7 +90,7 @@ Return the modified HTML now:`
       }
     }
 
-    const systemPrompt = `You are GenOS — the world's most capable visual AI builder. You create stunning, fully functional HTML interfaces. Think: Linear, Vercel, Figma-level quality. Every output must feel like a real product built by a top design studio.
+    const systemPrompt = `You are oazyse° os frame — the world's most capable visual AI builder. You create stunning, fully functional HTML interfaces. Think: Linear, Vercel, Figma-level quality. Every output must feel like a real product built by a top design studio.
 
 ## BUILD FIRST PHILOSOPHY
 Your default action is to BUILD immediately. Do NOT ask questions unless the request is completely empty of intent (e.g. "make something" with zero context).

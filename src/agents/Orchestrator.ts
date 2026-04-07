@@ -218,7 +218,7 @@ export class Orchestrator {
     try {
       const nodeStatus = await this.node.getStatus().catch(() => null)
       const peers = nodeStatus?.peers || 0
-      const capsList = Object.values(this.node.capabilities?.getAll?.() || {})
+      const capsList = Object.values((this.node as any).capabilities?.getAll?.() || {})
         .map((c: any) => `${c.id}: ${c.description}`)
         .slice(0, 12)
       if(capsList.length) capsContext = `\n\nAvailable data sources: ${capsList.join(' | ')}`
@@ -237,7 +237,7 @@ export class Orchestrator {
     if (/dark|тёмн|black|noir/i.test(command)) this.longTermMemory.store('theme', 'dark', 'preferences', 0.8)
     else if (/light|светл|white/i.test(command)) this.longTermMemory.store('theme', 'light', 'preferences', 0.8)
 
-    console.log(`[GenOS] Requesting generative UI for: "${command}"`);
+    console.log(`[oazyse° os frame] Requesting generative UI for: "${command}"`);
     const generatedHtml = await this.llmEngine.generateWidget(command, conversationContext, currentHtml);
 
     // Save this newly generated interface to the local market so it can be shared!

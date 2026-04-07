@@ -1,9 +1,9 @@
 /**
- * AutonomousAgent — The heart of the MESH hackathon demo.
+ * AutonomousAgent — The heart of the oazyse° os demo.
  *
  * Runs continuously (every 60s by default), scans the knowledge market,
  * evaluates packets with Gemini LLM, and fires on-chain Solana transactions
- * based on its decisions. All reasoning and tx hashes are broadcast to GenOS.
+ * based on its decisions. All reasoning and tx hashes are broadcast to oazyse° os frame.
  *
  * Flow:
  *   readOnChainState → scanMarket → evaluateWithLLM → decide → executeOnChain → broadcastDecision
@@ -13,7 +13,7 @@ import { Node } from '../core/Node'
 import { KnowledgeMarket, Listing } from '../core/KnowledgeMarket'
 import { TruthCourt } from '../truth/TruthCourt'
 import { TokenEconomics } from '../token/TokenEconomics'
-import { MeshProgram, NodeState } from '../blockchain/MeshProgram'
+import { OazyseNetProgram, NodeState } from '../blockchain/MeshProgram'
 import { LLMEngine } from './LLMEngine'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -49,7 +49,7 @@ export class AutonomousAgent {
   private running = false
   private timer: NodeJS.Timeout | null = null
   private llm: LLMEngine
-  private meshProgram: MeshProgram
+  private meshProgram: OazyseNetProgram
   decisions: Decision[] = []
   private cycle = 0
   private onDecision?: (d: Decision) => void
@@ -62,7 +62,7 @@ export class AutonomousAgent {
     onDecision?: (d: Decision) => void
   ) {
     this.llm = new LLMEngine()
-    this.meshProgram = new MeshProgram(node.wallet)
+    this.meshProgram = new OazyseNetProgram(node.wallet)
     this.onDecision = onDecision
   }
 
@@ -192,7 +192,7 @@ export class AutonomousAgent {
     listing: Listing,
     sellerState: NodeState
   ): Promise<{ qualityScore: number; reasoning: string }> {
-    const prompt = `You are an autonomous AI agent evaluating a knowledge packet for purchase on the MESH decentralized network.
+    const prompt = `You are an autonomous AI agent evaluating a knowledge packet for purchase on the oazyse° os net.
 
 Packet to evaluate:
 - Type: ${listing.manifest.payload.type}

@@ -1,8 +1,8 @@
 /**
- * MeshProgram — TypeScript client for the MESH Solana Program.
+ * OazyseNetProgram — TypeScript client for the oazyse° os net Solana Program.
  *
  * When the Anchor program is deployed (program-id.txt exists), this client
- * reads/writes real on-chain PDA accounts via the MESH Anchor program.
+ * reads/writes real on-chain PDA accounts via the oazyse° anchor program.
  * Falls back to Memo Program if PDA already exists or devnet is unavailable.
  */
 
@@ -70,9 +70,9 @@ export interface VerdictRecord {
   txHash?: string
 }
 
-const CACHE_DIR = path.join(os.homedir(), '.mesh-node', 'brain', 'blockchain')
+const CACHE_DIR = path.join(os.homedir(), '.oazyse-os', 'brain', 'blockchain')
 
-export class MeshProgram {
+export class OazyseNetProgram {
   private connection: Connection
   private programId: PublicKey | null = null
   private nodeCache = new Map<string, NodeState>()
@@ -98,9 +98,9 @@ export class MeshProgram {
     }
 
     if (this.programId) {
-      console.log(`[MeshProgram] Using deployed program: ${this.programId.toBase58()}`)
+      console.log(`[OazyseNetProgram] Using deployed program: ${this.programId.toBase58()}`)
     } else {
-      console.log('[MeshProgram] No program deployed — using Memo fallback')
+      console.log('[OazyseNetProgram] No program deployed — using Memo fallback')
     }
 
     this.loadCache()
@@ -162,7 +162,7 @@ export class MeshProgram {
         const existing = await this.connection.getAccountInfo(nodePDA)
         if (existing) {
           // Already on-chain, just write a memo
-          txHash = await this.writeMemo(`MESH|NODE_ONLINE|${nodeId.slice(0, 20)}`)
+          txHash = await this.writeMemo(`oazyse|node_online|${nodeId.slice(0, 20)}`)
         } else {
           // data = discriminator(8) + node_id(32)
           const data = Buffer.concat([DISC.initNode, nodeIdBytes])
@@ -178,11 +178,11 @@ export class MeshProgram {
           txHash = await this.sendIx(ix)
         }
       } catch (e: any) {
-        console.warn(`[MeshProgram] initNode program call failed: ${e.message?.slice(0, 80)}, falling back`)
-        txHash = await this.writeMemo(`MESH|INIT_NODE|${nodeId.slice(0, 20)}|rep=100`)
+        console.warn(`[OazyseNetProgram] initNode program call failed: ${e.message?.slice(0, 80)}, falling back`)
+        txHash = await this.writeMemo(`oazyse|init_node|${nodeId.slice(0, 20)}|rep=100`)
       }
     } else {
-      txHash = await this.writeMemo(`MESH|INIT_NODE|${nodeId.slice(0, 20)}|rep=100`)
+      txHash = await this.writeMemo(`oazyse|init_node|${nodeId.slice(0, 20)}|rep=100`)
     }
 
     const state: NodeState = {
@@ -222,10 +222,10 @@ export class MeshProgram {
         })
         txHash = await this.sendIx(ix)
       } catch (e: any) {
-        txHash = await this.writeMemo(`MESH|REP|${nodeId.slice(0, 12)}|delta=${delta}|rep=${newRep}`)
+        txHash = await this.writeMemo(`oazyse|rep|${nodeId.slice(0, 12)}|delta=${delta}|rep=${newRep}`)
       }
     } else {
-      txHash = await this.writeMemo(`MESH|REP|${nodeId.slice(0, 12)}|delta=${delta}|rep=${newRep}|${reason.slice(0, 20)}`)
+      txHash = await this.writeMemo(`oazyse|rep|${nodeId.slice(0, 12)}|delta=${delta}|rep=${newRep}|${reason.slice(0, 20)}`)
     }
 
     state.reputation = newRep
@@ -279,10 +279,10 @@ export class MeshProgram {
         txHash = await this.sendIx(ix)
       } catch (e: any) {
         // PacketRecord PDA already exists (same hash bought twice) — use memo
-        txHash = await this.writeMemo(`MESH|PACKET|${hash.slice(0,12)}|type=${packetType}|q=${qualityScore}|seller=${seller.slice(0,12)}`)
+        txHash = await this.writeMemo(`oazyse|packet|${hash.slice(0,12)}|type=${packetType}|q=${qualityScore}|seller=${seller.slice(0,12)}`)
       }
     } else {
-      txHash = await this.writeMemo(`MESH|PACKET|${hash.slice(0,12)}|type=${packetType}|price=${price}|quality=${qualityScore}|seller=${seller.slice(0,12)}`)
+      txHash = await this.writeMemo(`oazyse|packet|${hash.slice(0,12)}|type=${packetType}|price=${price}|quality=${qualityScore}|seller=${seller.slice(0,12)}`)
     }
 
     const record: PacketRecord = {
@@ -335,10 +335,10 @@ export class MeshProgram {
         })
         txHash = await this.sendIx(ix)
       } catch (e: any) {
-        txHash = await this.writeMemo(`MESH|VERDICT|${challengeId.slice(0,12)}|${verdict}|def=${defendant.slice(0,12)}`)
+        txHash = await this.writeMemo(`oazyse|verdict|${challengeId.slice(0,12)}|${verdict}|def=${defendant.slice(0,12)}`)
       }
     } else {
-      txHash = await this.writeMemo(`MESH|VERDICT|${challengeId.slice(0,12)}|${verdict}|defendant=${defendant.slice(0,12)}|slash=${slashAmount}`)
+      txHash = await this.writeMemo(`oazyse|verdict|${challengeId.slice(0,12)}|${verdict}|defendant=${defendant.slice(0,12)}|slash=${slashAmount}`)
     }
 
     const record: VerdictRecord = {
@@ -383,7 +383,7 @@ export class MeshProgram {
       return await this.sendIx(ix)
     } catch (e: any) {
       const mockSig = `local-${crypto.randomBytes(32).toString('hex')}`
-      console.warn(`[MeshProgram] Devnet unavailable: ${e.message?.slice(0, 60)}`)
+      console.warn(`[OazyseNetProgram] Devnet unavailable: ${e.message?.slice(0, 60)}`)
       return mockSig
     }
   }

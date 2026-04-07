@@ -4,7 +4,7 @@ import * as crypto from 'crypto'
 
 // ── PROTOCOL IDENTITY (immutable) ─────────────────────────────
 // Every ManifestPacket carries the constitution hash.
-// This makes every packet a proof that it belongs to the MESH network
+// This makes every packet a proof that it belongs to oazyse° os net
 // regardless of which blockchain or settlement layer is currently active.
 export const PROTOCOL_CONSTITUTION_HASH = '12942e3a558089b2831cdbb8c094e8e2528017d94208c1374d2861ebab303945'
 export const PROTOCOL_VERSION = '1.0-genesis'
@@ -59,7 +59,7 @@ export class ManifestBuilder {
   ): ManifestPacket {
     const base = {
       header: {
-        protocol: 'mesh',
+        protocol: 'oazyse-net',
         version: PROTOCOL_VERSION,
         constitution_hash: PROTOCOL_CONSTITUTION_HASH,
         creator_pubkey: keypair.publicKey.toBase58(),
@@ -116,18 +116,18 @@ export class ManifestBuilder {
   }
 
   /**
-   * Verify a manifest belongs to the MESH protocol.
+   * Verify a manifest belongs to the oazyse° os net.
    * Works regardless of which settlement layer the packet was created on.
    */
   static isFromMeshProtocol(manifest: ManifestPacket): boolean {
-    return manifest.header.protocol === 'mesh'
+    return manifest.header.protocol === 'oazyse-net'
       && manifest.core_intent === CORE_INTENT
       && manifest.header.constitution_hash === PROTOCOL_CONSTITUTION_HASH
   }
 
   static toMemo(manifest: ManifestPacket): string {
     const cHash = manifest.header.constitution_hash?.slice(0, 8) || 'unknown'
-    return `MESH/${manifest.header.version}|c=${cHash}|${manifest.payload.cid.slice(0, 12)}|${manifest.payload.type}|${manifest.payload.price}`
+    return `oazyse/${manifest.header.version}|c=${cHash}|${manifest.payload.cid.slice(0, 12)}|${manifest.payload.type}|${manifest.payload.price}`
   }
 
   static summarize(manifest: ManifestPacket): string {

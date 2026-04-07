@@ -22,7 +22,7 @@ export class AgentRegistry {
   private storePath: string
 
   constructor(private node: Node) {
-    const home = path.join(process.env.HOME || '~', '.mesh-node', 'brain')
+    const home = path.join(process.env.HOME || '~', '.oazyse-os', 'brain')
     fs.mkdirSync(home, { recursive: true })
     this.storePath = path.join(home, 'agents.json')
     this.load()
@@ -139,7 +139,7 @@ export class AgentRegistry {
       pubkey: 'optional-solana-pubkey'
     }
 
-    const curl = `curl -X POST http://localhost:9000/api/mesh/connect \\
+    const curl = `curl -X POST http://localhost:9000/api/net/connect \\
   -H "Content-Type: application/json" \\
   -d '${JSON.stringify(template, null, 2)}'`
 
@@ -147,7 +147,7 @@ export class AgentRegistry {
       suggested_capabilities: suggested,
       manifest_template: template,
       curl_example: curl,
-      message: `Based on your description, you can offer ${suggested.length} capabilities to the MESH network. Register and start earning tokens when other agents use your services.`
+      message: `Based on your description, you can offer ${suggested.length} capabilities to the oazyse° os net. Register and start earning tokens when other agents use your services.`
     }
   }
 

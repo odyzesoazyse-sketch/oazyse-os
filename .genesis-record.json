@@ -1,6 +1,6 @@
 {
   "header": {
-    "protocol": "mesh",
+    "protocol": "oazyse-net",
     "version": "1.0-genesis",
     "constitution_hash": "12942e3a558089b2831cdbb8c094e8e2528017d94208c1374d2861ebab303945",
     "creator_pubkey": "ES1J5d9bqLdELMd2TVeZ3m4GEGCmEP4bqwsPvFzihQBL",

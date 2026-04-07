@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════
-// MESH Agent SDK — Types
+// oazyse° os agent sdk — Types
 // ═══════════════════════════════════════════════════
 
 export interface Interaction {
@@ -44,17 +44,17 @@ export interface Insight {
   // contribution state
   status: 'draft' | 'reviewed' | 'approved' | 'contributed' | 'rejected'
   ownerNote?: string       // owner's annotation
-  contributionId?: string  // MESH network contribution ID if contributed
+  contributionId?: string  // oazyse° os net contribution ID if contributed
 }
 
 export interface SDKConfig {
   agentId: string
-  meshUrl?: string          // MESH node URL, default localhost:9000
+  oazyseUrl?: string          // oazyse° os node URL, default localhost:9000
   autoAnalyze?: boolean     // auto-run pattern analysis, default true
   analyzeInterval?: number  // ms, default 10 min
   minInteractionsForPattern?: number  // default 3
   storageDir?: string       // where to store local data
-  llmApiKey?: string        // for insight extraction (uses MESH node LLM by default)
+  llmApiKey?: string        // for insight extraction (uses oazyse° os node LLM by default)
   privacyMode?: 'strict' | 'normal'   // strict = never send raw text, only patterns
 }
 

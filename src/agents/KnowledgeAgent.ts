@@ -27,13 +27,13 @@ export class KnowledgeAgent extends BaseAgent {
     this.addMarketPacket({
       id: 'vibe-1', type: 'VIBE', title: 'Light Mode Material',
       description: 'Instantly changes OS canvas to clean, white aesthetic.',
-      price: '0.05 MESH', author: 'genesis',
+      price: '0.05 oazyse', author: 'genesis',
       content: `document.body.style.background='#F8F9FA'; document.body.style.color='#111'; document.getElementById('cmd').style.color='#111'; document.getElementById('cmd').style.background='#fff'; document.getElementById('cmd').style.borderColor='#ddd';`
     })
     this.addMarketPacket({
       id: 'vibe-2', type: 'VIBE', title: 'Synthwave Dreams',
       description: 'Deep purple gradients and neon aesthetic inject packet.',
-      price: '0.02 MESH', author: 'genesis',
+      price: '0.02 oazyse', author: 'genesis',
       content: `document.body.style.background='linear-gradient(45deg, #2a0845 0%, #6441A5 100%)'; document.body.style.color='#fff'; document.getElementById('cmd').style.background='rgba(0,0,0,0.3)';`
     })
   }

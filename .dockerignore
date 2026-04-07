@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+*.log
+dist
+.oazyse-os
+.mesh-node
+mesh-program/target
+mesh-program/node_modules
+openclaw-skill/node_modules
+dashboard/*.bak

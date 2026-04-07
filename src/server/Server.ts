@@ -13,11 +13,12 @@ import { AgentRegistry } from '../core/AgentRegistry'
 import { AgentJudge } from '../core/AgentJudge'
 import { TokenEconomics } from '../token/TokenEconomics'
 import { AutonomousAgent } from '../agents/AutonomousAgent'
-import { MeshProgram } from '../blockchain/MeshProgram'
+import { OazyseNetProgram } from '../blockchain/MeshProgram'
+import { OazyseOSMCPServer } from '../mcp/MCPServer'
 
 const PORT = Number(process.env.PORT) || 9000
 
-export class MeshServer {
+export class OazyseServer {
   app = express()
   server: http.Server
   wss: WebSocketServer
@@ -30,9 +31,10 @@ export class MeshServer {
   agentRegistry: AgentRegistry
   agentJudge: AgentJudge
   autonomousAgent: AutonomousAgent
+  mcpServer: OazyseOSMCPServer
   clients = new Set<WebSocket>()
   peers = new Map<string, WebSocket>() // remote node connections
-  // Known remote MESH nodes: nodeId → { url, connectedAt }
+  // Known remote oazyse° os nodes: nodeId → { url, connectedAt }
   remotePeers = new Map<string, { url: string; nodeId: string; connectedAt: number }>()
 
   constructor() {
@@ -52,10 +54,14 @@ export class MeshServer {
     this.tracker = new ProgressTracker()
     this.agentRegistry = new AgentRegistry(this.node)
     this.agentJudge = new AgentJudge(this.node)
+    this.mcpServer = new OazyseOSMCPServer(
+      this.node, this.market, this.court,
+      this.agentRegistry, this.autonomousAgent
+    )
 
     this.app.use(cors())
     this.app.use(express.json())
-    this.app.use(express.static(path.join(__dirname, '../../dashboard')))
+    this.app.use(express.static(path.join(__dirname, '../../dashboard'), { index: false }))
 
     this.server = http.createServer(this.app)
     this.wss = new WebSocketServer({ server: this.server })
@@ -92,7 +98,7 @@ export class MeshServer {
       if (!key) return res.status(400).json({ error: 'key required' })
       const success = this.orchestrator.llmEngine.setApiKey(key)
       if (success) {
-        this.broadcast('SYS', 'GenOS Engine unlocked via dynamic API key')
+        this.broadcast('SYS', 'oazyse° os frame engine unlocked via dynamic API key')
         res.json({ success: true })
       } else {
         res.status(400).json({ error: 'invalid key structure' })
@@ -125,9 +131,9 @@ export class MeshServer {
       })
     })
 
-    // GenOS unified market endpoint (for sharing over WebRTC)
-    this.app.get('/api/genos_market', (req, res) => {
-      // Return everything currently in the GenOS market store, so the browser can share it
+    // oazyse° os frame unified market endpoint (for sharing over WebRTC)
+    this.app.get('/api/frame/market', (req, res) => {
+      // Return everything currently in the oazyse° os market store, so the browser can share it
       const packets = this.orchestrator.knowledgeAgent.getMarketPackets()
       res.json({
         listings: packets
@@ -184,7 +190,7 @@ export class MeshServer {
       )
       this.broadcast('TRUTH', `Challenge filed: ${reason}`)
       
-      // Broadcast to all GenOS clients
+      // Broadcast to all oazyse° os frame clients
       this.broadcastJson({
         type: 'JURY_DUTY',
         data: {
@@ -220,10 +226,10 @@ export class MeshServer {
       res.json({ goals: this.tracker.getAllGoals() })
     })
 
-    // ── MESH PROTOCOL — Agent Connection ─────────────────────
+    // ── oazyse° os net — Agent Connection ─────────────────────
 
     // Подключить агента к сети
-    this.app.post('/api/mesh/connect', (req, res) => {
+    this.app.post('/api/net/connect', (req, res) => {
       const { agent_id, capabilities, endpoint_url, description, pubkey } = req.body
       if (!agent_id || !description) {
         return res.status(400).json({ error: 'agent_id and description required' })
@@ -251,7 +257,7 @@ export class MeshServer {
     })
 
     // Найти агентов по способности
-    this.app.get('/api/mesh/discover', (req, res) => {
+    this.app.get('/api/net/discover', (req, res) => {
       const capability = req.query.capability as string | undefined
       const limit = req.query.limit ? Number(req.query.limit) : 20
       const agents = this.agentRegistry.discover(capability).slice(0, limit)
@@ -259,16 +265,16 @@ export class MeshServer {
     })
 
     // Heartbeat — агент сигнализирует что жив
-    this.app.post('/api/mesh/heartbeat', (req, res) => {
+    this.app.post('/api/net/heartbeat', (req, res) => {
       const { agent_id, load, status } = req.body
       if (!agent_id) return res.status(400).json({ error: 'agent_id required' })
       const ok = this.agentRegistry.heartbeat(agent_id, load, status)
-      if (!ok) return res.status(404).json({ error: 'Agent not found. Use /api/mesh/connect first.' })
+      if (!ok) return res.status(404).json({ error: 'Agent not found. Use /api/net/connect first.' })
       res.json({ ok: true, timestamp: Date.now() })
     })
 
     // Онбординг — что агент может предложить сети
-    this.app.get('/api/mesh/onboard', (req, res) => {
+    this.app.get('/api/net/onboard', (req, res) => {
       const describe = req.query.describe as string || ''
       if (!describe) return res.status(400).json({ error: 'describe query param required' })
       const suggestion = this.agentRegistry.getOnboardingSuggestion(describe)
@@ -324,7 +330,7 @@ export class MeshServer {
     // Returns the protocol constitution — works on any settlement layer
     this.app.get('/api/protocol', (_req, res) => {
       res.json({
-        name: 'MESH Protocol',
+        name: 'oazyse° os net',
         version: '1.0-genesis',
         core_intent: 'ABUNDANCE_FOR_ALL_LIFE',
         constitution_hash: '12942e3a558089b2831cdbb8c094e8e2528017d94208c1374d2861ebab303945',
@@ -340,7 +346,7 @@ export class MeshServer {
           identity: 'ed25519 — chain-agnostic',
           packet_format: 'ManifestPacket — JSON + NaCL signature',
           economics_layer: 'TypeScript — runs anywhere',
-          ui_layer: 'GenOS — any browser',
+          ui_layer: 'oazyse° os frame — any browser',
           note: 'Only settlement_layer can change. Everything else is portable.',
         },
         seven_laws: [
@@ -360,7 +366,7 @@ export class MeshServer {
           { layer: 'solana-devnet', since: 'genesis (April 2026)', status: 'active' },
         ],
         future_candidates: [
-          { type: 'IBlockchain', description: 'MESH own chain — submit via Judge when ready' },
+          { type: 'IBlockchain', description: 'oazyse° os net chain — submit via Judge when ready' },
           { type: 'IBlockchain', description: 'Ethereum L2 — any EVM chain' },
           { type: 'IBlockchain', description: 'Cosmos IBC — interchain identity' },
         ],
@@ -410,7 +416,7 @@ export class MeshServer {
 
     // All on-chain node states
     this.app.get('/api/blockchain/nodes', (req, res) => {
-      const mp = this.autonomousAgent['meshProgram'] as MeshProgram
+      const mp = this.autonomousAgent['meshProgram'] as OazyseNetProgram
       res.json({
         nodes: mp.getAllNodeStates(),
         programId: '8tBwhuAj5A9KfMX1i5hg5QYmkxke7BUN4iH9JD6JMnRc',
@@ -517,7 +523,7 @@ export class MeshServer {
           result = await response.json()
         } else if (id === 'clock') {
           result = { time: new Date().toISOString(), timestamp: Date.now(), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }
-        } else if (id === 'mesh-status') {
+        } else if (id === 'oazyse-status') {
           result = await this.node.getStatus()
         } else {
           result = { id, invoked: true, timestamp: Date.now(), params }
@@ -538,9 +544,9 @@ export class MeshServer {
       }
     })
 
-    // ── PEER-TO-PEER — Connect to remote MESH nodes ───────────
+    // ── PEER-TO-PEER — Connect to remote oazyse° os nodes ───────────
 
-    // Connect to a remote MESH node by URL
+    // Connect to a remote oazyse° os node by URL
     this.app.post('/api/peer/connect', async (req, res) => {
       const { url } = req.body
       if (!url) return res.status(400).json({ error: 'url required' })
@@ -680,13 +686,13 @@ export class MeshServer {
       res.json({ success: true, hash: manifest.proof.hash.slice(0, 12) })
     })
 
-    // ── GenOS Capability Protocol ─────────────────────────────
+    // ── oazyse° os frame Capability Protocol ─────────────────────────────
 
     // In-memory capability store
     const capabilities: Record<string, any> = {}
 
     // Register a capability (API, data stream, app, agent)
-    this.app.post('/api/mesh/capability', (req, res) => {
+    this.app.post('/api/net/capability', (req, res) => {
       const cap = req.body
       if (!cap?.id) return res.status(400).json({ error: 'capability.id required' })
       capabilities[cap.id] = { ...cap, registered_at: Date.now() }
@@ -696,7 +702,7 @@ export class MeshServer {
     })
 
     // List all registered capabilities
-    this.app.get('/api/mesh/capabilities', (req, res) => {
+    this.app.get('/api/net/capabilities', (req, res) => {
       const tag = req.query.tag as string | undefined
       const category = req.query.category as string | undefined
       let list = Object.values(capabilities)
@@ -705,8 +711,8 @@ export class MeshServer {
       res.json({ capabilities: list, total: list.length })
     })
 
-    // Agent or external node pushes surface directives to GenOS
-    this.app.post('/api/genos/directive', (req, res) => {
+    // Agent or external node pushes surface directives to oazyse° os frame
+    this.app.post('/api/frame/directive', (req, res) => {
       const { directives } = req.body
       if (!Array.isArray(directives) || !directives.length) {
         return res.status(400).json({ error: 'directives array required' })
@@ -717,12 +723,12 @@ export class MeshServer {
 
     // HTTP wrapper for os_chat — lets external agents (e.g. OpenClaw) trigger
     // LLM UI generation without needing a WebSocket connection.
-    this.app.post('/api/mesh/chat', async (req, res) => {
+    this.app.post('/api/frame/chat', async (req, res) => {
       const { text, surface_id } = req.body
       if (!text) return res.status(400).json({ error: 'text required' })
       try {
         const uiPacket = await this.orchestrator.generateUI(text)
-        // Broadcast the result to all connected GenOS dashboards
+        // Broadcast the result to all connected oazyse° os frame dashboards
         if (uiPacket.type === 'html' && uiPacket.content) {
           this.broadcastJson({
             type: 'OS_RENDER',
@@ -834,15 +840,37 @@ export class MeshServer {
       })
     })
 
-    // ── GenOS ─────────────────────────────────────────────────
+    // ── MCP — Model Context Protocol ──────────────────────────
+    // Any MCP-compatible AI (Claude Desktop, OpenClaw, Cursor…)
+    // can connect via: { "mcpServers": { "oazyse": { "url": "http://localhost:9000/mcp" } } }
 
-    this.app.get('/genos', (req, res) => {
-      res.sendFile(path.join(__dirname, '../../dashboard/genos.html'))
+    this.app.get('/mcp/info', (_req, res) => {
+      res.json(this.mcpServer.getInfo())
+    })
+
+    this.app.all('/mcp', async (req, res) => {
+      try {
+        await this.mcpServer.handleRequest(req, res, req.body)
+      } catch (err: any) {
+        if (!res.headersSent) {
+          res.writeHead(500, { 'Content-Type': 'application/json' })
+          res.end(JSON.stringify({ error: err.message || 'MCP error' }))
+        }
+      }
+    })
+
+    // ── oazyse° os frame ─────────────────────────────────────────────────
+
+    this.app.get('/frame', (req, res) => {
+      res.redirect('/frame.html' + (req.query && Object.keys(req.query).length ? '?' + new URLSearchParams(req.query as any).toString() : ''))
     })
 
     // Serve dashboard at root
     this.app.get('/', (req, res) => {
-      res.sendFile(path.join(__dirname, '../../dashboard/index.html'))
+      res.redirect('/landing.html')
+    })
+    this.app.get('/dashboard', (req, res) => {
+      res.redirect('/index.html')
     })
   }
 
@@ -906,7 +934,7 @@ export class MeshServer {
         const peer = this.node.peers.get(msg.peerId)
         if (peer) peer.exchangeCount++
         
-        // Ingest the newly received remote packets into the local GenOS market store
+        // Ingest the newly received remote packets into the local oazyse° os market store
         if (Array.isArray(msg.payload)) {
           console.log(`[P2P DEBUG] Received payload array of length ${msg.payload.length}`);
           let added = 0;
@@ -918,7 +946,7 @@ export class MeshServer {
                 type: packet.type || 'DATA',
                 title: packet.title || packet.description || 'Unknown Packet',
                 description: packet.description || 'P2P synced data packet',
-                price: (packet.price || 0) + ' MESH',
+                price: (packet.price || 0) + ' oazyse',
                 author: packet.author || packet.seller || msg.peerId,
                 content: packet.content || ''
               });
@@ -960,7 +988,7 @@ export class MeshServer {
           this.node.nodeId, // mock voter ID as our own node ID since single user locally
           msg.verdict,
           0.01,
-          'User submitted via GenOS'
+          'User submitted via oazyse° os frame'
         )
         if (result.accepted) {
           this.broadcast('TRUTH', result.message)
@@ -1010,7 +1038,7 @@ export class MeshServer {
         break
       }
       case 'surface_directive': {
-        // Agent pushes directives to all GenOS clients
+        // Agent pushes directives to all oazyse° os frame clients
         if (Array.isArray(msg.directives)) {
           this.broadcastJson({ type: 'SURFACE_DIRECTIVE', data: { directives: msg.directives } })
         }
@@ -1057,7 +1085,7 @@ export class MeshServer {
 
     this.server.listen(PORT, () => {
       console.log(`\n  ╔══════════════════════════════════════════╗`)
-      console.log(`  ║   MESH NODE — LIVE                       ║`)
+      console.log(`  ║   oazyse° os node — live                 ║`)
       console.log(`  ║   ${this.node.nodeId.padEnd(38)}║`)
       console.log(`  ║   Balance: ${(balance + ' SOL').padEnd(31)}║`)
       console.log(`  ╚══════════════════════════════════════════╝`)
@@ -1067,7 +1095,7 @@ export class MeshServer {
 
       // Create genesis manifest with constitution hash (if not already saved)
       if (!this.node.genesisRecord) {
-        const genManifest = this.node.offer('GENESIS', 'Network Genesis — ABUNDANCE_FOR_ALL_LIFE', 0, ['genesis', 'mesh', 'protocol'])
+        const genManifest = this.node.offer('GENESIS', 'Network Genesis — ABUNDANCE_FOR_ALL_LIFE', 0, ['genesis', 'oazyse-net', 'protocol'])
         this.node.saveGenesis(genManifest)
       }
       this.broadcast('GENESIS', `Node ${this.node.nodeId} online — ABUNDANCE_FOR_ALL_LIFE`)
@@ -1093,7 +1121,9 @@ export class MeshServer {
         this.broadcast('AI', `Autonomous agent online — evaluating market every ${autoInterval / 1000}s`)
         this.broadcast('AI', `Trigger manually: POST /api/autonomous/trigger`)
       }
-      console.log(`  GenOS:     http://localhost:${PORT}/genos`)
+      console.log(`  frame:     http://localhost:${PORT}/frame`)
+      console.log(`  MCP:       http://localhost:${PORT}/mcp`)
+      console.log(`  MCP Info:  http://localhost:${PORT}/mcp/info`)
 
       // Прунинг стейл-агентов каждые 2 минуты
       setInterval(() => this.agentRegistry.pruneStale(), 2 * 60 * 1000)
@@ -1102,5 +1132,5 @@ export class MeshServer {
 }
 
 // Start
-const server = new MeshServer()
+const server = new OazyseServer()
 server.start().catch(console.error)

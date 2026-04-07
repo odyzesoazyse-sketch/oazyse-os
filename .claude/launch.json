@@ -9,11 +9,9 @@
     },
     {
       "name": "MESH Node (start)",
-      "runtimeExecutable": "/usr/local/Cellar/node/25.5.0/bin/node",
-      "runtimeArgs": ["/usr/local/Cellar/node/25.5.0/bin/npx", "ts-node", "src/server/Server.ts"],
+      "runtimeExecutable": "/usr/local/Cellar/node/25.5.0/bin/npx",
+      "runtimeArgs": ["ts-node", "src/server/Server.ts"],
       "port": 9000,
-      "autoPort": false,
-      "cwd": "/Users/admin/Documents/Abundance AI",
       "env": {
         "PATH": "/usr/local/Cellar/node/25.5.0/bin:/usr/local/bin:/usr/bin:/bin"
       }

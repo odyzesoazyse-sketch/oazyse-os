@@ -1,7 +1,7 @@
 {
-  "id": "mesh-genos",
-  "name": "MESH GenOS",
-  "description": "Control the Abundance AI MESH Node visual OS. Mount widgets, change themes, generate AI-powered surfaces, and manage the peer network — all from your messaging app.",
+  "id": "oazyse-os-link",
+  "name": "oazyse° os link",
+  "description": "Control the Abundance AI oazyse° os node visual OS. Mount widgets, change themes, generate AI-powered surfaces, and manage the peer network — all from your messaging app.",
   "version": "1.0.0",
   "configSchema": {
     "type": "object",

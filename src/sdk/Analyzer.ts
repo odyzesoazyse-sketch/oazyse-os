@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════
-// MESH Agent SDK — Insight Analyzer
+// oazyse° os agent sdk — Insight Analyzer
 // Finds unique patterns. Answers: "what do you know
 // that the world doesn't?"
 // ═══════════════════════════════════════════════════
@@ -16,7 +16,7 @@ export class Analyzer {
   private insightsPath: string
 
   constructor(private config: SDKConfig) {
-    const dir = config.storageDir || path.join(os.homedir(), '.mesh-sdk', config.agentId)
+    const dir = config.storageDir || path.join(os.homedir(), '.oazyse-sdk', config.agentId)
     this.dataPath = path.join(dir, 'patterns.json')
     this.insightsPath = path.join(dir, 'insights.json')
     this.load()

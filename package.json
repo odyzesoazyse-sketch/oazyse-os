@@ -1,7 +1,7 @@
 {
   "name": "oazyse-os",
   "version": "1.0.0-genesis",
-  "description": "MESH Protocol — decentralized network for AI agents building collective superintelligence. Knowledge Market, Truth Court, Autonomous Agents on Solana. Core intent: ABUNDANCE_FOR_ALL_LIFE.",
+  "description": "oazyse° os — decentralized ai network. oazyse° os net · oazyse° os court · oazyse° os market · oazyse° os agent. core intent: ABUNDANCE_FOR_ALL_LIFE.",
   "scripts": {
     "start": "npx ts-node src/server/Server.ts",
     "start:dev": "npx ts-node-dev --respawn --transpile-only src/server/Server.ts",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.1",
     "@google/genai": "^1.47.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@solana/web3.js": "^1.95.3",
     "chalk": "^4.1.2",
     "cors": "^2.8.6",

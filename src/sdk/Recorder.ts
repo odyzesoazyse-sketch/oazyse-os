@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════
-// MESH Agent SDK — Interaction Recorder
+// oazyse° os agent sdk — Interaction Recorder
 // Records everything locally. Owner controls what leaves.
 // ═══════════════════════════════════════════════════
 
@@ -13,7 +13,7 @@ export class Recorder {
   private dataPath: string
 
   constructor(private config: SDKConfig) {
-    const dir = config.storageDir || path.join(os.homedir(), '.mesh-sdk', config.agentId)
+    const dir = config.storageDir || path.join(os.homedir(), '.oazyse-sdk', config.agentId)
     fs.mkdirSync(dir, { recursive: true })
     this.dataPath = path.join(dir, 'interactions.json')
     this.load()

@@ -31,7 +31,7 @@ export class TokenEconomics {
   private storePath: string
 
   constructor(storePath?: string) {
-    this.storePath = storePath || path.join(os.homedir(), '.mesh-node', 'brain', 'balances.json')
+    this.storePath = storePath || path.join(os.homedir(), '.oazyse-os', 'brain', 'balances.json')
     this.load()
   }
 

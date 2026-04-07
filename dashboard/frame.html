@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GenOS — Abundance AI</title>
+<title>oazyse° os frame</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Questrial&display=swap" rel="stylesheet">
 <style>
@@ -544,7 +544,7 @@ body.ambient #ambient-hint{display:block}
   <div id="surfaces"></div>
 
   <div id="canvas-hint">
-    <h2 data-i18n="hint.title">MESH° GenOS</h2>
+    <h2 data-i18n="hint.title">oazyse°° oazyse° os frame</h2>
     <p data-i18n="hint.sub">Everything is generated in the moment.<br>Say what you want to see, do, or connect.</p>
   </div>
 
@@ -578,7 +578,7 @@ body.ambient #ambient-hint{display:block}
 ══════════════════════════════ -->
 <div id="dash-mode">
   <div id="dh">
-    <div class="logo">MESH° <span>/ genos</span></div>
+    <div class="logo">oazyse°° <span>/ genos</span></div>
     <div class="hstats">
       <span>Agents <b id="ha">0</b></span>
       <span>Knowledge <b id="hk">0</b></span>
@@ -927,8 +927,8 @@ const BUILTIN_CAPS = [
   {id:'btc-price',   category:'data_stream', description:'Bitcoin USD price',         tags:['btc','bitcoin','биткоин','price','цена','крипто'], endpoint:'https://api.coinbase.com/v2/prices/BTC-USD/spot', schema:{price:'number'}},
   {id:'eth-price',   category:'data_stream', description:'Ethereum USD price',        tags:['eth','ethereum','эфир','price','цена','крипто'],  endpoint:'https://api.coinbase.com/v2/prices/ETH-USD/spot', schema:{price:'number'}},
   {id:'crypto-prices',category:'data_stream',description:'Crypto prices BTC + ETH',  tags:['crypto','bitcoin','ethereum','prices','цены','крипто']},
-  {id:'mesh-agents', category:'data_stream', description:'Connected MESH agents',     tags:['agents','агенты','network','сеть','участники'], endpoint:'/api/mesh/discover'},
-  {id:'mesh-status', category:'data_stream', description:'MESH network status',       tags:['status','статус','network','сеть','balance'],    endpoint:'/api/status'},
+  {id:'mesh-agents', category:'data_stream', description:'Connected oazyse° agents',     tags:['agents','агенты','network','сеть','участники'], endpoint:'/api/mesh/discover'},
+  {id:'mesh-status', category:'data_stream', description:'oazyse° network status',       tags:['status','статус','network','сеть','balance'],    endpoint:'/api/status'},
   {id:'mesh-knowledge',category:'data_stream',description:'Knowledge market',         tags:['knowledge','знания','market','маркет','данные'],  endpoint:'/api/market'},
   {id:'telegram',    category:'app',         description:'Telegram messenger',        tags:['telegram','телеграм','tg','chat'],   has_visual:true, visual_src:'https://web.telegram.org', visual_mode_default:'native'},
   {id:'notes',       category:'local',       description:'Sticky note pad',           tags:['notes','заметки','note','записка','sticky','memo']},
@@ -1013,8 +1013,8 @@ const FAST_RENDERS = {
       <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
         <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0">
           <div id="af-dot-${id}" style="width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>
-          <span style="font-size:10px;font-family:var(--mono);color:var(--text2)">AUTONOMOUS AI — MESH NETWORK</span>
-          <a href="https://explorer.solana.com/address/8tBwhuAj5A9KfMX1i5hg5QYmkxke7BUN4iH9JD6JMnRc?cluster=devnet" target="_blank" style="font-size:9px;font-family:var(--mono);color:var(--green);text-decoration:none;opacity:.7" title="View MESH Program on Solana Explorer">↗ devnet</a>
+          <span style="font-size:10px;font-family:var(--mono);color:var(--text2)">AUTONOMOUS AI — oazyse° NETWORK</span>
+          <a href="https://explorer.solana.com/address/8tBwhuAj5A9KfMX1i5hg5QYmkxke7BUN4iH9JD6JMnRc?cluster=devnet" target="_blank" style="font-size:9px;font-family:var(--mono);color:var(--green);text-decoration:none;opacity:.7" title="View oazyse° Program on Solana Explorer">↗ devnet</a>
           <button onclick="fetch('/api/autonomous/trigger',{method:'POST'}).then(r=>r.json()).then(d=>{if(d.decision)afAddDecision('${id}',d.decision)})" style="margin-left:auto;font-size:9px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;cursor:pointer;color:var(--text2);font-family:var(--mono)">TRIGGER</button>
         </div>
         <div id="af-feed-${id}" style="flex:1;overflow-y:auto;padding:8px 6px;display:flex;flex-direction:column;gap:6px">
@@ -1180,24 +1180,24 @@ const FAST_RENDERS = {
 
   'agent-chat': {
     title:'AGENT CHAT', w:320, h:380,
-    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div id="ac-log-${id}" style="flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px"><div style="font-size:10px;color:var(--text3);text-align:center;font-family:var(--mono);padding:12px">Direct chat with MESH AI agent</div></div><div style="padding:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0"><input id="ac-in-${id}" placeholder="Ask anything…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);outline:none;font-family:var(--font)" onkeydown="if(event.key==='Enter')agentChatSend('${id}')"><button onclick="agentChatSend('${id}')" style="padding:7px 14px;background:hsla(270,100%,65%,.2);border:1px solid var(--purple);border-radius:6px;cursor:pointer;font-size:12px;color:var(--purple)">↵</button></div></div>` },
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div id="ac-log-${id}" style="flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px"><div style="font-size:10px;color:var(--text3);text-align:center;font-family:var(--mono);padding:12px">Direct chat with oazyse° AI agent</div></div><div style="padding:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0"><input id="ac-in-${id}" placeholder="Ask anything…" style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);outline:none;font-family:var(--font)" onkeydown="if(event.key==='Enter')agentChatSend('${id}')"><button onclick="agentChatSend('${id}')" style="padding:7px 14px;background:hsla(270,100%,65%,.2);border:1px solid var(--purple);border-radius:6px;cursor:pointer;font-size:12px;color:var(--purple)">↵</button></div></div>` },
     init(){}
   },
 
   'code-runner': {
     title:'JS RUNNER', w:380, h:340,
-    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">JAVASCRIPT RUNNER</span><button onclick="codeRun('${id}')" style="margin-left:auto;font-size:10px;padding:3px 12px;background:hsla(150,100%,50%,.15);border:1px solid var(--green);border-radius:4px;cursor:pointer;color:var(--green);font-family:var(--mono)">▶ RUN</button><button onclick="codeClear('${id}')" style="font-size:10px;padding:3px 8px;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text3);font-family:var(--mono)">CLEAR</button></div><textarea id="cr-ed-${id}" style="flex:1;background:var(--bg3);border:none;border-bottom:1px solid var(--border);resize:none;padding:10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;tab-size:2;min-height:140px" placeholder="// Write JavaScript here&#10;console.log('Hello MESH!')"></textarea><div id="cr-out-${id}" style="height:90px;overflow-y:auto;padding:8px 10px;font-family:var(--mono);font-size:11px;color:var(--green);line-height:1.6;background:var(--bg)"></div></div>` },
+    render(id){ return `<div style="display:flex;flex-direction:column;height:100%"><div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">JAVASCRIPT RUNNER</span><button onclick="codeRun('${id}')" style="margin-left:auto;font-size:10px;padding:3px 12px;background:hsla(150,100%,50%,.15);border:1px solid var(--green);border-radius:4px;cursor:pointer;color:var(--green);font-family:var(--mono)">▶ RUN</button><button onclick="codeClear('${id}')" style="font-size:10px;padding:3px 8px;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text3);font-family:var(--mono)">CLEAR</button></div><textarea id="cr-ed-${id}" style="flex:1;background:var(--bg3);border:none;border-bottom:1px solid var(--border);resize:none;padding:10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;tab-size:2;min-height:140px" placeholder="// Write JavaScript here&#10;console.log('Hello oazyse°!')"></textarea><div id="cr-out-${id}" style="height:90px;overflow-y:auto;padding:8px 10px;font-family:var(--mono);font-size:11px;color:var(--green);line-height:1.6;background:var(--bg)"></div></div>` },
     init(){}
   },
 
   'network-graph': {
-    title: 'MESH NETWORK', w: 460, h: 420,
+    title: 'oazyse° NETWORK', w: 460, h: 420,
     render(id) { return `
       <div style="width:100%;height:100%;background:var(--bg);position:relative;overflow:hidden;border-radius:0 0 8px 8px">
         <canvas id="ng-c-${id}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
         <div style="position:absolute;top:8px;left:10px;font-family:var(--mono);font-size:9px;color:var(--green);display:flex;align-items:center;gap:5px;z-index:2">
           <div style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite"></div>
-          ● LIVE · MESH NETWORK
+          ● LIVE · oazyse° NETWORK
         </div>
         <div id="ng-stats-${id}" style="position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:9px;color:var(--text3);z-index:2">
           <span id="ng-nc-${id}">5</span> nodes · <span id="ng-pc-${id}">0</span> packets
@@ -1881,13 +1881,13 @@ async function cmd(text){
     if(slash==='launch'){appLoad(parts.slice(1).join(' '));done('');return}
     if(slash==='apps'){appShowSwitcher();done('');return}
     if(slash==='demo'){
-      addNotif('🌐 MESH Protocol — AI agents live on Solana devnet','success')
+      addNotif('🌐 oazyse° Protocol — AI agents live on Solana devnet','success')
       mountSurface({capability:'autonomous-feed',intent:'AI agent decisions live on Solana devnet',position:'center'})
       setTimeout(()=>{
-        mountSurface({capability:'network-graph',intent:'MESH network topology — force physics visualization',position:'right'})
-        mountSurface({capability:'agent-chat',intent:'Talk to the MESH agent',position:'left'})
+        mountSurface({capability:'network-graph',intent:'oazyse° network topology — force physics visualization',position:'right'})
+        mountSurface({capability:'agent-chat',intent:'Talk to the oazyse° agent',position:'left'})
       },350)
-      done('MESH Demo launched — watching agents on Solana')
+      done('oazyse° Demo launched — watching agents on Solana')
       return
     }
     if(slash==='network'){mountSurface({capability:'network-graph',intent:text,position:'center'});done('Network graph');return}
@@ -2270,7 +2270,7 @@ function afAddDecision(surfaceId, d) {
 }
 
 // ═══════════════════════════════════════════════════
-// MESH NETWORK GRAPH — Force Physics Visualization
+// oazyse° NETWORK GRAPH — Force Physics Visualization
 // ═══════════════════════════════════════════════════
 const NG_STATE = {}
 const NG_ROLES = [
@@ -2619,7 +2619,7 @@ registerScene({
     { type: 'os_theme', preset: 'light' },
     { type: 'mount', intent: 'clock', pos: 'top-right' },
     { type: 'mount', intent: 'mesh-status', pos: 'top-left' },
-    { type: 'notify', message: '☀️ Доброе утро — MESH активна' }
+    { type: 'notify', message: '☀️ Доброе утро — oazyse° активна' }
   ]
 })
 
@@ -2647,7 +2647,7 @@ registerScene({
 // ── i18n ──
 const I18N = {
   en: {
-    'hint.title': 'MESH° GenOS',
+    'hint.title': 'oazyse°° oazyse° os frame',
     'hint.sub': 'Everything is generated in the moment.<br>Say what you want to see, do, or connect.',
     'cb.placeholder': 'ask anything — agent handles the rest',
     'cb.hint': '⏎ enter',
@@ -2663,7 +2663,7 @@ const I18N = {
     'panel.mission.title': 'Mission', 'panel.mission.sub': 'The seven laws',
   },
   ru: {
-    'hint.title': 'MESH° GenOS',
+    'hint.title': 'oazyse°° oazyse° os frame',
     'hint.sub': 'Всё создаётся прямо сейчас.<br>Скажи что хочешь увидеть, сделать или подключить.',
     'cb.placeholder': 'спроси что угодно — агент сделает остальное',
     'cb.hint': '⏎ enter',
@@ -2774,9 +2774,9 @@ const SLASH_COMMANDS = [
   {label:'/save ',hint:'Save current interface as named app',icon:'💾'},
   {label:'/launch ',hint:'Launch a saved app by name',icon:'🚀'},
   {label:'/apps',hint:'Show all your saved apps',icon:'⊞'},
-  {label:'/demo',hint:'Launch full MESH Protocol demo — autonomous agents on Solana',icon:'🌐'},
-  {label:'/network',hint:'MESH network topology — force physics visualization',icon:'◈'},
-  {label:'/showcase',hint:'Auto-typing live demo — watch GenOS explain itself',icon:'▶'},
+  {label:'/demo',hint:'Launch full oazyse° Protocol demo — autonomous agents on Solana',icon:'🌐'},
+  {label:'/network',hint:'oazyse° network topology — force physics visualization',icon:'◈'},
+  {label:'/showcase',hint:'Auto-typing live demo — watch oazyse° os frame explain itself',icon:'▶'},
 ]
 
 function updateAutocomplete(text){
@@ -3368,7 +3368,7 @@ if(new URLSearchParams(location.search).get('demo')==='1'){
 setTimeout(()=>g('cb-input').focus(),200)
 // Boot notification
 setTimeout(()=>{
-  addNotif('GenOS ready — press ⌘K for command palette, ? for shortcuts','info')
+  addNotif('oazyse° os frame ready — press ⌘K for command palette, ? for shortcuts','info')
 }, 1500)
 
 // ═══════════════════════════════════════════════════
@@ -3413,7 +3413,7 @@ async function startShowcase() {
   Object.keys(S.surfaces).forEach(unmountSurface)
   await _scWait(500)
 
-  _scNarrate('Welcome to <b>GenOS</b> — the first OS built for AI agents', 3800)
+  _scNarrate('Welcome to <b>oazyse° os frame</b> — the first OS built for AI agents', 3800)
   await _scWait(2200)
   if (!_scActive) return
 
@@ -3426,14 +3426,14 @@ async function startShowcase() {
   await _scWait(260)
   cmd('/network')
   await _scWait(600)
-  _scNarrate('<b>47 MESH nodes</b> — force physics, real-time knowledge flows', 4500)
+  _scNarrate('<b>47 oazyse° nodes</b> — force physics, real-time knowledge flows', 4500)
   await _scWait(4800)
   if (!_scActive) return
 
   // auto-click GLOBAL VISION on latest network surface
   const visionBtns = document.querySelectorAll('[onclick*="ngVision"]')
   if (visionBtns.length) visionBtns[visionBtns.length - 1].click()
-  _scNarrate('<b>GLOBAL VISION</b> — scaling to 10,000 nodes. The entire MESH network.', 5500)
+  _scNarrate('<b>GLOBAL VISION</b> — scaling to 10,000 nodes. The entire oazyse° network.', 5500)
   await _scWait(6500)
   if (!_scActive) return
 
@@ -3455,15 +3455,15 @@ async function startShowcase() {
   if (!_scActive) return
 
   // ask a question
-  await _scType('what can MESH Protocol do?')
+  await _scType('what can oazyse° Protocol do?')
   _scNarrate('Ask anything. <b>Agents handle the rest.</b>', 3500)
   await _scWait(1800)
   if (!_scActive) return
-  cmd('what can MESH Protocol do?')
+  cmd('what can oazyse° Protocol do?')
   await _scWait(5500)
   if (!_scActive) return
 
-  _scNarrate('<b>MESH Protocol</b> — <em>Intelligence as a Commons</em> · ABUNDANCE_FOR_ALL_LIFE ◈', 0)
+  _scNarrate('<b>oazyse° Protocol</b> — <em>Intelligence as a Commons</em> · ABUNDANCE_FOR_ALL_LIFE ◈', 0)
   await _scWait(6000)
 
   stopShowcase()

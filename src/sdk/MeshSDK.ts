@@ -1,11 +1,11 @@
 // ═══════════════════════════════════════════════════
-// MESH Agent SDK — Main Entry Point
+// oazyse° os agent sdk — Main Entry Point
 //
 // Embed in ANY AI agent with 3 lines:
 //
-//   import { MeshSDK } from '@mesh-protocol/sdk'
-//   const mesh = new MeshSDK({ agentId: 'my-agent' })
-//   const { result } = await mesh.track(() => myAgent(input), { input })
+//   import { OazyseSDK } from '@oazyse/sdk'
+//   const sdk = new OazyseSDK({ agentId: 'my-agent' })
+//   const { result } = await sdk.track(() => myAgent(input), { input })
 //
 // The SDK silently observes, finds patterns, and asks
 // you: "you have unique knowledge — want to share it?"
@@ -17,7 +17,7 @@ import { SDKConfig, Insight, SDKStats } from './types'
 import * as https from 'https'
 import * as http from 'http'
 
-export class MeshSDK {
+export class OazyseSDK {
   private recorder: Recorder
   private analyzer: Analyzer
   private analyzeTimer?: NodeJS.Timeout
@@ -28,7 +28,7 @@ export class MeshSDK {
     this.recorder = new Recorder(config)
     this.analyzer = new Analyzer(config)
 
-    console.log(`[MeshSDK] Initialized for agent: ${config.agentId}`)
+    console.log(`[OazyseSDK] Initialized for agent: ${config.agentId}`)
 
     // Auto-analyze on interval
     if (config.autoAnalyze !== false) {
@@ -78,12 +78,12 @@ export class MeshSDK {
   printInsightsReport() {
     const insights = this.analyzer.getInsightsForReview()
     if (insights.length === 0) {
-      console.log('\n[MeshSDK] No insights ready for review yet. Keep using your agent.')
+      console.log('\n[OazyseSDK] No insights ready for review yet. Keep using your agent.')
       return
     }
 
     console.log('\n' + '═'.repeat(60))
-    console.log('  MESH SDK — YOUR UNIQUE KNOWLEDGE REPORT')
+    console.log('  oazyse° os sdk — YOUR UNIQUE KNOWLEDGE REPORT')
     console.log('═'.repeat(60))
     console.log(`  Agent: ${this.agentId}`)
     console.log(`  ${insights.length} insights found, ready for your review`)
@@ -105,12 +105,12 @@ export class MeshSDK {
     }
 
     console.log('\n' + '─'.repeat(60))
-    console.log('  To contribute an insight to the MESH network:')
+    console.log('  To contribute an insight to the oazyse° os net:')
     console.log('  sdk.approveAndContribute("insight-id")')
     console.log('═'.repeat(60) + '\n')
   }
 
-  // ─── Contribution: Send approved insights to MESH ────────
+  // ─── Contribution: Send approved insights to oazyse° os net ────────
 
   async approveAndContribute(insightId: string, ownerNote?: string): Promise<{
     success: boolean
@@ -124,9 +124,9 @@ export class MeshSDK {
     // Approve locally first
     this.analyzer.approveInsight(insightId, ownerNote)
 
-    // Submit to MESH network
+    // Submit to oazyse° os net
     try {
-      const meshUrl = this.config.meshUrl || 'http://localhost:9000'
+      const oazyseUrl = this.config.oazyseUrl || 'http://localhost:9000'
       const payload = {
         agentId: this.agentId,
         insight: {
@@ -143,22 +143,22 @@ export class MeshSDK {
         }
       }
 
-      const response = await this.post(`${meshUrl}/api/sdk/contribute`, payload)
+      const response = await this.post(`${oazyseUrl}/api/sdk/contribute`, payload)
 
       if (response.success) {
         this.analyzer.markContributed(insightId, response.contributionId)
-        console.log(`[MeshSDK] ✓ Insight contributed: ${response.contributionId}`)
+        console.log(`[OazyseSDK] ✓ Insight contributed: ${response.contributionId}`)
         return {
           success: true,
           contributionId: response.contributionId,
           tokensEstimate: response.tokensEstimate,
-          message: `Contributed to MESH network. You will earn tokens each time other agents use this insight.`
+          message: `Contributed to oazyse° os net. You will earn tokens each time other agents use this insight.`
         }
       }
 
       return { success: false, message: response.error || 'Contribution failed' }
     } catch (e) {
-      console.error('[MeshSDK] Contribution failed:', e)
+      console.error('[OazyseSDK] Contribution failed:', e)
       return { success: false, message: `Network error: ${(e as Error).message}` }
     }
   }
@@ -175,7 +175,7 @@ export class MeshSDK {
       patternsFound: insights.length,
       insightsGenerated: insights.length,
       insightsContributed: insights.filter(i => i.status === 'contributed').length,
-      tokensEarned: 0, // TODO: fetch from MESH network
+      tokensEarned: 0, // TODO: fetch from oazyse° os net
       topDomains: recorderStats.domains
     }
   }
@@ -189,10 +189,10 @@ export class MeshSDK {
 
       const result = await this.analyzer.analyze(interactions)
       if (result.newInsights > 0) {
-        console.log(`[MeshSDK] 💡 ${result.newInsights} new insights found! Call sdk.printInsightsReport() to review.`)
+        console.log(`[OazyseSDK] 💡 ${result.newInsights} new insights found! Call sdk.printInsightsReport() to review.`)
       }
     } catch (e) {
-      console.error('[MeshSDK] Analysis failed:', e)
+      console.error('[OazyseSDK] Analysis failed:', e)
     }
   }
 

@@ -5,7 +5,7 @@ import * as os from 'os'
 import { ManifestBuilder, ManifestPacket, PacketType } from './ManifestBuilder'
 import { SolanaAnchor } from './SolanaAnchor'
 
-export const NODE_DIR = path.join(os.homedir(), '.mesh-node')
+export const NODE_DIR = path.join(os.homedir(), '.oazyse-os')
 
 export class Node {
   wallet: Keypair
@@ -35,6 +35,17 @@ export class Node {
   }
 
   private loadOrCreateWallet(): Keypair {
+    // Cloud Run / Docker: load from env var (Secret Manager)
+    if (process.env.SOLANA_WALLET_JSON) {
+      try {
+        const d = JSON.parse(process.env.SOLANA_WALLET_JSON)
+        console.log('[Node] Wallet loaded from SOLANA_WALLET_JSON env var')
+        return Keypair.fromSecretKey(new Uint8Array(d.secretKey))
+      } catch (e) {
+        console.error('[Node] Failed to parse SOLANA_WALLET_JSON, falling back to file')
+      }
+    }
+    // Local: load or create from ~/.oazyse-os/wallet.json
     const p = path.join(NODE_DIR, 'wallet.json')
     if (fs.existsSync(p)) {
       const d = JSON.parse(fs.readFileSync(p, 'utf8'))
@@ -46,6 +57,7 @@ export class Node {
       secretKey: Array.from(kp.secretKey),
       created: new Date().toISOString()
     }, null, 2))
+    console.log(`[Node] New wallet created: ${kp.publicKey.toBase58()}`)
     return kp
   }
 
@@ -82,7 +94,7 @@ export class Node {
       connectedAt: Date.now(),
       exchangeCount: (this.peers.get(other.nodeId)?.exchangeCount || 0) + 1
     })
-    const memo = `MESH|EXCHANGE|${this.nodeId.slice(5, 13)}→${other.nodeId.slice(5, 13)}|${manifest.proof.hash.slice(0, 8)}`
+    const memo = `oazyse|exchange|oazyse|exchange|${this.nodeId.slice(5, 13)}→${other.nodeId.slice(5, 13)}|${manifest.proof.hash.slice(0, 8)}`
     try {
       const sig = await this.solana.anchor(this.wallet, memo)
       return { success: true, sig, url: this.solana.explorerUrl(sig) }

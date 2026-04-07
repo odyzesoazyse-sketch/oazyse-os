@@ -44,7 +44,7 @@ export class AgentJudge {
   private storePath: string
 
   constructor(private node: Node) {
-    const home = path.join(process.env.HOME || '~', '.mesh-node', 'brain')
+    const home = path.join(process.env.HOME || '~', '.oazyse-os', 'brain')
     fs.mkdirSync(home, { recursive: true })
     this.storePath = path.join(home, 'judge.json')
     this.load()
