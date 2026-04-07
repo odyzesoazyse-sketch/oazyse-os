@@ -109,7 +109,10 @@ export class Node {
   }
 
   async status() {
-    const balance = await this.solana.balance(this.wallet.publicKey)
+    const balance = await Promise.race([
+      this.solana.balance(this.wallet.publicKey),
+      new Promise<number>(r => setTimeout(() => r(0), 4000))
+    ])
     return {
       nodeId: this.nodeId,
       pubkey: this.wallet.publicKey.toBase58(),

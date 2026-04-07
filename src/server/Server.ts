@@ -1078,10 +1078,13 @@ export class OazyseServer {
   // ── START ─────────────────────────────────────────────────
 
   async start() {
-    // Fund wallet on startup
-    console.log(`\n  Funding wallet on Solana Devnet...`)
-    await this.node.solana.fund(this.node.wallet.publicKey)
-    const balance = await this.node.solana.balance(this.node.wallet.publicKey)
+    // Fund wallet in background (non-blocking) — devnet airdrop can be slow
+    console.log(`\n  Requesting Solana Devnet airdrop (background)...`)
+    this.node.solana.fund(this.node.wallet.publicKey).catch(() => {})
+    const balance = await Promise.race([
+      this.node.solana.balance(this.node.wallet.publicKey),
+      new Promise<number>(r => setTimeout(() => r(0), 5000))
+    ])
 
     this.server.listen(PORT, () => {
       console.log(`\n  ╔══════════════════════════════════════════╗`)
