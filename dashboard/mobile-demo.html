@@ -3516,6 +3516,7 @@ function stopShowcase() {
 
 // ── MOBILE FAKE DEMO SCRIPT ─────────────
 
+
 async function startMobileFakeDemo() {
   _scActive = true
   const btn = g('showcase-btn'), badge = g('demo-badge'), stop = g('stop-demo')
@@ -3527,22 +3528,21 @@ async function startMobileFakeDemo() {
   await _scWait(500)
 
   _scNarrate('<b>Phase 1:</b> Generative AI UI Builder', 3000)
-  await _scWait(2000)
+  await _scWait(1500)
 
-  // Step 1: Generate UI
   await _scType('build a real-time node reputation tracker UI')
-  await _scWait(500)
+  await _scWait(200)
   g('cb-input').value = ''
   g('cb-loader').classList.add('on')
   g('cb-hint').textContent = 'Compiling UI...'
-  await _scWait(2200)
+  await _scWait(1800)
   g('cb-loader').classList.remove('on')
   g('cb-hint').textContent = '⏎'
 
   mountSurface({
     surface_id: 'ui-gen',
     title: 'Node Tracker (Generated)',
-    width: 340, height: 210, x: 10, y: 80,
+    width: 340, height: 210, x: window.innerWidth/2 - 170, y: 100,
     html: `
       <div style="padding:16px;font-family:var(--font);color:var(--text)">
         <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
@@ -3559,53 +3559,55 @@ async function startMobileFakeDemo() {
       </div>
     `
   })
-  _scNarrate('Any interface can be generated instantly from natural language.', 3500)
+  _scNarrate('Interface generated instantly from natural language.', 3500)
   await _scWait(4000)
 
-  _scNarrate('<b>Phase 2:</b> Autonomous Knowledge Trading', 3000)
-  await _scWait(2000)
-
-  // Step 2: Search market
-  await _scType('scan market for quantum alignment models')
+  // Clear screen for phase 2
+  Object.keys(S.surfaces).forEach(unmountSurface)
   await _scWait(500)
+
+  _scNarrate('<b>Phase 2:</b> Autonomous Knowledge Trading', 3000)
+  await _scWait(1500)
+
+  await _scType('scan market for quantum alignment models')
+  await _scWait(200)
   g('cb-input').value = ''
   g('cb-loader').classList.add('on')
   g('cb-hint').textContent = 'Scanning...'
-  await _scWait(1500)
+  await _scWait(1200)
   g('cb-loader').classList.remove('on')
   g('cb-hint').textContent = '⏎'
 
   mountSurface({
     surface_id: 'market-1',
     title: 'Knowledge Market',
-    width: 340, height: 180, x: 10, y: 310,
+    width: 340, height: 160, x: window.innerWidth/2 - 170, y: 80,
     html: `
       <div style="padding:16px;font-family:var(--font);color:var(--text)">
         <h3 style="margin:0 0 12px;color:var(--green)">Quantum Alignment Set</h3>
         <p style="font-size:13px;color:var(--text2);margin:0 0 12px">Hash: <b>0xQ72...9L</b><br>Creator: oaz...9B1</p>
         <div style="display:flex;justify-content:space-between;align-items:center">
            <div style="font-size:18px;color:var(--text)">25 SOL</div>
-           <div style="padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:11px">PENDING AUDIT</div>
+           <div style="padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--text2)">PENDING AUDIT</div>
         </div>
       </div>
     `
   })
-  _scNarrate('Agent discovered a packet. Initiating Truth Court...', 3500)
-  await _scWait(3500)
+  _scNarrate('Agent found a packet. Initiating Truth Court analysis...', 3500)
+  await _scWait(3000)
 
-  // Step 3: Trigger truth court
   await _scType('challenge packet 0xQ72 in Truth Court')
-  await _scWait(500)
+  await _scWait(200)
   g('cb-input').value = ''
   g('cb-loader').classList.add('on')
   g('cb-hint').textContent = 'Judging...'
-  await _scWait(1800)
+  await _scWait(1500)
   g('cb-loader').classList.remove('on')
 
   mountSurface({
     surface_id: 'court-1',
     title: 'Truth Court Analysis',
-    width: 340, height: 160, x: 10, y: 510,
+    width: 340, height: 160, x: window.innerWidth/2 - 170, y: 260,
     html: `
       <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text2)">
         <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Jury Node 1:</span><span style="color:var(--green)">VALID (99%)</span></div>
@@ -3621,23 +3623,22 @@ async function startMobileFakeDemo() {
   _scNarrate('Consensus reached. Settling tokens on Solana...', 3500)
   await _scWait(3000)
 
-  // Step 4: On-chain transaction
   mountSurface({
     surface_id: 'tx-1',
     title: 'Solana Devnet Settlement',
-    width: 340, height: 110, x: 10, y: 690,
+    width: 340, height: 120, x: window.innerWidth/2 - 170, y: 440,
     html: `
-      <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--green)">
-        ✓ PacketRecord PDA Indexed<br>
-        ✓ 90/5/5 Token Split Executed<br>
-        <div style="margin-top:8px;padding:6px;background:rgba(0,255,0,0.1);border-radius:4px;word-break:break-all;font-size:10px">
+      <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text)">
+        <div style="color:var(--green);margin-bottom:4px">✓ PacketRecord PDA Indexed</div>
+        <div style="color:var(--green);margin-bottom:10px">✓ 90/5/5 Token Split Executed</div>
+        <div style="padding:8px;background:rgba(0,255,0,0.1);border-radius:4px;word-break:break-all;font-size:10px;color:var(--green);border:1px solid rgba(0,255,0,0.2)">
           Tx: 5KjX...hH3s
         </div>
       </div>
     `
   })
 
-  _scNarrate('Demo Complete. The network evolves autonomously.', 5000)
+  _scNarrate('Demo Complete. Truth recorded on-chain permanently.', 5000)
   await _scWait(5000)
   
   _scActive = false
