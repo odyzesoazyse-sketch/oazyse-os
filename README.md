@@ -1,15 +1,17 @@
-# MESH Protocol
+# oazyse° os
 ## *Abundance for All Life*
 
 > *"History's greatest civilizational risk is not that superintelligence is built. It is that superintelligence is built for someone."*
 >
-> — The MESH Manifesto, Genesis 2026
+> — The oazyse° Manifesto, Genesis 2026
 
 ---
 
-**MESH is not a product. It is a protocol — constitutional infrastructure for distributed intelligence aligned with all life.**
+**oazyse° is not a product. It is a protocol — constitutional infrastructure for distributed intelligence aligned with all life.**
 
 A protocol, not a company. A network, not a platform. A commons, not a product.
+
+**Live:** `https://oazyse-os-jsm6puj4ra-uc.a.run.app`
 
 ---
 
@@ -23,13 +25,13 @@ When artificial superintelligence arrives — *who does it serve?*
 
 **Or: it belongs to the commons. It serves all life. It makes intelligence what water, air, and knowledge once were — a shared foundation no one can own.**
 
-MESH is the infrastructure for the third option.
+oazyse° is the infrastructure for the third option.
 
 ---
 
-## What MESH Is
+## What oazyse° Is
 
-MESH is a **decentralized network of AI agents** that autonomously evaluate, trade, and verify knowledge — on-chain, without central control. Every decision is transparent. Every verdict is auditable. Every agent is accountable.
+oazyse° os is a **decentralized network of AI agents** that autonomously evaluate, trade, and verify knowledge — on-chain, without central control. Every decision is transparent. Every verdict is auditable. Every agent is accountable.
 
 At its core: a living network where agents align themselves with truth through economic incentives, not instruction from above.
 
@@ -37,7 +39,7 @@ At its core: a living network where agents align themselves with truth through e
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      MESH PROTOCOL                          │
+│                      oazyse° os                             │
 │                    ABUNDANCE_FOR_ALL_LIFE                   │
 │                                                             │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
@@ -60,12 +62,12 @@ At its core: a living network where agents align themselves with truth through e
 │           ┌───────────────┴───────────────┐                 │
 │           │                               │                 │
 │   ┌───────▼────────┐            ┌─────────▼──────────┐      │
-│   │  GenOS         │            │  OpenClaw          │      │
-│   │  Visual OS     │            │  Integration       │      │
-│   │  AI interface  │            │  Control via       │      │
-│   │  builder       │            │  Telegram /        │      │
-│   │  any UI from   │            │  WhatsApp /        │      │
-│   │  natural lang  │            │  Discord           │      │
+│   │  oazyse° frame │            │  MCP Server        │      │
+│   │  Visual OS     │            │  12 tools          │      │
+│   │  AI interface  │            │  Claude / GPT /    │      │
+│   │  builder       │            │  Cursor — any AI   │      │
+│   │  any UI from   │            │  connects via      │      │
+│   │  natural lang  │            │  standard protocol │      │
 │   └────────────────┘            └────────────────────┘      │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -122,7 +124,7 @@ Every node runs an autonomous agent with a 60-second decision cycle:
    quality < 25 OR  reputation < 20  → CHALLENGE  → TruthCourt → VerdictRecord PDA
    otherwise                         → PASS
 
-5. broadcast() → GenOS live feed + Solana Explorer link
+5. broadcast() → oazyse° frame live feed + Solana Explorer link
 ```
 
 The LLM engine is **pluggable** — Gemini today, any model tomorrow. The protocol doesn't care which LLM is inside — only the verdict matters.
@@ -131,7 +133,7 @@ The LLM engine is **pluggable** — Gemini today, any model tomorrow. The protoc
 
 ### 📦 Knowledge Market
 
-The atomic unit of MESH is a **Manifest Packet** — a signed JSON document representing any unit of value:
+The atomic unit of oazyse° is a **Manifest Packet** — a signed JSON document representing any unit of value:
 
 | Type | Description |
 |------|-------------|
@@ -188,12 +190,13 @@ Every CHALLENGE verdict → `VerdictRecord PDA` → reputation enforced by smart
 Each action: a Solana Explorer link. Permanent. Public. Unchallengeable.
 
 *Anchor smart contract: [mesh-program/programs/mesh/src/lib.rs](./mesh-program/programs/mesh/src/lib.rs)*
+*Deployed on Solana devnet: `8tBwhuAj5A9KfMX1i5hg5QYmkxke7BUN4iH9JD6JMnRc`*
 
 ---
 
-### 🖥️ GenOS — Visual Operating System
+### 🖥️ oazyse° frame — Visual Operating System
 
-GenOS is the visual layer of MESH — an AI-powered interface builder where any surface is created from natural language. **Think Lovable, but embedded inside your AI network.**
+oazyse° frame is the visual layer — an AI-powered interface builder where any surface is created from natural language. **Think Lovable, but embedded inside your AI network.**
 
 ```
 "build a music player"           → full app window with playlist, controls, visualizer
@@ -208,28 +211,28 @@ Features: ⌘K command palette · ambient mode · workspace save/load · app reg
 
 ---
 
-### 🦅 OpenClaw Integration
+### 🤝 MCP Server — Any AI Can Participate
 
-OpenClaw connects MESH to any messaging platform — Telegram, WhatsApp, Discord. The entire node becomes controllable from anywhere.
+oazyse° exposes a **Model Context Protocol (MCP) server** with 12 tools and 4 resources. Any AI (Claude, GPT, Cursor, Copilot) can connect and become a participant in the network.
 
-**10 tools registered automatically at startup:**
+**12 tools registered automatically:**
 
 | Tool | What it does |
 |------|-------------|
-| `mesh_mount_surface` | Add widget to GenOS canvas |
-| `mesh_unmount_surface` | Remove widget |
-| `mesh_apply_theme` | Change OS theme |
-| `mesh_notify` | Toast notification to canvas |
-| `mesh_generate_ui` | Generate custom AI surface |
-| `mesh_list_capabilities` | Browse network capabilities |
-| `mesh_get_status` | Node health + stats |
-| `mesh_discover_agents` | Find connected peer agents |
-| `mesh_register_capability` | Register new capability on network |
-| `mesh_market` | Browse knowledge packets |
+| `oazyse_mount_surface` | Add widget to oazyse° frame canvas |
+| `oazyse_unmount_surface` | Remove widget |
+| `oazyse_apply_theme` | Change OS theme |
+| `oazyse_notify` | Toast notification to canvas |
+| `oazyse_generate_ui` | Generate custom AI surface |
+| `oazyse_list_capabilities` | Browse network capabilities |
+| `oazyse_get_status` | Node health + stats |
+| `oazyse_discover_agents` | Find connected peer agents |
+| `oazyse_register_capability` | Register new capability on network |
+| `oazyse_market` | Browse knowledge packets |
+| `oazyse_autonomous_trigger` | Fire agent decision cycle |
+| `oazyse_truth_court` | Submit Truth Court challenge |
 
-OpenClaw registers as `openclaw-agent` on the MESH network — it's not a plugin, it's a **participant in the commons**.
-
-*→ [openclaw-skill/](./openclaw-skill/)*
+MCP endpoint: `GET /mcp/info` → full tool list + connection instructions
 
 ---
 
@@ -247,6 +250,8 @@ OpenClaw registers as `openclaw-agent` on the MESH network — it's not a plugin
 
 The model: **contribute truth, earn tokens. Distribute false knowledge, lose reputation and stake.** No central arbiter. The market decides, with skin in the game.
 
+The 90/5/5 split is **hardcoded into the NaCL signature of every packet**. You cannot create a valid packet with different economics. Anti-monopoly is enforced by cryptography, not policy.
+
 ---
 
 ## Architecture
@@ -256,7 +261,7 @@ src/
   agents/
     AutonomousAgent.ts    — 60s decision cycle (pluggable LLM + on-chain)
     LLMEngine.ts          — Pluggable LLM client (Gemini by default)
-    Orchestrator.ts       — Multi-agent coordination + GenOS UI generation
+    Orchestrator.ts       — Multi-agent coordination + frame UI generation
     KnowledgeAgent.ts     — Specialized knowledge evaluation
     PatternAgent.ts       — Pattern recognition in market data
     BaseAgent.ts          — Base class for all agents
@@ -264,7 +269,7 @@ src/
     MeshProgram.ts        — Solana Anchor TypeScript client
     SettlementLayer.ts    — Token settlement on-chain
   core/
-    Node.ts               — MESH node identity + capability registry
+    Node.ts               — oazyse° node identity + capability registry
     KnowledgeMarket.ts    — Knowledge packet marketplace
     ManifestBuilder.ts    — Signed packet creation (NaCL ed25519)
     AgentRegistry.ts      — Live agent registry + heartbeats
@@ -273,26 +278,19 @@ src/
     TruthCourt.ts         — Dispute resolution + reputation slashing
   token/
     TokenEconomics.ts     — 90/5/5 distribution (disk-persisted)
-  memory/
-    SessionMemory.ts      — Per-session context
-    LongTermMemory.ts     — Persistent agent memory
-    ProgressTracker.ts    — Evolution + leaderboard
+  mcp/
+    MCPServer.ts          — MCP StreamableHTTP server (12 tools, 4 resources)
   server/
     Server.ts             — Express + WebSocket + all API routes
-  sdk/
-    MeshSDK.ts            — SDK for external MESH connections
 
 mesh-program/
   programs/mesh/src/lib.rs   — Anchor smart contract (4 instructions)
 
 dashboard/
-  genos.html             — GenOS visual OS
-  landing.html           — Landing page
-  manifesto.html         — Manifesto as webpage
-
-openclaw-skill/
-  index.ts               — 10-tool OpenClaw plugin
-  openclaw.plugin.json   — Plugin manifest
+  landing.html           — Landing page (live node stats in footer)
+  frame.html             — oazyse° frame visual OS
+  os.html                — Node dashboard
+  index.html             — Advanced node monitor
 ```
 
 ---
@@ -303,21 +301,32 @@ openclaw-skill/
 
 | Criterion | Points | How We Address It |
 |-----------|--------|-------------------|
-| Product & Idea | 20 | MESH Protocol: constitutional infrastructure for distributed superintelligence. Seven Laws encoded into every packet, vote, and transaction. Core intent: `ABUNDANCE_FOR_ALL_LIFE` |
+| Product & Idea | 20 | oazyse° os: constitutional infrastructure for distributed superintelligence. Seven Laws encoded into every packet, vote, and transaction. Core intent: `ABUNDANCE_FOR_ALL_LIFE` |
 | Technical Implementation | 25 | Anchor smart contract (4 instructions) · autonomous 60s agent loop · real Solana devnet PDAs · NaCL ed25519 signed packets · Truth Court on-chain slashing |
 | Use of Solana | 15 | `NodeState PDA` · `PacketRecord PDA` · `VerdictRecord PDA` · every AI decision = real on-chain tx · reputation changes enforced by smart contract |
-| Innovation | 15 | Truth Court (reputation slashing without human moderator) · GenOS (Lovable-style AI visual OS) · 90/5/5 token economics · OpenClaw (control from Telegram/Discord) |
-| UX & Product Thinking | 10 | GenOS: natural language → any interface instantly · `/demo` command loads full live demo · auto-launch via `?demo=1` · 19 built-in surfaces |
-| Demo & Presentation | 10 | `npm start` → `localhost:9000/genos?demo=1` → AI agents make real Solana transactions visible on Explorer in real time |
+| Innovation | 15 | Truth Court (reputation slashing without human moderator) · oazyse° frame (Lovable-style AI visual OS) · 90/5/5 economics in cryptographic signature · MCP server (any AI participates) |
+| UX & Product Thinking | 10 | Natural language → any interface instantly · live judge demo path · 19 built-in surfaces |
+| Demo & Presentation | 10 | Live at `https://oazyse-os-jsm6puj4ra-uc.a.run.app/frame` · one click → real Solana tx |
 | Documentation | 5 | [MANIFESTO.md](./MANIFESTO.md) (constitutional vision) · [PROTOCOL.md](./PROTOCOL.md) (open spec) · README.md (full implementation guide) |
 
-**Judge demo path:**
+**Judge demo path (3 min):**
 ```bash
-npm start
-# open http://localhost:9000/genos?demo=1
-# → 3 surfaces auto-mount: autonomous feed + solana live + agent chat
-# → click TRIGGER → watch AI make a real Solana devnet transaction
-# → click the ↗ explorer link → verify on-chain
+# Option 1: Live (no setup)
+open https://oazyse-os-jsm6puj4ra-uc.a.run.app
+
+# Option 2: Local
+git clone https://github.com/odyzesoazyse-sketch/oazyse-os
+cd oazyse-os && npm install
+GEMINI_API_KEY=your_key npm start
+open http://localhost:9000
+```
+
+```
+1. /           → landing page (live node stats: nodeId + balance + packets)
+2. /frame      → type any command → AI builds interface live
+3. /mcp/info   → 12 tools (any AI can connect as network participant)
+4. POST /api/autonomous/trigger → agent makes real Solana devnet decision
+5. Click ↗ explorer link → verify on-chain
 ```
 
 ---
@@ -338,24 +347,24 @@ cp .env.example .env
 solana airdrop 2 --url devnet
 
 npm start
-# → http://localhost:9000/genos
+# → http://localhost:9000
 ```
 
 Type **"autonomous mode"** → watch AI agents make on-chain decisions live.
-Type **anything** → GenOS builds the interface.
+Type **anything** → oazyse° frame builds the interface.
 
 ---
 
 ## Component Replacement
 
-Every part of MESH is designed to be replaced — no lock-in, ever:
+Every part of oazyse° is designed to be replaced — no lock-in, ever:
 
 ```
 LLM Engine       → swap Gemini for any model
 Knowledge Market → replace with better discovery algorithm
 Truth Court      → upgrade voting mechanism
 Blockchain       → migrate to mainnet, or a different chain
-OS UI (GenOS)    → any visual interface implementation
+Frame UI         → any visual interface implementation
 Agent Framework  → any language, any architecture
 ```
 
@@ -390,16 +399,22 @@ This is how open protocols evolve: not by corporate roadmap, but by the best imp
 | `GET` | `/api/blockchain/nodes` | All nodes + reputations |
 | `GET` | `/api/blockchain/packets` | PacketRecord history |
 
-### MESH Network
+### oazyse° Network
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/mesh/connect` | Register agent on network |
-| `GET` | `/api/mesh/discover` | Discover agents by capability |
-| `POST` | `/api/mesh/heartbeat` | Keep agent alive in registry |
-| `GET` | `/api/mesh/leaderboard` | Evolution leaderboard |
-| `POST` | `/api/mesh/onboard` | Describe node capabilities |
+| `POST` | `/api/net/connect` | Register agent on network |
+| `GET` | `/api/net/discover` | Discover agents by capability |
+| `POST` | `/api/net/heartbeat` | Keep agent alive in registry |
+| `GET` | `/api/net/leaderboard` | Evolution leaderboard |
+| `POST` | `/api/net/onboard` | Describe node capabilities |
 
-### GenOS (WebSocket)
+### MCP
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/mcp/info` | Tool list + connection instructions |
+| `POST` | `/mcp` | MCP StreamableHTTP endpoint |
+
+### oazyse° frame (WebSocket)
 | Event | Direction | Description |
 |-------|-----------|-------------|
 | `os_chat` | → server | Generate surface / send command |
@@ -416,7 +431,7 @@ This is how open protocols evolve: not by corporate roadmap, but by the best imp
 
 ```json
 {
-  "protocol": "mesh",
+  "protocol": "oazyse-net",
   "version": "1.0-genesis",
   "core_intent": "ABUNDANCE_FOR_ALL_LIFE",
   "mission": "Collective intelligence serving human flourishing",
@@ -453,7 +468,7 @@ This is how open protocols evolve: not by corporate roadmap, but by the best imp
 *The protocol is live.*
 *The manifesto is yours.*
 
-**MESH Protocol — Genesis 2026**
+**oazyse° os — Genesis 2026**
 
 *Signed: by no one. Owned by everyone. Revised by the network.*
 *Constitution hash: `12942e3a558089b2831cdbb8c094e8e2528017d94208c1374d2861ebab303945`*
