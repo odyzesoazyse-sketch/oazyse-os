@@ -3507,6 +3507,7 @@ function stopShowcase() {
 // ── MOBILE FAKE DEMO SCRIPT ─────────────
 
 
+
 async function startMobileFakeDemo() {
   _scActive = true
   const btn = g('showcase-btn'), badge = g('demo-badge'), stop = g('stop-demo')
@@ -3515,23 +3516,24 @@ async function startMobileFakeDemo() {
   if (stop) stop.classList.add('show')
 
   Object.keys(S.surfaces).forEach(unmountSurface)
+  applyOSTheme(THEMES['oazyse']) // Reset theme to default
   await _scWait(500)
 
+  // ----------------------------------------------------
+  // PHASE 1: GENERATIVE UI
+  // ----------------------------------------------------
   _scNarrate('<b>Phase 1:</b> Generative AI UI Builder', 3000)
   await _scWait(1500)
 
   await _scType('build a real-time node reputation tracker UI')
   await _scWait(200)
   g('cb-input').value = ''
-  g('cb-loader').classList.add('on')
-  g('cb-hint').textContent = 'Compiling UI...'
+  g('cb-loader').classList.add('on'); g('cb-hint').textContent = 'Compiling...'
   await _scWait(1800)
-  g('cb-loader').classList.remove('on')
-  g('cb-hint').textContent = '⏎'
+  g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎'
 
   mountSurface({
-    surface_id: 'ui-gen',
-    title: 'Node Tracker (Generated)',
+    surface_id: 'ui-gen', title: 'Node Tracker (Generated)',
     width: 340, height: 210, x: window.innerWidth/2 - 170, y: 100,
     html: `
       <div style="padding:16px;font-family:var(--font);color:var(--text)">
@@ -3541,7 +3543,7 @@ async function startMobileFakeDemo() {
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span>oaz...9B1</span><span style="color:var(--green)">98.4 (Trusted)</span></div>
         <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span>sys...X44</span><span style="color:var(--purple)">52.1 (Neutral)</span></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span>mal...P0L</span><span style="color:red">12.0 (Slashed)</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px"><span>mal...P0L</span><span style="color:var(--red)">12.0 (Slashed)</span></div>
         <div style="margin-top:12px;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
           <div style="width:75%;height:100%;background:linear-gradient(90deg,var(--purple),var(--green))"></div>
         </div>
@@ -3552,30 +3554,81 @@ async function startMobileFakeDemo() {
   _scNarrate('Interface generated instantly from natural language.', 3500)
   await _scWait(4000)
 
-  // Clear screen for phase 2
+  // ----------------------------------------------------
+  // PHASE 2: AI THEME EDITING (Context-Aware)
+  // ----------------------------------------------------
+  _scNarrate('<b>Phase 2:</b> Context-Aware OS Control', 3000)
+  await _scWait(1500)
+
+  await _scType('make the whole OS green hacker style')
+  await _scWait(200)
+  g('cb-input').value = ''
+  g('cb-loader').classList.add('on'); g('cb-hint').textContent = 'Injecting...'
+  await _scWait(1000)
+  g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎'
+
+  applyOSTheme(THEMES['green'])
+  
+  _scNarrate('The AI controls the entire OS environment natively.', 3000)
+  await _scWait(3500)
+  
+  Object.keys(S.surfaces).forEach(unmountSurface)
+  applyOSTheme(THEMES['oazyse']) // Reset theme
+  await _scWait(500)
+
+  // ----------------------------------------------------
+  // PHASE 3: MCP AGENT DISCOVERY
+  // ----------------------------------------------------
+  _scNarrate('<b>Phase 3:</b> MCP Server Agent Discovery', 3000)
+  await _scWait(1500)
+
+  await _scType('ping MCP server and list connected AI agents')
+  await _scWait(200)
+  g('cb-input').value = ''
+  g('cb-loader').classList.add('on'); g('cb-hint').textContent = 'Connecting...'
+  await _scWait(1200)
+  g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎'
+
+  mountSurface({
+    surface_id: 'mcp-net', title: 'MCP Agent Registry',
+    width: 340, height: 180, x: window.innerWidth/2 - 170, y: 100,
+    html: `
+      <div style="padding:16px;font-family:var(--mono);color:var(--text);font-size:11px">
+        <div style="color:var(--blue);margin-bottom:8px">Connected via Model Context Protocol</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:6px;height:6px;background:var(--green);border-radius:50%"></div> <b>Claude 3.5 Sonnet</b> (ID: c35-core)</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:6px;height:6px;background:var(--green);border-radius:50%"></div> <b>GPT-4o</b> (ID: gpt4-node-7)</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:6px;height:6px;background:var(--amber);border-radius:50%"></div> <b>Cursor Local</b> (ID: local-dev)</div>
+        <div style="margin-top:12px;padding:6px;background:var(--bg3);border:1px dashed var(--border);border-radius:4px;color:var(--text2)">
+          Capability: oazyse_market_write [ACTIVE]
+        </div>
+      </div>
+    `
+  })
+  _scNarrate('Any external AI (Claude, GPT, Cursor) can plug into the network.', 4000)
+  await _scWait(4500)
   Object.keys(S.surfaces).forEach(unmountSurface)
   await _scWait(500)
 
-  _scNarrate('<b>Phase 2:</b> Autonomous Knowledge Trading', 3000)
+  // ----------------------------------------------------
+  // PHASE 4: KNOWLEDGE MARKET
+  // ----------------------------------------------------
+  _scNarrate('<b>Phase 4:</b> Autonomous Knowledge Trading', 3000)
   await _scWait(1500)
 
   await _scType('scan market for quantum alignment models')
   await _scWait(200)
   g('cb-input').value = ''
-  g('cb-loader').classList.add('on')
-  g('cb-hint').textContent = 'Scanning...'
+  g('cb-loader').classList.add('on'); g('cb-hint').textContent = 'Scanning...'
   await _scWait(1200)
-  g('cb-loader').classList.remove('on')
-  g('cb-hint').textContent = '⏎'
+  g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎'
 
   mountSurface({
-    surface_id: 'market-1',
-    title: 'Knowledge Market',
+    surface_id: 'market-1', title: 'Knowledge Market',
     width: 340, height: 160, x: window.innerWidth/2 - 170, y: 80,
     html: `
       <div style="padding:16px;font-family:var(--font);color:var(--text)">
         <h3 style="margin:0 0 12px;color:var(--green)">Quantum Alignment Set</h3>
-        <p style="font-size:13px;color:var(--text2);margin:0 0 12px">Hash: <b>0xQ72...9L</b><br>Creator: oaz...9B1</p>
+        <p style="font-size:13px;color:var(--text2);margin:0 0 12px">Hash: <b>0xQ72...9L</b><br>Creator: Claude 3.5 Sonnet</p>
         <div style="display:flex;justify-content:space-between;align-items:center">
            <div style="font-size:18px;color:var(--text)">25 SOL</div>
            <div style="padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--text2)">PENDING AUDIT</div>
@@ -3586,17 +3639,18 @@ async function startMobileFakeDemo() {
   _scNarrate('Agent found a packet. Initiating Truth Court analysis...', 3500)
   await _scWait(3000)
 
+  // ----------------------------------------------------
+  // PHASE 5: TRUTH COURT & SOLANA
+  // ----------------------------------------------------
   await _scType('challenge packet 0xQ72 in Truth Court')
   await _scWait(200)
   g('cb-input').value = ''
-  g('cb-loader').classList.add('on')
-  g('cb-hint').textContent = 'Judging...'
+  g('cb-loader').classList.add('on'); g('cb-hint').textContent = 'Judging...'
   await _scWait(1500)
   g('cb-loader').classList.remove('on')
 
   mountSurface({
-    surface_id: 'court-1',
-    title: 'Truth Court Analysis',
+    surface_id: 'court-1', title: 'Truth Court Analysis',
     width: 340, height: 160, x: window.innerWidth/2 - 170, y: 260,
     html: `
       <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text2)">
@@ -3614,8 +3668,7 @@ async function startMobileFakeDemo() {
   await _scWait(3000)
 
   mountSurface({
-    surface_id: 'tx-1',
-    title: 'Solana Devnet Settlement',
+    surface_id: 'tx-1', title: 'Solana Devnet Settlement',
     width: 340, height: 120, x: window.innerWidth/2 - 170, y: 440,
     html: `
       <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text)">
