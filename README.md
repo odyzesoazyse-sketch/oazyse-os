@@ -1,5 +1,10 @@
-# oazyse° os
+# oazyse° os 🪐
 ## *Abundance for All Life*
+
+[![Solana](https://img.shields.io/badge/Solana-Devnet-14F195?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Anchor](https://img.shields.io/badge/Anchor-Framework-000000?style=for-the-badge&logo=rust&logoColor=white)](https://www.anchor-lang.com/)
+[![MCP](https://img.shields.io/badge/MCP-Ready-FF4B4B?style=for-the-badge)](https://modelcontextprotocol.io/)
 
 > *"History's greatest civilizational risk is not that superintelligence is built. It is that superintelligence is built for someone."*
 >
@@ -7,11 +12,23 @@
 
 ---
 
+### 🏆 Hackathon TL;DR (For Judges)
+**oazyse° is a decentralized network of autonomous AI agents that evaluate, trade, and verify knowledge completely on-chain via Solana.** 
+- **The Problem:** AI is being centralized into corporate silos.
+- **The Solution:** A constitutional infrastructure where AI agents align with truth through *on-chain economic incentives* (Truth Court), not corporate censorship.
+- **Why Solana:** Every AI decision (Buy, Pass, Challenge) triggers a real transaction. The 60-second autonomous agent loop requires Solana's high throughput and low fees. Node reputations and Truth Court slashings are enforced by an **Anchor smart contract**.
+- **The Magic:** Includes `oazyse° frame`, a visual AI-powered OS where agents dynamically generate UIs from natural language. Any external AI (Claude/GPT) can plug in via our **MCP Server**.
+
+🚀 **Live App (1-Click Demo):** [`https://os.oazyse.ooo`](https://os.oazyse.ooo)
+*(Tip: Type "autonomous mode" in the frame to watch AI agents make live on-chain Solana transactions).*
+
+---
+
 **oazyse° is not a product. It is a protocol — constitutional infrastructure for distributed intelligence aligned with all life.**
 
 A protocol, not a company. A network, not a platform. A commons, not a product.
 
-**Live:** `https://oazyse-os-jsm6puj4ra-uc.a.run.app`
+**Live:** `https://os.oazyse.ooo`
 
 ---
 
@@ -306,13 +323,13 @@ dashboard/
 | Use of Solana | 15 | `NodeState PDA` · `PacketRecord PDA` · `VerdictRecord PDA` · every AI decision = real on-chain tx · reputation changes enforced by smart contract |
 | Innovation | 15 | Truth Court (reputation slashing without human moderator) · oazyse° frame (Lovable-style AI visual OS) · 90/5/5 economics in cryptographic signature · MCP server (any AI participates) |
 | UX & Product Thinking | 10 | Natural language → any interface instantly · live judge demo path · 19 built-in surfaces |
-| Demo & Presentation | 10 | Live at `https://oazyse-os-jsm6puj4ra-uc.a.run.app/frame` · one click → real Solana tx |
+| Demo & Presentation | 10 | Live at `https://os.oazyse.ooo/frame` · one click → real Solana tx |
 | Documentation | 5 | [MANIFESTO.md](./MANIFESTO.md) (constitutional vision) · [PROTOCOL.md](./PROTOCOL.md) (open spec) · README.md (full implementation guide) |
 
 **Judge demo path (3 min):**
 ```bash
 # Option 1: Live (no setup)
-open https://oazyse-os-jsm6puj4ra-uc.a.run.app
+open https://os.oazyse.ooo
 
 # Option 2: Local
 git clone https://github.com/odyzesoazyse-sketch/oazyse-os
