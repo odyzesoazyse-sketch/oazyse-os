@@ -1652,17 +1652,23 @@ function makeDraggable(el, spec){
   const bar=el.querySelector('.surf-bar')
   if(!bar) return  // embed surfaces are not draggable
   let dx=0,dy=0,dragging=false
-  bar.addEventListener('mousedown',e=>{
-    dragging=true;dx=e.clientX-spec.x;dy=e.clientY-spec.y
-    el.classList.add('dragging');el.style.zIndex=999;e.preventDefault()
-  })
-  document.addEventListener('mousemove',e=>{
+  const start = (cx, cy) => { dragging=true; dx=cx-spec.x; dy=cy-spec.y; el.classList.add('dragging'); el.style.zIndex=999 }
+  const move = (cx, cy) => {
     if(!dragging)return
-    spec.x=Math.max(0,Math.min(innerWidth-spec.w,e.clientX-dx))
-    spec.y=Math.max(0,Math.min(innerHeight-80,e.clientY-dy))
+    spec.x=Math.max(0,Math.min(innerWidth-spec.w,cx-dx))
+    spec.y=Math.max(0,Math.min(innerHeight-80,cy-dy))
     el.style.left=spec.x+'px';el.style.top=spec.y+'px'
-  })
-  document.addEventListener('mouseup',()=>{if(dragging){dragging=false;el.classList.remove('dragging');saveSurfaces()}})
+  }
+  const end = () => {if(dragging){dragging=false;el.classList.remove('dragging');saveSurfaces()}}
+
+  bar.addEventListener('mousedown',e=>{start(e.clientX, e.clientY); e.preventDefault()})
+  bar.addEventListener('touchstart',e=>{start(e.touches[0].clientX, e.touches[0].clientY)}, {passive:true})
+  
+  document.addEventListener('mousemove',e=>{move(e.clientX, e.clientY)})
+  document.addEventListener('touchmove',e=>{if(dragging){move(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault()}}, {passive:false})
+  
+  document.addEventListener('mouseup',end)
+  document.addEventListener('touchend',end)
 }
 function makeResizable(el, spec){
   const handle=el.querySelector('.surf-resize')
