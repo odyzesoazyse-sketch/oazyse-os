@@ -38,7 +38,7 @@
     a{text-decoration:none;color:inherit}
 
     /* ── CURSOR ── */
-    .cur{position:fixed;pointer-events:none;z-index:9999;border-radius:50%;mix-blend-mode:screen}
+    /* dots injected via JS — no class needed */
 
     /* ── TYPOGRAPHY ── */
     .q{font-family:'Questrial',sans-serif}
@@ -112,7 +112,7 @@
     .mq-sep{color:hsl(var(--green)/0.35)}
 
     /* ── LAYOUT ── */
-    main{position:relative;z-index:2;padding-top:0}
+    main{position:relative;z-index:2;padding-top:calc(4.75rem + 1px)}
     .sec{padding:7rem 2rem;max-width:1000px;margin:0 auto}
     .sec-w{padding:7rem 2rem;max-width:1200px;margin:0 auto}
 
@@ -257,89 +257,16 @@
   </nav>
 </header>
 
-<!-- MARQUEE -->
-<div style="margin-top:calc(4.75rem + 1px);position:relative;z-index:2">
-  <div class="mq-wrap">
-    <div class="mq-inner">
-      <span class="l-label">ABUNDANCE_FOR_ALL_LIFE</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">oazyse° os net</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">SOLANA DEVNET</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">KNOWLEDGE MARKET</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">TRUTH COURT</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">90% TO CREATOR</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">7 LAWS</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">GENESIS 2026</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">ABUNDANCE_FOR_ALL_LIFE</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">oazyse° os net</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">SOLANA DEVNET</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">KNOWLEDGE MARKET</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">TRUTH COURT</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">90% TO CREATOR</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">7 LAWS</span><span class="l-label mq-sep">·</span>
-      <span class="l-label">GENESIS 2026</span><span class="l-label mq-sep">·</span>
-    </div>
-  </div>
-</div>
-
 <main>
 
 <!-- ════════════════════════════════════════
      § 1  HERO
 ════════════════════════════════════════ -->
 <section class="hero">
-  <!-- Orbital network -->
-  <div class="hero-net" aria-hidden="true">
-    <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" style="width:min(600px,90vw);height:min(600px,90vw);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)">
-      <defs>
-        <radialGradient id="cg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="hsl(270 100% 65%)" stop-opacity=".8"/>
-          <stop offset="100%" stop-color="hsl(270 100% 65%)" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="gg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="hsl(270 100% 65%)" stop-opacity=".12"/>
-          <stop offset="100%" stop-color="transparent" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="300" cy="300" r="280" fill="url(#gg)"/>
-      <circle class="orb-ring" cx="300" cy="300" r="100"/>
-      <circle class="orb-ring" cx="300" cy="300" r="170"/>
-      <circle class="orb-ring" cx="300" cy="300" r="240"/>
-      <circle cx="300" cy="300" r="14" fill="url(#cg)"/>
-      <circle cx="300" cy="300" r="5" fill="white" opacity=".9"/>
-      <g class="on1">
-        <circle cx="400" cy="300" r="4" fill="hsl(270 100% 65%/0.7)"/>
-        <circle cx="300" cy="200" r="3" fill="hsl(150 100% 45%/0.7)"/>
-        <circle cx="200" cy="300" r="4" fill="hsl(270 100% 65%/0.7)"/>
-        <circle cx="300" cy="400" r="3" fill="hsl(150 100% 45%/0.7)"/>
-      </g>
-      <g class="on2">
-        <circle cx="470" cy="300" r="3" fill="hsl(270 100% 65%/0.6)"/>
-        <circle cx="385" cy="153" r="4" fill="hsl(150 100% 45%/0.6)"/>
-        <circle cx="215" cy="153" r="3" fill="hsl(270 100% 65%/0.6)"/>
-        <circle cx="130" cy="300" r="4" fill="hsl(150 100% 45%/0.6)"/>
-        <circle cx="215" cy="447" r="3" fill="hsl(270 100% 65%/0.6)"/>
-        <circle cx="385" cy="447" r="3" fill="hsl(150 100% 45%/0.6)"/>
-      </g>
-      <g class="on3">
-        <circle cx="540" cy="300" r="3" fill="hsl(150 100% 45%/0.4)"/>
-        <circle cx="470" cy="130" r="2" fill="hsl(270 100% 65%/0.4)"/>
-        <circle cx="300" cy="60"  r="3" fill="hsl(150 100% 45%/0.4)"/>
-        <circle cx="130" cy="130" r="2" fill="hsl(270 100% 65%/0.4)"/>
-        <circle cx="60"  cy="300" r="3" fill="hsl(150 100% 45%/0.4)"/>
-        <circle cx="130" cy="470" r="2" fill="hsl(270 100% 65%/0.4)"/>
-        <circle cx="300" cy="540" r="3" fill="hsl(150 100% 45%/0.4)"/>
-        <circle cx="470" cy="470" r="2" fill="hsl(270 100% 65%/0.4)"/>
-      </g>
-    </svg>
-  </div>
-
   <p class="l-label" data-r style="margin-bottom:2.5rem">by oazyse° · solana devnet · genesis 2026</p>
 
-  <!-- Product name — the first thing visitors see -->
-  <div style="margin-bottom:1.5rem;line-height:.9;text-align:center">
-    <div class="grad" data-r data-d="1" style="font-family:'Questrial',sans-serif;font-size:clamp(4rem,14vw,10rem);line-height:.92">oazyse°</div>
-    <div class="grad" data-r data-d="2" style="font-family:'Questrial',sans-serif;font-size:clamp(4rem,14vw,10rem);line-height:.92">os</div>
-  </div>
+  <!-- Product name — one line, hero scale -->
+  <div class="grad" data-r data-d="1" style="font-family:'Questrial',sans-serif;font-size:clamp(3.5rem,11vw,8rem);line-height:.95;margin-bottom:1.5rem;white-space:nowrap">oazyse° os</div>
 
   <p class="l-sub" data-r data-d="3" style="margin-bottom:2rem">the operating system for collective intelligence</p>
 
@@ -687,27 +614,33 @@ function setLang(l){
 }
 document.addEventListener('click',e=>{if(!e.target.closest('.lang-drop')){langOpen=false;const m=document.getElementById('lang-menu');if(m)m.classList.remove('open')}})
 
-// ── CURSOR TRAIL ──────────────────────────────────────────────
-const N=8,dots=[]
-for(let i=0;i<N;i++){
-  const d=document.createElement('div')
-  const t=i/N
-  d.className='cur'
-  d.style.cssText=`width:${4-t*2}px;height:${4-t*2}px;background:hsl(${270-t*120} 100% ${65+t*10}%);opacity:${.8-t*.7}`
-  document.body.appendChild(d)
-  dots.push({el:d,x:0,y:0})
+// ── CURSOR TRAIL (exact oazyse.ooo) ───────────────────────────
+const trail=[]
+const maxTrail=8
+for(let i=0;i<maxTrail;i++){
+  const dot=document.createElement('div')
+  dot.style.cssText='position:fixed;width:4px;height:4px;border-radius:50%;background:linear-gradient(135deg,hsl(270,100%,65%),hsl(150,100%,45%));pointer-events:none;z-index:9999;'
+  document.body.appendChild(dot)
+  trail.push(dot)
 }
-let mx=0,my=0
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY})
-;(function loop(){
-  dots[0].x+=(mx-dots[0].x)*.35
-  dots[0].y+=(my-dots[0].y)*.35
-  for(let i=1;i<N;i++){
-    dots[i].x+=(dots[i-1].x-dots[i].x)*.5
-    dots[i].y+=(dots[i-1].y-dots[i].y)*.5
+let mouseX=0,mouseY=0
+const positions=Array(maxTrail).fill(null).map(()=>({x:0,y:0}))
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY})
+;(function animate(){
+  positions[0]={x:mouseX,y:mouseY}
+  for(let i=1;i<maxTrail;i++){
+    positions[i]={
+      x:positions[i].x+(positions[i-1].x-positions[i].x)*.35,
+      y:positions[i].y+(positions[i-1].y-positions[i].y)*.35
+    }
   }
-  dots.forEach(d=>{d.el.style.transform=`translate(${d.x-2}px,${d.y-2}px)`})
-  requestAnimationFrame(loop)
+  trail.forEach((dot,i)=>{
+    dot.style.left=`${positions[i].x-2}px`
+    dot.style.top=`${positions[i].y-2}px`
+    dot.style.opacity=`${(1-i/maxTrail)*.6}`
+    dot.style.transform=`scale(${1-i*.1})`
+  })
+  requestAnimationFrame(animate)
 })()
 
 // ── SCROLL REVEAL ─────────────────────────────────────────────
