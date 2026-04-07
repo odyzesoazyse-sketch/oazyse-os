@@ -603,8 +603,8 @@ main {
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       </button>
       <div class="ls-lang-drop ls-hidden" id="ls-lang-drop">
-        <button data-lang="en" onclick="setLang('en')" class="active">EN</button>
-        <button data-lang="ru" onclick="setLang('ru')">RU</button>
+        
+        
       </div>
     </div>
   </div>
@@ -1194,7 +1194,7 @@ function applyI18n(lang) {
 
 function setLang(l) {
   localStorage.setItem('ls-lang', l)
-  applyI18n(l)
+  applyI18n('en')
   lsLangOpen = false
   const dr = document.getElementById('ls-lang-drop')
   if (dr) dr.classList.add('ls-hidden')

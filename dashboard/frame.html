@@ -524,8 +524,8 @@ body.ambient #ambient-hint{display:block}
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
     </button>
     <div id="ls-lang-drop" class="ls-lang-drop ls-hidden">
-      <button data-lang="en" onclick="lsSetLang('en')">English</button>
-      <button data-lang="ru" onclick="lsSetLang('ru')">Русский</button>
+      
+      
     </div>
   </div>
 </div>
@@ -2699,7 +2699,7 @@ function applyI18n(lang) {
 const _origLsSetLang = typeof lsSetLang !== 'undefined' ? lsSetLang : null
 function lsSetLangFull(l) {
   if (_origLsSetLang) _origLsSetLang(l)
-  applyI18n(l)
+  applyI18n('en')
   localStorage.setItem('ls-lang', l)
   lsLangOpen = false
   const dr = document.getElementById('ls-lang-drop')
@@ -3368,7 +3368,7 @@ if(new URLSearchParams(location.search).get('demo')==='1'){
   setTimeout(()=>cmd('/demo'), 1500)
 }
 // Apply saved language (or default EN)
-;(function(){ const l = localStorage.getItem('ls-lang') || 'en'; applyI18n(l) })()
+;(function(){ const l = 'en'; applyI18n('en') })()
 setTimeout(()=>g('cb-input').focus(),200)
 
 // ── AUTO-DEMO on first visit ────────────────────────
