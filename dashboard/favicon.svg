@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="oazyseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9d4edd" />
+      <stop offset="50%" stop-color="#48cae4" />
+      <stop offset="100%" stop-color="#06d6a0" />
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#oazyseGrad)" stroke-width="1.5">
+    <circle cx="46" cy="50" r="46" />
+    <circle cx="56" cy="50" r="36" />
+    <circle cx="65" cy="50" r="26" />
+    <circle cx="72" cy="50" r="16" />
+    <circle cx="78" cy="50" r="8" />
+    <circle cx="82" cy="50" r="3" />
+  </g>
+</svg>
