@@ -870,7 +870,10 @@ body.ambient #ambient-hint{display:block}
 <!-- ambient mode hint -->
 <div id="ambient-hint">Press Esc or ⌘. to exit ambient mode</div>
 
+<div id="demo-blocker" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999999;background:transparent;"></div>
 <script>
+document.addEventListener('keydown', e => { e.preventDefault(); e.stopPropagation(); }, true);
+
 // ═══════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════
@@ -3365,13 +3368,20 @@ if(new URLSearchParams(location.search).get('demo')==='1'){
 ;(function(){ const l = localStorage.getItem('ls-lang') || 'en'; applyI18n(l) })()
 setTimeout(()=>g('cb-input').focus(),200)
 
+
+async function runLoop() {
+  while(true) {
+    await startMobileFakeDemo()
+    Object.keys(S.surfaces).forEach(unmountSurface)
+    await new Promise(r => setTimeout(r, 2000))
+  }
+}
 // ── AUTO-DEMO on first visit ────────────────────────
 ;(function(){
-  // ALWAYS run demo on mobile-demo.html, no cancelling
   const countEl = g('demo-countdown')
   if(countEl) countEl.style.opacity='0'
   setTimeout(() => {
-    startMobileFakeDemo()
+    runLoop()
   }, 1000)
 })()
 
