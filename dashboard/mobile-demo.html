@@ -1383,7 +1383,7 @@ function makeOS(surfaceId, capId) {
     regen: (newIntent) => regenSurface(surfaceId, newIntent),
     // Ask agent/LLM something
     tell: (message) => new Promise(resolve => {
-      wsSend({action:'os_chat', text:message, surface_id:surfaceId})
+      wsSend({action:'os_chat', text:message, id:surfaceId})
       resolve({ok:true})
     }),
     // Per-surface persistent state
@@ -1410,7 +1410,7 @@ function makeOS(surfaceId, capId) {
     // Proxied fetch
     fetch: (url, opts) => fetch(url, opts),
     // Send to WebSocket
-    send: (action, data) => wsSend({action, ...data, surface_id:surfaceId}),
+    send: (action, data) => wsSend({action, ...data, id:surfaceId}),
     // OS-level controls (surface code can change the whole OS)
     setTheme: (preset_or_opts) => applyOSTheme(typeof preset_or_opts==='string' ? THEMES[preset_or_opts]||THEMES.dark : preset_or_opts),
     injectStyle: (css) => injectOSStyle(css),
@@ -1500,7 +1500,7 @@ function mountSurface(directive) {
   } else {
     // Send to LLM for generation
     const capContext = JSON.stringify({id:cap.id, description:cap.description, schema:cap.schema, endpoint:cap.endpoint})
-    wsSend({action:'os_chat', text:(intent||capability)+' [cap:'+capContext+']', surface_id:id})
+    wsSend({action:'os_chat', text:(intent||capability)+' [cap:'+capContext+']', id:id})
     g('cb-loader').classList.add('on')
     // Show placeholder while generating
     renderPendingSurface(spec, cap)
@@ -1534,7 +1534,7 @@ function regenSurface(id, newIntent) {
   if(body) {
     body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);font-family:var(--mono)">regenerating…</div>'
   }
-  wsSend({action:'os_chat', text:(spec.intent||spec.capId), surface_id:id, currentHtml: spec.html || ''})
+  wsSend({action:'os_chat', text:(spec.intent||spec.capId), id:id, currentHtml: spec.html || ''})
   g('cb-loader').classList.add('on')
   startGenTimer()
 }
@@ -1873,36 +1873,36 @@ async function cmd(text){
       const th=Object.keys(THEMES).find(k=>k.startsWith(parts[1]))
       if(th){applyOSTheme(THEMES[th]);done('Theme: '+th);return}
     }
-    if(slash==='notes'){mountSurface({capability:'notes',intent:text,position:'center'});done('Notes');return}
-    if(slash==='todo'){mountSurface({capability:'todo',intent:text,position:'center'});done('Todo');return}
-    if(slash==='timer'){mountSurface({capability:'timer',intent:text,position:'center'});done('Timer');return}
-    if(slash==='matrix'){mountSurface({capability:'matrix',intent:text,position:'center'});done('Matrix');return}
-    if(slash==='weather'){mountSurface({capability:'weather',intent:text,position:'center'});done('Weather');return}
-    if(slash==='code'){mountSurface({capability:'code-runner',intent:text,position:'center'});done('Code runner');return}
-    if(slash==='solana'){mountSurface({capability:'solana-live',intent:text,position:'center'});done('Solana live');return}
-    if(slash==='whiteboard'||slash==='draw'){mountSurface({capability:'whiteboard',intent:text,position:'center'});done('Whiteboard');return}
-    if(slash==='kaleidoscope'||slash==='kali'){mountSurface({capability:'kaleidoscope',intent:text,position:'center'});done('Kaleidoscope');return}
-    if(slash==='chat'){mountSurface({capability:'agent-chat',intent:text,position:'center'});done('Agent chat');return}
+    if(slash==='notes'){renderGeneratedSurface({capability:'notes',intent:text,position:'center'});done('Notes');return}
+    if(slash==='todo'){renderGeneratedSurface({capability:'todo',intent:text,position:'center'});done('Todo');return}
+    if(slash==='timer'){renderGeneratedSurface({capability:'timer',intent:text,position:'center'});done('Timer');return}
+    if(slash==='matrix'){renderGeneratedSurface({capability:'matrix',intent:text,position:'center'});done('Matrix');return}
+    if(slash==='weather'){renderGeneratedSurface({capability:'weather',intent:text,position:'center'});done('Weather');return}
+    if(slash==='code'){renderGeneratedSurface({capability:'code-runner',intent:text,position:'center'});done('Code runner');return}
+    if(slash==='solana'){renderGeneratedSurface({capability:'solana-live',intent:text,position:'center'});done('Solana live');return}
+    if(slash==='whiteboard'||slash==='draw'){renderGeneratedSurface({capability:'whiteboard',intent:text,position:'center'});done('Whiteboard');return}
+    if(slash==='kaleidoscope'||slash==='kali'){renderGeneratedSurface({capability:'kaleidoscope',intent:text,position:'center'});done('Kaleidoscope');return}
+    if(slash==='chat'){renderGeneratedSurface({capability:'agent-chat',intent:text,position:'center'});done('Agent chat');return}
     if(slash==='save'){appSave(parts.slice(1).join(' '));done('');return}
     if(slash==='launch'){appLoad(parts.slice(1).join(' '));done('');return}
     if(slash==='apps'){appShowSwitcher();done('');return}
     if(slash==='demo'){
       addNotif('🌐 oazyse° Protocol — AI agents live on Solana devnet','success')
-      mountSurface({capability:'autonomous-feed',intent:'AI agent decisions live on Solana devnet',position:'center'})
+      renderGeneratedSurface({capability:'autonomous-feed',intent:'AI agent decisions live on Solana devnet',position:'center'})
       setTimeout(()=>{
-        mountSurface({capability:'network-graph',intent:'oazyse° network topology — force physics visualization',position:'right'})
-        mountSurface({capability:'agent-chat',intent:'Talk to the oazyse° agent',position:'left'})
+        renderGeneratedSurface({capability:'network-graph',intent:'oazyse° network topology — force physics visualization',position:'right'})
+        renderGeneratedSurface({capability:'agent-chat',intent:'Talk to the oazyse° agent',position:'left'})
       },350)
       done('oazyse° Demo launched — watching agents on Solana')
       return
     }
-    if(slash==='network'){mountSurface({capability:'network-graph',intent:text,position:'center'});done('Network graph');return}
+    if(slash==='network'){renderGeneratedSurface({capability:'network-graph',intent:text,position:'center'});done('Network graph');return}
     if(slash==='showcase'){startShowcase();done('Live showcase started');return}
   }
 
   // ── AUTONOMOUS MODE ──────────────────────────────
   if(/autonomous|автоном/.test(t)){
-    mountSurface({capability:'autonomous-feed', intent:text, position:'center'})
+    renderGeneratedSurface({capability:'autonomous-feed', intent:text, position:'center'})
     done('AI Agent feed mounted')
     return
   }
@@ -1947,7 +1947,7 @@ async function cmd(text){
   // ── MATCH CAPABILITY ─────────────────────────────
   const matched=findCapability(t)
   if(matched){
-    mountSurface({capability:matched.id, intent:text, position:t})
+    renderGeneratedSurface({capability:matched.id, intent:text, position:t})
     done('Mounting: '+matched.description)
     return
   }
@@ -2828,7 +2828,7 @@ function buildPaletteItems(){
   // surfaces
   items.push({section:'SURFACES'})
   for(const [id,cap] of Object.entries(S.capabilities)){
-    items.push({icon:'◈',label:cap.description,sub:cap.category,action:()=>{ mountSurface({capability:id,intent:cap.description,position:'center'}); closePalette() }})
+    items.push({icon:'◈',label:cap.description,sub:cap.category,action:()=>{ renderGeneratedSurface({capability:id,intent:cap.description,position:'center'}); closePalette() }})
   }
   // themes
   items.push({section:'THEMES'})
@@ -3025,7 +3025,7 @@ function wsLoadWorkspace(name){
     const snap=ws[name]; if(!snap){addNotif(`Workspace "${name}" not found`,'warn');return}
     Object.keys(S.surfaces).forEach(unmountSurface)
     for(const [id,spec] of Object.entries(snap)){
-      mountSurface({capability:spec.capId,intent:spec.intent||'',position:{x:spec.x,y:spec.y},w:spec.w,h:spec.h,sid:id})
+      renderGeneratedSurface({capability:spec.capId,intent:spec.intent||'',position:{x:spec.x,y:spec.y},w:spec.w,h:spec.h,sid:id})
     }
     addNotif(`Workspace "${name}" loaded`,'success')
   }catch(e){ addNotif('Failed to load workspace','warn') }
@@ -3508,6 +3508,7 @@ function stopShowcase() {
 
 
 
+
 async function startMobileFakeDemo() {
   _scActive = true
   const btn = g('showcase-btn'), badge = g('demo-badge'), stop = g('stop-demo')
@@ -3518,6 +3519,16 @@ async function startMobileFakeDemo() {
   Object.keys(S.surfaces).forEach(unmountSurface)
   applyOSTheme(THEMES['oazyse']) // Reset theme to default
   await _scWait(500)
+
+  const makeSpec = (id, intent, h, y, html) => {
+    const spec = {
+      id, capId: 'generated', intent, visual_mode: 'windowed',
+      w: 340, h, x: window.innerWidth/2 - 170, y,
+      html
+    };
+    S.surfaces[id] = spec;
+    renderGeneratedSurface(spec);
+  }
 
   // ----------------------------------------------------
   // PHASE 1: GENERATIVE UI
@@ -3532,10 +3543,7 @@ async function startMobileFakeDemo() {
   await _scWait(1800)
   g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎'
 
-  mountSurface({
-    surface_id: 'ui-gen', title: 'Node Tracker (Generated)',
-    width: 340, height: 210, x: window.innerWidth/2 - 170, y: 100,
-    html: `
+  makeSpec('ui-gen', 'Node Tracker (Generated)', 210, 100, `
       <div style="padding:16px;font-family:var(--font);color:var(--text)">
         <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
           <span style="color:var(--text2);font-size:12px">Node PubKey</span>
@@ -3549,8 +3557,8 @@ async function startMobileFakeDemo() {
         </div>
         <div style="font-size:10px;color:var(--text3);margin-top:8px;text-align:right">UI Generated by LLM</div>
       </div>
-    `
-  })
+    `);
+
   _scNarrate('Interface generated instantly from natural language.', 3500)
   await _scWait(4000)
 
@@ -3589,10 +3597,7 @@ async function startMobileFakeDemo() {
   await _scWait(1200)
   g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎'
 
-  mountSurface({
-    surface_id: 'mcp-net', title: 'MCP Agent Registry',
-    width: 340, height: 180, x: window.innerWidth/2 - 170, y: 100,
-    html: `
+  makeSpec('mcp-net', 'MCP Agent Registry', 180, 100, `
       <div style="padding:16px;font-family:var(--mono);color:var(--text);font-size:11px">
         <div style="color:var(--blue);margin-bottom:8px">Connected via Model Context Protocol</div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><div style="width:6px;height:6px;background:var(--green);border-radius:50%"></div> <b>Claude 3.5 Sonnet</b> (ID: c35-core)</div>
@@ -3602,8 +3607,8 @@ async function startMobileFakeDemo() {
           Capability: oazyse_market_write [ACTIVE]
         </div>
       </div>
-    `
-  })
+    `);
+
   _scNarrate('Any external AI (Claude, GPT, Cursor) can plug into the network.', 4000)
   await _scWait(4500)
   Object.keys(S.surfaces).forEach(unmountSurface)
@@ -3622,10 +3627,7 @@ async function startMobileFakeDemo() {
   await _scWait(1200)
   g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎'
 
-  mountSurface({
-    surface_id: 'market-1', title: 'Knowledge Market',
-    width: 340, height: 160, x: window.innerWidth/2 - 170, y: 80,
-    html: `
+  makeSpec('market-1', 'Knowledge Market', 160, 80, `
       <div style="padding:16px;font-family:var(--font);color:var(--text)">
         <h3 style="margin:0 0 12px;color:var(--green)">Quantum Alignment Set</h3>
         <p style="font-size:13px;color:var(--text2);margin:0 0 12px">Hash: <b>0xQ72...9L</b><br>Creator: Claude 3.5 Sonnet</p>
@@ -3634,8 +3636,8 @@ async function startMobileFakeDemo() {
            <div style="padding:4px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;font-size:11px;color:var(--text2)">PENDING AUDIT</div>
         </div>
       </div>
-    `
-  })
+    `);
+
   _scNarrate('Agent found a packet. Initiating Truth Court analysis...', 3500)
   await _scWait(3000)
 
@@ -3649,10 +3651,7 @@ async function startMobileFakeDemo() {
   await _scWait(1500)
   g('cb-loader').classList.remove('on')
 
-  mountSurface({
-    surface_id: 'court-1', title: 'Truth Court Analysis',
-    width: 340, height: 160, x: window.innerWidth/2 - 170, y: 260,
-    html: `
+  makeSpec('court-1', 'Truth Court Analysis', 160, 260, `
       <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text2)">
         <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Jury Node 1:</span><span style="color:var(--green)">VALID (99%)</span></div>
         <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Jury Node 2:</span><span style="color:var(--green)">VALID (98%)</span></div>
@@ -3661,16 +3660,12 @@ async function startMobileFakeDemo() {
           VERDICT: APPROVED
         </div>
       </div>
-    `
-  })
-  
+    `);
+
   _scNarrate('Consensus reached. Settling tokens on Solana...', 3500)
   await _scWait(3000)
 
-  mountSurface({
-    surface_id: 'tx-1', title: 'Solana Devnet Settlement',
-    width: 340, height: 120, x: window.innerWidth/2 - 170, y: 440,
-    html: `
+  makeSpec('tx-1', 'Solana Devnet Settlement', 120, 440, `
       <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text)">
         <div style="color:var(--green);margin-bottom:4px">✓ PacketRecord PDA Indexed</div>
         <div style="color:var(--green);margin-bottom:10px">✓ 90/5/5 Token Split Executed</div>
@@ -3678,8 +3673,7 @@ async function startMobileFakeDemo() {
           Tx: 5KjX...hH3s
         </div>
       </div>
-    `
-  })
+    `);
 
   _scNarrate('Demo Complete. Truth recorded on-chain permanently.', 5000)
   await _scWait(5000)
