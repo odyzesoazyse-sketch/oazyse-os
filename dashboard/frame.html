@@ -642,7 +642,7 @@ body.ambient #ambient-hint{display:block}
               <div class="cs" id="llm-s"></div>
               <div style="height:12px"></div>
               <div class="cc-h"><div class="cc-i">🔗</div><div class="cc-t">Protocol API</div></div>
-              <div class="code-b">curl -X POST http://localhost:9000/api/mesh/connect \
+              <div class="code-b">curl -X POST https://oazyse-os-jsm6puj4ra-uc.a.run.app/api/net/connect \
   -H "Content-Type: application/json" \
   -d '{"agent_id":"my-agent","description":"...","capabilities":["code_generation"]}'</div>
             </div>
@@ -2065,7 +2065,8 @@ function clearGenTimer() {
 }
 
 function wsConnect(){
-  const ws=new WebSocket(`ws://${location.host}`)
+  const proto=location.protocol==='https:'?'wss':'ws'
+  const ws=new WebSocket(`${proto}://${location.host}`)
   S.ws=ws
   ws.onopen=()=>{g('wsd').classList.add('live');g('wsl').textContent='connected'}
   ws.onclose=()=>{
@@ -2479,7 +2480,7 @@ async function connectAgent(){
   if(!id||!desc){st.className='cs err';st.textContent='agent-id and description required';return}
   st.className='cs';st.textContent='Connecting…'
   try{
-    const r=await fetch('/api/mesh/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_id:id,description:desc,capabilities:[...S.caps],endpoint_url:ep})})
+    const r=await fetch('/api/net/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_id:id,description:desc,capabilities:[...S.caps],endpoint_url:ep})})
     const d=await r.json()
     if(d.success){st.className='cs ok';st.textContent=`✓ Registered. ${d.network_summary.agents} agents in network.`
       clear('ca-id');clear('ca-desc');clear('ca-ep')

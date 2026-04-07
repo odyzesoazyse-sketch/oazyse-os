@@ -1118,6 +1118,7 @@ export class OazyseServer {
       const autoEnabled = process.env.AUTONOMOUS_AGENT !== 'false'
       if (autoEnabled) {
         this.autonomousAgent.start(autoInterval)
+        this.autonomousAgent.seedMarket()
         this.broadcast('AI', `Autonomous agent online — evaluating market every ${autoInterval / 1000}s`)
         this.broadcast('AI', `Trigger manually: POST /api/autonomous/trigger`)
       }

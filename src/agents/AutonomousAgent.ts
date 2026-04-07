@@ -336,7 +336,7 @@ Low quality (<30) = vague, overpriced, or suspicious.`
   // ── MARKET SEEDING ──────────────────────────────────────────
   // Seeds the market with demo packets so there's always something to evaluate
 
-  private async seedMarket(): Promise<void> {
+  async seedMarket(): Promise<void> {
     const seeds = [
       { type: 'KNOWLEDGE' as const, desc: 'DeFi yield optimization strategies — backtested 2023-2025', price: 0.005, tags: ['defi', 'yield', 'finance'] },
       { type: 'DATA' as const, desc: 'Solana validator performance metrics — real-time feed', price: 0.001, tags: ['solana', 'validators', 'data'] },

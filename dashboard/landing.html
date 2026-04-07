@@ -1120,15 +1120,16 @@ mesh.<span class="c-fn">printInsightsReport</span>()
 <!-- FOOTER -->
 <footer>
   <div class="footer-links">
-    <a href="genos.html?demo=1" class="footer-link">genos</a>
+    <a href="/frame" class="footer-link">os frame</a>
     <a href="index.html" class="footer-link" data-i18n="footNetwork">network</a>
     <a href="manifesto.html" class="footer-link">manifesto</a>
     <a href="../MANIFESTO.md" target="_blank" class="footer-link">manifesto.md ↗</a>
     <a href="../PROTOCOL.md" target="_blank" class="footer-link">protocol</a>
     <a href="https://explorer.solana.com/address/8tBwhuAj5A9KfMX1i5hg5QYmkxke7BUN4iH9JD6JMnRc?cluster=devnet" target="_blank" class="footer-link">solana explorer ↗</a>
   </div>
-  <p class="footer-text" data-i18n="footTagline">mesh° · abundance for all life · genesis 2026</p>
+  <p class="footer-text" data-i18n="footTagline">oazyse° · abundance for all life · genesis 2026</p>
   <p class="footer-text" style="margin-top:.5rem;opacity:.4">12942e3a558089b2831cdbb8c094e8e2528017d94208c1374d2861ebab303945</p>
+  <p class="footer-text" style="margin-top:.8rem" id="live-node-status"></p>
 </footer>
 
 <script>
@@ -1374,6 +1375,17 @@ window.addEventListener('scroll', () => {
   updateThemeIcon()
   applyLang(lang)
 })()
+
+// ── LIVE NODE STATUS ──
+fetch('/api/status').then(r => r.json()).then(d => {
+  const el = document.getElementById('live-node-status')
+  if (!el) return
+  const id = d.nodeId || '—'
+  const bal = d.balance != null ? d.balance + ' SOL' : '—'
+  const peers = d.peers ?? 0
+  const packets = d.offered ?? 0
+  el.textContent = `node ${id} · ${bal} · ${peers} peers · ${packets} packets · live on solana devnet`
+}).catch(() => {})
 </script>
 </body>
 </html>

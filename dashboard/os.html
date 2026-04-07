@@ -149,9 +149,9 @@ const inputEl = document.getElementById('cmd')
 
 // ── WEBSOCKET ────────────────────────────────────────────
 function connectWS() {
-  const host = location.hostname || 'localhost'
-  const port = location.port || '9000'
-  ws = new WebSocket(`ws://${host}:${port}`)
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws'
+  const host = location.host || 'localhost:9000'
+  ws = new WebSocket(`${proto}://${host}`)
   
   ws.onopen = () => {
     document.getElementById('ws-dot').className = 'dot live'

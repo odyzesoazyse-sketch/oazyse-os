@@ -387,7 +387,7 @@ function shareMarket() {
 
 async function shareMarketWith(peerId) {
   try {
-    const r = await fetch(`${API()}/api/genos_market`)
+    const r = await fetch(`${API()}/api/frame/market`)
     const data = await r.json()
     const conn = connections[peerId]
     if (conn && conn.open) {
@@ -423,9 +423,9 @@ function broadcastOffer() {
 // WEBSOCKET — Server Connection
 // ═══════════════════════════════════════════════════════════
 function connectWS() {
-  const host = location.hostname || 'localhost'
-  const port = location.port || '9000'
-  ws = new WebSocket(`ws://${host}:${port}`)
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws'
+  const host = location.host || 'localhost:9000'
+  ws = new WebSocket(`${proto}://${host}`)
   ws.onopen = () => {
     document.getElementById('ws-dot').className = 'sdot on'
     document.getElementById('sub-status').textContent = 'Decentralized AI Agent Network · Abundance Protocol · Solana Devnet'
