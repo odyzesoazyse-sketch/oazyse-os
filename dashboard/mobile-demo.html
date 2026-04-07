@@ -3551,17 +3551,12 @@ async function startMobileFakeDemo() {
   await _scType('build a real-time node reputation tracker UI');
   await _scWait(200);
   
-  // FAKE ENTER PRESS
-  g('cb-input').style.transform = 'scale(0.98)';
-  setTimeout(()=>g('cb-input').style.transform = 'scale(1)', 100);
-  await _scWait(100);
-  g('cb-input').value = '';
-  g('cb-loader').classList.add('on'); g('cb-hint').textContent = 'Compiling...';
-  
+  g('cb-input').style.transform = 'scale(0.98)'; setTimeout(()=>g('cb-input').style.transform = 'scale(1)', 100); await _scWait(100);
+  g('cb-input').value = ''; g('cb-loader').classList.add('on'); g('cb-hint').textContent = 'Compiling...';
   await _scWait(1200);
   g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎';
 
-  makeSpec('ui-gen', 'Node Tracker (Generated)', 210, 100, `
+  makeSpec('ui-gen', 'Node Tracker (Generated)', 210, 90, `
     <div style="padding:16px;font-family:var(--font);color:var(--text)">
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:8px">
         <span style="color:var(--text2);font-size:12px">Node PubKey</span>
@@ -3582,7 +3577,7 @@ async function startMobileFakeDemo() {
   // PHASE 2
   _scNarrate('<b>Phase 2:</b> Context-Aware OS Control', 3000);
   await _scWait(1000);
-  await _scType('make the whole OS green hacker style');
+  await _scType('make the whole OS green hacker style and open matrix');
   await _scWait(200);
   
   g('cb-input').style.transform = 'scale(0.98)'; setTimeout(()=>g('cb-input').style.transform = 'scale(1)', 100); await _scWait(100);
@@ -3591,8 +3586,11 @@ async function startMobileFakeDemo() {
   g('cb-loader').classList.remove('on'); g('cb-hint').textContent = '⏎';
 
   applyOSTheme(THEMES['green']);
+  mountSurface({ capability: 'matrix', surface_id: 'mtx-1', size: {w:340, h:150}, position: 'bottom right' });
+  const msurf = g('surface-mtx-1'); if(msurf) { msurf.style.left = Math.max(10, window.innerWidth/2 - 170)+'px'; msurf.style.top = '315px'; }
+  
   _scNarrate('The AI controls the entire OS environment natively.', 3000);
-  await _scWait(3500);
+  await _scWait(4000);
   
   Object.keys(S.surfaces).forEach(unmountSurface);
   applyOSTheme(THEMES['oazyse']);
@@ -3620,8 +3618,8 @@ async function startMobileFakeDemo() {
       </div>
     </div>
   `);
-  _scNarrate('Any external AI (Claude, GPT, Cursor) can plug into the network.', 4000);
-  await _scWait(4500);
+  _scNarrate('External AI models seamlessly plug into the network.', 3500);
+  await _scWait(4000);
   Object.keys(S.surfaces).forEach(unmountSurface);
   await _scWait(500);
 
@@ -3658,7 +3656,7 @@ async function startMobileFakeDemo() {
   await _scWait(1200);
   g('cb-loader').classList.remove('on');
 
-  makeSpec('court-1', 'Truth Court Analysis', 160, 260, `
+  makeSpec('court-1', 'Truth Court Analysis', 160, 250, `
     <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text2)">
       <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Jury Node 1:</span><span style="color:var(--green)">VALID (99%)</span></div>
       <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>Jury Node 2:</span><span style="color:var(--green)">VALID (98%)</span></div>
@@ -3671,7 +3669,7 @@ async function startMobileFakeDemo() {
   _scNarrate('Consensus reached. Settling tokens on Solana...', 3500);
   await _scWait(3000);
 
-  makeSpec('tx-1', 'Solana Devnet Settlement', 120, 440, `
+  makeSpec('tx-1', 'Solana Devnet Settlement', 120, 420, `
     <div style="padding:16px;font-family:var(--mono);font-size:12px;color:var(--text)">
       <div style="color:var(--green);margin-bottom:4px">✓ PacketRecord PDA Indexed</div>
       <div style="color:var(--green);margin-bottom:10px">✓ 90/5/5 Token Split Executed</div>
@@ -3681,6 +3679,7 @@ async function startMobileFakeDemo() {
     </div>
   `);
 
+  addNotif('Solana Devnet Transaction Confirmed ✅', 'success');
   _scNarrate('Demo Complete. Truth recorded on-chain permanently.', 5000);
   await _scWait(5000);
   _scActive = false;
