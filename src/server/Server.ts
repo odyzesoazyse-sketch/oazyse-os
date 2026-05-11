@@ -62,6 +62,7 @@ export class OazyseServer {
     this.app.use(cors())
     this.app.use(express.json())
     this.app.use(express.static(path.join(__dirname, '../../dashboard'), { index: false }))
+    this.app.use('/media', express.static(path.join(__dirname, '../../media'), { index: false }))
 
     this.server = http.createServer(this.app)
     this.wss = new WebSocketServer({ server: this.server })
@@ -955,6 +956,9 @@ export class OazyseServer {
     })
     this.app.get('/mobile-demo', (req, res) => {
       res.redirect('/mobile-demo.html')
+    })
+    this.app.get('/video-deck', (req, res) => {
+      res.redirect('/video-deck.html')
     })
 
     // Serve dashboard at root

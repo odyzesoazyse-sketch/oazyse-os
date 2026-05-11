@@ -5,3 +5,11 @@ dist/
 *.log
 .DS_Store
 mesh-program/target/
+media/video-audio/
+media/video-slides/
+media/video-work/
+fix_*.py
+patch_*.py
+remove_ru.py
+rewrite_demo.py
+update_mobile_demo*.py

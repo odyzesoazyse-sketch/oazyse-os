@@ -9,3 +9,11 @@ mesh-program/target
 mesh-program/node_modules
 openclaw-skill/node_modules
 dashboard/*.bak
+media/video-audio
+media/video-slides
+media/video-work
+fix_*.py
+patch_*.py
+remove_ru.py
+rewrite_demo.py
+update_mobile_demo*.py

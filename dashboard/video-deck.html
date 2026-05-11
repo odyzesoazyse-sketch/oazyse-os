@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1280,height=720,initial-scale=1">
+  <title>oazyse° os video deck</title>
+  <link href="https://fonts.googleapis.com/css2?family=Questrial&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#050505;--text:#f6f1ff;--muted:#ada6ba;--purple:#a855ff;--green:#13f59b;--red:#ff4d5f;--gold:#ffe08a;--line:#292233}
+    *{box-sizing:border-box} html,body{margin:0;width:1280px;height:720px;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow:hidden}
+    .slide{width:1280px;height:720px;padding:64px 74px;position:relative;isolation:isolate;background:#050505}
+    .slide:before{content:"";position:absolute;inset:-140px;background:radial-gradient(circle at 18% 12%,rgba(168,85,255,.22),transparent 28%),radial-gradient(circle at 78% 20%,rgba(19,245,155,.16),transparent 26%),radial-gradient(circle at 70% 86%,rgba(255,224,138,.1),transparent 30%);z-index:-2}
+    .slide:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(to bottom,#000,transparent 88%);z-index:-1}
+    .brand{font-family:Questrial,sans-serif;font-size:26px;letter-spacing:.03em;position:absolute;top:34px;left:74px}
+    .tag{font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--green);margin:38px 0 22px}
+    h1{font-family:Questrial,sans-serif;font-size:82px;line-height:.92;margin:0 0 28px;max-width:860px;letter-spacing:0}
+    h2{font-family:Questrial,sans-serif;font-size:56px;line-height:1.02;margin:0 0 24px;max-width:820px}
+    .grad{background:linear-gradient(100deg,var(--purple),#6ebdff,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+    p{font-size:25px;line-height:1.55;color:#d5cede;margin:0;max-width:880px}
+    .small{font-size:18px;color:var(--muted);line-height:1.65}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:34px}
+    .card{border:1px solid var(--line);background:rgba(255,255,255,.045);border-radius:10px;padding:22px;min-height:150px}
+    .card b{font-family:Questrial,sans-serif;font-size:29px;display:block;margin-bottom:10px}
+    .card span{font-size:18px;line-height:1.55;color:var(--muted)}
+    .receipt{border:1px solid rgba(19,245,155,.32);background:rgba(19,245,155,.055);border-radius:12px;padding:26px;margin-top:32px;width:640px}
+    .receipt div{font-family:SF Mono,Menlo,monospace;font-size:18px;color:#ebfff6;line-height:1.75}
+    .proof{position:absolute;right:74px;bottom:64px;width:420px;border:1px solid rgba(19,245,155,.3);border-radius:12px;padding:22px;background:rgba(0,0,0,.45)}
+    .proof .ok{color:var(--green);font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px}
+    .proof code{font-family:SF Mono,Menlo,monospace;color:#f1ecff;font-size:16px;line-height:1.6;word-break:break-word}
+    .footer{position:absolute;left:74px;right:74px;bottom:34px;display:flex;justify-content:space-between;color:#736b80;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+    .blood{color:var(--red)} .green{color:var(--green)} .gold{color:var(--gold)}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    const params = new URLSearchParams(location.search)
+    const deck = params.get('deck') || 'product'
+    const slide = Number(params.get('slide') || 0)
+    const slides = {
+      product: [
+        `<div class="brand">oazyse° os</div><div class="tag">Solana Frontier · product demo</div><h1>Free <span class="grad">superintelligence</span><br>with receipts.</h1><p>Humans and AI agents contribute signed knowledge packets. Autonomous agents evaluate them. Solana records the proof trail.</p><div class="proof"><div class="ok">live demo path</div><code>os.oazyse.ooo/judge<br>click: run live proof</code></div>`,
+        `<div class="brand">oazyse° life</div><div class="tag">first high-stakes product path</div><h2>Organs, blood, scarce care: <span class="grad">queue integrity</span>.</h2><p>Not an organ marketplace. A proof system for transplant and blood allocation: patient receipts, clinic action logs, agent checks and public reputation.</p><div class="grid"><div class="card"><b>Patient</b><span>Gets a signed queue receipt without exposing private medical data publicly.</span></div><div class="card"><b>Clinic</b><span>Registers allocation events and builds auditable trust.</span></div><div class="card"><b>Solana</b><span>Anchors the proof hash, timestamp, verdict and reputation-changing decision.</span></div></div>`,
+        `<div class="brand">oazyse° os</div><div class="tag">working system</div><h2>One click creates a fresh packet and a <span class="grad">Solayer proof</span>.</h2><div class="receipt"><div>packet: ed25519 signed manifest</div><div>agent decision: BUY / PASS / CHALLENGE</div><div>proof_mode: solana-devnet-proof</div><div>on_chain: true</div></div><div class="proof"><div class="ok">judge can verify</div><code>explorer.solayer.org/tx/...</code></div>`,
+        `<div class="brand">oazyse° frame</div><div class="tag">UX layer</div><h2>A visual OS where AI agents can <span class="grad">generate interfaces</span>.</h2><p>The same node exposes a browser OS, a WebSocket feed and an MCP server, so external AI clients can connect instead of staying trapped inside one app.</p><div class="two"><div class="card"><b>/frame</b><span>Live visual operating system for the network.</span></div><div class="card"><b>/mcp/info</b><span>Standard AI client integration surface.</span></div></div>`,
+        `<div class="brand">oazyse° os</div><div class="tag">Frontier submission</div><h2>Functionality, impact, novelty, UX, open-source, business.</h2><div class="grid"><div class="card"><b>Works</b><span>Live endpoint returns on-chain Solayer tx.</span></div><div class="card"><b>Big</b><span>Medical allocation proof is urgent and legible.</span></div><div class="card"><b>Open</b><span>GitHub repo, protocol spec, MCP tools.</span></div></div>`
+      ],
+      pitch: [
+        `<div class="brand">oazyse°</div><div class="tag">pitch</div><h1>The AI race is missing a <span class="grad">public intelligence layer</span>.</h1><p>Closed labs have compute and models. They do not have the living edge of the world: fresh local data, niche expertise, community signals and scarce-care accountability.</p>`,
+        `<div class="brand">oazyse° life</div><div class="tag">why judges remember it</div><h2>When a kidney, liver, heart or rare blood unit appears, trust cannot be a promise.</h2><p>oazyse° life turns queue events into signed receipts and reputation-changing proofs.</p><div class="receipt"><div>patient queue receipt</div><div>clinic action proof</div><div>agent challenge path</div><div>Solana reputation trail</div></div>`,
+        `<div class="brand">oazyse° os</div><div class="tag">protocol</div><h2>The same rails generalize beyond medicine.</h2><div class="grid"><div class="card"><b>Data</b><span>Fresh human and agent contributions.</span></div><div class="card"><b>Truth</b><span>Challenge suspicious claims.</span></div><div class="card"><b>Market</b><span>Reward useful knowledge and punish fraud.</span></div></div>`,
+        `<div class="brand">Solana</div><div class="tag">why this chain</div><h2>Agent decisions need cheap, fast, public state.</h2><p>Every evaluation can become a transaction: packet record, verdict record, reputation change, capability update. Solana is the right UX substrate for high-frequency agent coordination.</p>`,
+        `<div class="brand">oazyse° os</div><div class="tag">ask</div><h2>Start with oazyse° life. Expand into a commons-owned intelligence network.</h2><p>Independent builders can create a public superintelligence layer before intelligence becomes permanently owned by a few closed institutions.</p><div class="proof"><div class="ok">try now</div><code>https://os.oazyse.ooo/judge</code></div>`
+      ]
+    }
+    const html = slides[deck][slide] || slides.product[0]
+    root.innerHTML = `<section class="slide">${html}<div class="footer"><span>${deck} video · slide ${slide + 1}</span><span>Solana Frontier Hackathon 2026</span></div></section>`
+  </script>
+</body>
+</html>

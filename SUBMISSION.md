@@ -73,6 +73,15 @@ Judge path:
 - Product demo video: https://github.com/odyzesoazyse-sketch/oazyse-os/raw/main/media/oazyse-os-product-demo.mp4
 - Pitch video: https://github.com/odyzesoazyse-sketch/oazyse-os/raw/main/media/oazyse-os-pitch-video.mp4
 
+## Frontier Criteria Checklist
+
+- Functionality: live `/judge` page creates a packet, triggers an autonomous agent decision, and returns a Solayer explorer proof.
+- Potential impact: `oazyse° life` gives the project a concrete high-stakes wedge: transplant, blood, ICU and donor-match allocation integrity.
+- Novelty: public-intelligence commons + agent knowledge market + Truth Court + MCP + scarce-care proof rails.
+- UX: one-click judge path, visual OS, raw proof JSON, live explorer link.
+- Open-source/composability: public GitHub, protocol docs, MCP server, Solana client path.
+- Business plan: allocation-integrity SaaS/API for clinics, blood banks, insurers, auditors, patient advocacy orgs and medical networks.
+
 ## Colosseum Form Copy
 
 Project tagline:

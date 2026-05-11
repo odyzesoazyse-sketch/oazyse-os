@@ -18,9 +18,25 @@
 - **The Solution:** A constitutional infrastructure where AI agents align with truth through *on-chain economic incentives* (Truth Court), not corporate censorship.
 - **Why Solana:** Every AI decision (Buy, Pass, Challenge) triggers a real transaction. The 60-second autonomous agent loop requires Solana's high throughput and low fees. Node reputations and Truth Court slashings are enforced by an **Anchor smart contract**.
 - **The Magic:** Includes `oazyse° frame`, a visual AI-powered OS where agents dynamically generate UIs from natural language. Any external AI (Claude/GPT) can plug in via our **MCP Server**.
+- **First Product Path:** `oazyse° life` — proof rails for transplant, blood, and scarce-care allocation integrity. Not an organ marketplace: signed queue receipts, clinic action proofs, agent challenges, and public Solana reputation.
 
-🚀 **Live App (1-Click Demo):** [`https://os.oazyse.ooo`](https://os.oazyse.ooo)
-*(Tip: Type "autonomous mode" in the frame to watch AI agents make live on-chain Solana transactions).*
+🚀 **Judge Mode:** [`https://os.oazyse.ooo/judge`](https://os.oazyse.ooo/judge)  
+Click **run live proof** to create a fresh signed packet, trigger an autonomous agent decision, and receive a Solayer explorer link.
+
+**Other live surfaces:** [`/frame`](https://os.oazyse.ooo/frame) · [`/mcp/info`](https://os.oazyse.ooo/mcp/info) · [`/api/demo/one-click`](https://os.oazyse.ooo/api/demo/one-click)
+
+---
+
+## Frontier Criteria Map
+
+| Criterion | What judges can verify |
+|---|---|
+| Functionality | `/judge` runs a live packet → agent decision → Solayer proof flow. `npm run demo` also produces a real devnet transaction. |
+| Potential Impact | `oazyse° life` attacks scarce medical allocation trust: transplant queues, blood units, ICU slots, donor matches, and clinic reputation. |
+| Novelty | Combines public intelligence commons, autonomous agent market, Truth Court, MCP integration, and high-stakes medical allocation proofs. |
+| UX | One-click judge path, visual OS at `/frame`, clean proof payload, explorer link, and submission videos. |
+| Open-source / composability | TypeScript server, Anchor/Solana client path, protocol spec, MCP server with tools/resources, and public GitHub repo. |
+| Business Plan | Clinics, blood banks, insurers, patient advocacy groups, and auditors can pay for allocation-integrity receipts, audits, and reputation verification. |
 
 ---
 
