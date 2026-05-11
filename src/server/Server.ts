@@ -73,6 +73,11 @@ export class OazyseServer {
   // ── REST API ──────────────────────────────────────────────
 
   private setupRoutes() {
+    const redirect307 = (target: string) => (req: express.Request, res: express.Response) => {
+      const query = req.originalUrl.includes('?') ? `?${req.originalUrl.split('?').slice(1).join('?')}` : ''
+      res.redirect(307, `${target}${query}`)
+    }
+
     // Node status
     this.app.get('/api/status', async (req, res) => {
       const status = await this.node.getStatus()
@@ -392,6 +397,72 @@ export class OazyseServer {
       if (!decision) return res.json({ success: false, message: 'No packets to evaluate' })
       res.json({ success: true, decision })
     })
+
+    // One-click hackathon demo: seed fresh real-world data, trigger an agent
+    // decision, and return the exact proof path needed for a short video.
+    // Supports GET so judges can open it directly in a browser.
+    const runOneClickDemo = async (req: express.Request, res: express.Response) => {
+      try {
+        if (this.market.browse().length === 0) {
+          await this.autonomousAgent.seedMarket()
+        }
+
+        const freshPacket = this.market.list(
+          'DATA',
+          req.body?.description || 'Fresh community signal: local real-world data contributed by a human node for public AI training',
+          req.body?.price ?? 0,
+          ['fresh-data', 'community-node', 'frontier-demo', ...(req.body?.tags || [])],
+          {
+            source: 'one-click-demo',
+            human_contributed: true,
+            created_for: 'Solana Frontier Hackathon',
+            note: 'Shows how people can contribute fresh data outside centralized AI silos.'
+          }
+        )
+
+        const decision = await this.autonomousAgent.triggerOnce()
+        const status = await this.node.getStatus()
+        const mode = !decision
+          ? 'seeded-only'
+          : decision.on_chain
+            ? 'solana-devnet-proof'
+            : 'local-fallback-devnet-unavailable'
+
+        const payload = {
+          success: !!decision,
+          story: 'Human-contributed fresh data enters the oazyse network; an autonomous agent evaluates it; the result becomes a verifiable packet/decision for the public intelligence commons.',
+          node: {
+            nodeId: status.nodeId,
+            pubkey: status.pubkey,
+            solanaBalance: status.balance
+          },
+          contributed_packet: {
+            hash: freshPacket.proof.hash.slice(0, 16),
+            type: freshPacket.payload.type,
+            description: freshPacket.payload.description,
+            tags: freshPacket.payload.tags,
+            signature_verified: ManifestBuilder.verify(freshPacket)
+          },
+          decision,
+          proof_mode: mode,
+          proof_note: mode === 'solana-devnet-proof'
+            ? 'Open explorer_url to verify the public Solana devnet proof.'
+            : 'The agent decision ran locally, but the Solana devnet transaction path fell back because the network/program call was unavailable.',
+          next_for_video: [
+            'Open /frame for the visual OS.',
+            'Open /api/demo/one-click to show the machine-readable proof.',
+            'Open /mcp/info to show any AI client can connect.'
+          ]
+        }
+
+        this.broadcastJson({ type: 'DEMO_PROOF', data: payload })
+        res.json(payload)
+      } catch (e: any) {
+        res.status(500).json({ success: false, error: e.message })
+      }
+    }
+    this.app.get('/api/demo/one-click', runOneClickDemo)
+    this.app.post('/api/demo/one-click', runOneClickDemo)
 
     // Start autonomous agent
     this.app.post('/api/autonomous/start', async (req, res) => {
@@ -743,6 +814,15 @@ export class OazyseServer {
         res.status(500).json({ error: e.message })
       }
     })
+
+    // Compatibility aliases used by the docs, OpenClaw plugin, and older demos.
+    this.app.post('/api/mesh/connect', redirect307('/api/net/connect'))
+    this.app.get('/api/mesh/discover', redirect307('/api/net/discover'))
+    this.app.post('/api/mesh/heartbeat', redirect307('/api/net/heartbeat'))
+    this.app.post('/api/mesh/capability', redirect307('/api/net/capability'))
+    this.app.get('/api/mesh/capabilities', redirect307('/api/net/capabilities'))
+    this.app.post('/api/mesh/chat', redirect307('/api/frame/chat'))
+    this.app.post('/api/genos/directive', redirect307('/api/frame/directive'))
 
     // ══════════════════════════════════════════════════════════
     // SDK ENDPOINTS — for embedded agents contributing knowledge

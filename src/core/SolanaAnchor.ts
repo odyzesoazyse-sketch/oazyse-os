@@ -4,13 +4,14 @@ import {
 } from '@solana/web3.js'
 import { ManifestPacket, ManifestBuilder } from './ManifestBuilder'
 
+const DEFAULT_RPC = process.env.SOLANA_RPC_URL || 'https://devnet-rpc.solayer.org'
 const MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr')
 
 export class SolanaAnchor {
   connection: Connection
 
   constructor() {
-    this.connection = new Connection('https://api.devnet.solana.com', 'confirmed')
+    this.connection = new Connection(DEFAULT_RPC, 'confirmed')
   }
 
   async fund(pubkey: PublicKey): Promise<boolean> {
@@ -27,6 +28,11 @@ export class SolanaAnchor {
   }
 
   async anchor(keypair: Keypair, memo: string): Promise<string> {
+    const balance = await this.connection.getBalance(keypair.publicKey).catch(() => 0)
+    if (balance < 5_000) {
+      const sig = await this.connection.requestAirdrop(keypair.publicKey, Math.floor(0.02 * LAMPORTS_PER_SOL))
+      await this.connection.confirmTransaction(sig, 'confirmed')
+    }
     await new Promise(r => setTimeout(r, 2000))
     const ix = new TransactionInstruction({
       keys: [{ pubkey: keypair.publicKey, isSigner: true, isWritable: false }],
@@ -48,10 +54,12 @@ export class SolanaAnchor {
   }
 
   explorerUrl(sig: string): string {
+    if (DEFAULT_RPC.includes('solayer')) return `https://explorer.solayer.org/tx/${sig}?cluster=devnet`
     return `https://explorer.solana.com/tx/${sig}?cluster=devnet`
   }
 
   addressUrl(pubkey: string): string {
+    if (DEFAULT_RPC.includes('solayer')) return `https://explorer.solayer.org/address/${pubkey}?cluster=devnet`
     return `https://explorer.solana.com/address/${pubkey}?cluster=devnet`
   }
 }

@@ -91,7 +91,7 @@ export class AutonomousAgent {
   isRunning(): boolean { return this.running }
 
   async triggerOnce(): Promise<Decision | null> {
-    return this.runCycle()
+    return this.runCycle(true)
   }
 
   getRecentDecisions(limit = 20): Decision[] {
@@ -116,8 +116,8 @@ export class AutonomousAgent {
 
   // ── CORE LOOP ───────────────────────────────────────────────
 
-  private async runCycle(): Promise<Decision | null> {
-    if (!this.running) return null
+  private async runCycle(force = false): Promise<Decision | null> {
+    if (!this.running && !force) return null
     const start = Date.now()
     this.cycle++
     const cycleNum = this.cycle

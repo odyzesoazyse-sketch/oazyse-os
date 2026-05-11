@@ -17,8 +17,8 @@ import * as path from 'path'
 import * as os from 'os'
 
 const MEMO_PROGRAM  = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr')
-const DEVNET        = 'https://api.devnet.solana.com'
-const EXPLORER_BASE = 'https://explorer.solana.com'
+const DEVNET        = process.env.SOLANA_RPC_URL || 'https://devnet-rpc.solayer.org'
+const EXPLORER_BASE = DEVNET.includes('solayer') ? 'https://explorer.solayer.org' : 'https://explorer.solana.com'
 
 // Anchor instruction discriminators = sha256("global:<name>")[0:8]
 function discriminator(name: string): Buffer {
@@ -375,6 +375,11 @@ export class OazyseNetProgram {
 
   private async writeMemo(memo: string): Promise<string> {
     try {
+      const balance = await this.connection.getBalance(this.wallet.publicKey).catch(() => 0)
+      if (balance < 5_000) {
+        const sig = await this.connection.requestAirdrop(this.wallet.publicKey, 20_000_000)
+        await this.connection.confirmTransaction(sig, 'confirmed')
+      }
       const ix = new TransactionInstruction({
         keys: [{ pubkey: this.wallet.publicKey, isSigner: true, isWritable: false }],
         programId: MEMO_PROGRAM,

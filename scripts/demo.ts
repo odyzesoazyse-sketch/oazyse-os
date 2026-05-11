@@ -5,6 +5,7 @@ import { Orchestrator } from '../src/agents/Orchestrator'
 import { TruthCourt } from '../src/truth/TruthCourt'
 import { ProgressTracker } from '../src/memory/ProgressTracker'
 import { TokenEconomics } from '../src/token/TokenEconomics'
+import { Keypair } from '@solana/web3.js'
 
 async function demo() {
   console.clear()
@@ -16,6 +17,8 @@ async function demo() {
   // ── TWO NODES ────────────────────────────────────────────
   const alpha = new Node()
   const beta  = new Node()
+  beta.wallet = Keypair.generate()
+  beta.nodeId = `node-${beta.wallet.publicKey.toBase58().slice(0, 8).toLowerCase()}`
   alpha.peers.set(beta.nodeId, { connectedAt: Date.now(), exchangeCount: 0 })
   beta.peers.set(alpha.nodeId, { connectedAt: Date.now(), exchangeCount: 0 })
 

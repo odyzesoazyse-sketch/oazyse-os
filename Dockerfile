@@ -12,6 +12,8 @@ COPY . .
 # Cloud Run requires PORT 8080 by default
 ENV PORT=8080
 ENV NODE_ENV=production
+ENV MCP_PUBLIC_URL=https://os.oazyse.ooo
+ENV SOLANA_RPC_URL=https://devnet-rpc.solayer.org
 
 # Expose port
 EXPOSE 8080
