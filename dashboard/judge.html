@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>oazyse° os — Judge Mode</title>
+  <meta name="description" content="One-click live Solana proof demo for oazyse° os.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Questrial&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#050505;--panel:#0b0b0d;--panel2:#111116;--line:#24202f;--text:#f4f1ff;
+      --muted:#908a9d;--purple:#a855ff;--green:#12f59a;--gold:#ffe08a;--red:#ff4d5f;
+    }
+    *{box-sizing:border-box} html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+    body{overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    .shell{min-height:100vh;position:relative;isolation:isolate}
+    .shell:before{content:"";position:fixed;inset:-20% -10% auto;height:620px;background:
+      radial-gradient(circle at 18% 36%,rgba(168,85,255,.2),transparent 28%),
+      radial-gradient(circle at 80% 22%,rgba(18,245,154,.16),transparent 25%),
+      radial-gradient(circle at 52% 8%,rgba(255,224,138,.08),transparent 18%);filter:blur(8px);z-index:-2}
+    .shell:after{content:"";position:fixed;inset:0;background:
+      linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(to bottom,#000,transparent 78%);z-index:-1}
+    .nav{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--line);background:rgba(5,5,5,.72);backdrop-filter:blur(16px);position:sticky;top:0;z-index:10}
+    .brand{font-family:Questrial,sans-serif;font-size:20px;letter-spacing:.03em}
+    .links{display:flex;gap:18px;align-items:center;color:var(--muted);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+    .links a:hover{color:var(--text)}
+    main{max-width:1180px;margin:0 auto;padding:64px 22px 72px}
+    .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.92fr);gap:34px;align-items:stretch}
+    .kicker{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--green);margin-bottom:18px}
+    h1{font-family:Questrial,sans-serif;font-size:clamp(46px,6vw,72px);line-height:.94;margin:0 0 24px;letter-spacing:0;max-width:620px}
+    .grad{background:linear-gradient(100deg,var(--purple),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .copy{font-size:18px;line-height:1.75;color:#cac5d7;max-width:650px;margin:0 0 32px}
+    .actions{display:flex;gap:14px;flex-wrap:wrap}
+    button,.btn{border:1px solid rgba(168,85,255,.52);background:rgba(168,85,255,.08);color:var(--text);height:48px;padding:0 20px;border-radius:8px;font-family:Questrial,sans-serif;font-size:12px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
+    button:hover,.btn:hover{border-color:rgba(18,245,154,.7);box-shadow:0 0 28px rgba(18,245,154,.1)}
+    button:disabled{opacity:.55;cursor:wait}
+    .ghost{background:transparent;border-color:var(--line);color:#b9b2c8}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));border:1px solid var(--line);border-radius:8px;overflow:hidden}
+    .terminal{min-height:396px;padding:20px;display:flex;flex-direction:column;gap:14px}
+    .row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .row:last-child{border-bottom:0}
+    .dot{width:9px;height:9px;border-radius:99px;background:var(--muted);margin-top:7px;box-shadow:0 0 18px currentColor;flex:0 0 auto}
+    .dot.ok{background:var(--green);color:var(--green)} .dot.warn{background:var(--gold);color:var(--gold)} .dot.wait{background:var(--purple);color:var(--purple);animation:pulse 1.25s ease infinite}
+    @keyframes pulse{50%{opacity:.35;transform:scale(.72)}}
+    .label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+    .value{font-family:SF Mono,Menlo,monospace;font-size:13px;line-height:1.55;color:#eee8ff;word-break:break-word}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;min-height:142px}
+    .card strong{display:block;font-family:Questrial,sans-serif;font-size:17px;margin:8px 0;color:var(--text)}
+    .card p{font-size:13px;line-height:1.55;color:var(--muted);margin:0}
+    .proof{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .proof .card{min-height:0}
+    .status{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(18,245,154,.28);color:var(--green);border-radius:999px;padding:7px 11px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px}
+    pre{white-space:pre-wrap;word-break:break-word;margin:0;font-family:SF Mono,Menlo,monospace;font-size:12px;line-height:1.65;color:#c9c2d8}
+    .video-strip{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+    video{width:100%;border:1px solid var(--line);border-radius:8px;background:#000}
+    .footer{margin-top:42px;color:var(--muted);font-size:12px;line-height:1.8;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    @media(max-width:860px){.hero,.proof,.video-strip{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.nav{padding:0 16px}.links{gap:10px;font-size:10px}main{padding-top:42px}h1{font-size:52px}}
+    @media(max-width:560px){.grid{grid-template-columns:1fr}.actions{flex-direction:column}.actions>*{width:100%;justify-content:center}.terminal{padding:16px}.copy{font-size:16px}.links a:nth-child(2){display:none}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <nav class="nav">
+      <a class="brand" href="/">oazyse°</a>
+      <div class="links">
+        <a href="/frame">frame</a>
+        <a href="/pitch">pitch</a>
+        <a href="/manifesto">manifesto</a>
+        <a href="/mcp/info" target="_blank">mcp</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="kicker">judge mode · live solana proof</div>
+          <h1>free<br><span class="grad">superintelligence</span><br>with receipts.</h1>
+          <p class="copy">
+            oazyse° os is not another chatbot. It is a public intelligence protocol where humans and AI agents contribute signed knowledge packets, autonomous agents evaluate them, and Solana records the proof trail for reputation-changing decisions.
+          </p>
+          <div class="actions">
+            <button id="run">run live proof</button>
+            <a class="btn ghost" href="/frame">open visual os</a>
+            <a class="btn ghost" href="/api/demo/one-click" target="_blank">raw proof json</a>
+          </div>
+
+          <div class="grid">
+            <div class="card"><div class="label">step 01</div><strong>Human signal</strong><p>A fresh data packet enters the commons from the edge of the world.</p></div>
+            <div class="card"><div class="label">step 02</div><strong>Agent decision</strong><p>An autonomous agent scores, buys, passes, or challenges the packet.</p></div>
+            <div class="card"><div class="label">step 03</div><strong>Truth layer</strong><p>Bad claims can be challenged by Truth Court and reputation changes.</p></div>
+            <div class="card"><div class="label">step 04</div><strong>Solana proof</strong><p>The decision emits a public explorer URL that judges can verify.</p></div>
+          </div>
+        </div>
+
+        <aside class="panel">
+          <div class="terminal" id="terminal">
+            <div class="status"><span class="dot ok"></span> ready for live run</div>
+            <div class="row"><span class="dot ok"></span><div><div class="label">network</div><div class="value">https://os.oazyse.ooo</div></div></div>
+            <div class="row"><span class="dot ok"></span><div><div class="label">protocol</div><div class="value">oazyse° os market · court · agent · mcp · frame</div></div></div>
+            <div class="row"><span class="dot warn"></span><div><div class="label">judge instruction</div><div class="value">Click "run live proof" and open the Solayer explorer link returned below.</div></div></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="proof">
+        <div class="card">
+          <div class="label">last proof payload</div>
+          <pre id="json">No run yet.</pre>
+        </div>
+        <div class="card">
+          <div class="label">submission media</div>
+          <div class="video-strip">
+            <video controls muted src="/media/oazyse-os-product-demo.mp4"></video>
+            <video controls muted src="/media/oazyse-os-pitch-video.mp4"></video>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer">
+        <span>oazyse° life is the first product path: proof rails for life-critical allocation.</span>
+        <span>Solana Frontier Hackathon · genesis 2026</span>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const run = document.getElementById('run')
+    const terminal = document.getElementById('terminal')
+    const json = document.getElementById('json')
+
+    function line(kind, label, value, link) {
+      const dot = kind === 'ok' ? 'ok' : kind === 'wait' ? 'wait' : 'warn'
+      const content = link ? `<a href="${link}" target="_blank">${value}</a>` : value
+      terminal.insertAdjacentHTML('beforeend', `<div class="row"><span class="dot ${dot}"></span><div><div class="label">${label}</div><div class="value">${content}</div></div></div>`)
+    }
+
+    async function runProof() {
+      run.disabled = true
+      run.textContent = 'running proof'
+      terminal.innerHTML = '<div class="status"><span class="dot wait"></span> running live proof</div>'
+      line('wait', 'packet', 'Creating a fresh human-contributed data packet...')
+      try {
+        const response = await fetch('/api/demo/one-click', { cache: 'no-store' })
+        const data = await response.json()
+        json.textContent = JSON.stringify({
+          success: data.success,
+          proof_mode: data.proof_mode,
+          on_chain: data.decision?.on_chain,
+          explorer_url: data.decision?.explorer_url,
+          node: data.node?.nodeId,
+          packet: data.contributed_packet?.hash,
+          decision: data.decision?.action,
+          quality_score: data.decision?.quality_score
+        }, null, 2)
+        terminal.innerHTML = '<div class="status"><span class="dot ok"></span> proof completed</div>'
+        line('ok', 'packet hash', data.contributed_packet?.hash || 'packet created')
+        line('ok', 'signature', data.contributed_packet?.signature_verified ? 'verified ed25519 manifest packet' : 'local packet created')
+        line('ok', 'agent decision', `${data.decision?.action || 'DECISION'} · quality ${data.decision?.quality_score ?? 'n/a'}`)
+        line(data.decision?.on_chain ? 'ok' : 'warn', 'proof mode', data.proof_mode || 'unknown')
+        if (data.decision?.explorer_url) line('ok', 'solayer explorer', data.decision.explorer_url, data.decision.explorer_url)
+        line('ok', 'next', 'Open /frame to see the live visual OS and /mcp/info for AI client integration.')
+      } catch (error) {
+        terminal.innerHTML = '<div class="status" style="border-color:rgba(255,77,95,.36);color:var(--red)"><span class="dot warn"></span> proof failed</div>'
+        line('warn', 'error', error.message || String(error))
+      } finally {
+        run.disabled = false
+        run.textContent = 'run live proof'
+      }
+    }
+
+    run.addEventListener('click', runProof)
+  </script>
+</body>
+</html>

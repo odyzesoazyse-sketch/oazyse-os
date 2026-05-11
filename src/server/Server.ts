@@ -944,6 +944,9 @@ export class OazyseServer {
     this.app.get('/frame', (req, res) => {
       res.redirect('/frame.html' + (req.query && Object.keys(req.query).length ? '?' + new URLSearchParams(req.query as any).toString() : ''))
     })
+    this.app.get('/judge', (req, res) => {
+      res.redirect('/judge.html')
+    })
     this.app.get('/pitch', (req, res) => {
       res.redirect('/pitch.html')
     })

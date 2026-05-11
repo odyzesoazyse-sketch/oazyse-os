@@ -64,6 +64,7 @@ Judge path:
 ## Submission Links
 
 - Website: https://os.oazyse.ooo/
+- Judge mode: https://os.oazyse.ooo/judge
 - Live OS: https://os.oazyse.ooo/frame
 - One-click proof demo: https://os.oazyse.ooo/api/demo/one-click
 - MCP connection info: https://os.oazyse.ooo/mcp/info
@@ -84,7 +85,7 @@ Short description:
 
 Demo instructions:
 
-> Open https://os.oazyse.ooo/frame for the visual OS, then open https://os.oazyse.ooo/api/demo/one-click. The endpoint creates a fresh signed packet, triggers an autonomous agent decision, and returns a Solayer explorer URL when the decision is anchored on devnet. Open https://os.oazyse.ooo/mcp/info to verify external AI clients can connect.
+> Open https://os.oazyse.ooo/judge and click "run live proof". The page creates a fresh signed packet, triggers an autonomous agent decision, and returns a Solayer explorer URL when the decision is anchored on devnet. Then open https://os.oazyse.ooo/frame for the visual OS and https://os.oazyse.ooo/mcp/info to verify external AI clients can connect.
 
 ## What This Is Not Yet
 
