@@ -944,6 +944,15 @@ export class OazyseServer {
     this.app.get('/frame', (req, res) => {
       res.redirect('/frame.html' + (req.query && Object.keys(req.query).length ? '?' + new URLSearchParams(req.query as any).toString() : ''))
     })
+    this.app.get('/pitch', (req, res) => {
+      res.redirect('/pitch.html')
+    })
+    this.app.get('/manifesto', (req, res) => {
+      res.redirect('/manifesto.html')
+    })
+    this.app.get('/mobile-demo', (req, res) => {
+      res.redirect('/mobile-demo.html')
+    })
 
     // Serve dashboard at root
     this.app.get('/', (req, res) => {
