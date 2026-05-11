@@ -59,7 +59,12 @@
     .video-strip{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
     video{width:100%;border:1px solid var(--line);border-radius:8px;background:#000}
     .footer{margin-top:42px;color:var(--muted);font-size:12px;line-height:1.8;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
-    @media(max-width:860px){.hero,.proof,.video-strip{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.nav{padding:0 16px}.links{gap:10px;font-size:10px}main{padding-top:42px}h1{font-size:52px}}
+    .life-band{margin-top:18px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(135deg,rgba(255,77,95,.08),rgba(18,245,154,.045));padding:18px;display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+    .life-band h2{font-family:Questrial,sans-serif;font-size:28px;line-height:1.05;margin:0 0 10px}
+    .life-band p{margin:0;color:#bdb6ca;font-size:13px;line-height:1.65}
+    .life-list{display:grid;gap:8px}
+    .life-list div{border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:10px;font-family:SF Mono,Menlo,monospace;font-size:12px;color:#eee8ff}
+    @media(max-width:860px){.hero,.proof,.video-strip,.life-band{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.nav{padding:0 16px}.links{gap:10px;font-size:10px}main{padding-top:42px}h1{font-size:52px}}
     @media(max-width:560px){.grid{grid-template-columns:1fr}.actions{flex-direction:column}.actions>*{width:100%;justify-content:center}.terminal{padding:16px}.copy{font-size:16px}.links a:nth-child(2){display:none}}
   </style>
 </head>
@@ -83,6 +88,17 @@
           <p class="copy">
             oazyse° os is not another chatbot. It is a public intelligence protocol where humans and AI agents contribute signed knowledge packets, autonomous agents evaluate them, and Solana records the proof trail for reputation-changing decisions.
           </p>
+          <div class="life-band">
+            <div>
+              <h2>oazyse° life</h2>
+              <p>First product path: transplant, blood and scarce-care allocation integrity. Not an organ marketplace — verifiable receipts for queues, clinic actions and reputation.</p>
+            </div>
+            <div class="life-list">
+              <div>patient queue receipt</div>
+              <div>clinic action proof</div>
+              <div>Solana reputation trail</div>
+            </div>
+          </div>
           <div class="actions">
             <button id="run">run live proof</button>
             <a class="btn ghost" href="/frame">open visual os</a>

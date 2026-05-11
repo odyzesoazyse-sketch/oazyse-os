@@ -191,6 +191,23 @@
     .out-fake{background:hsl(var(--red)/0.05);border:1px solid hsl(var(--red)/0.2);padding:1.5rem;border-radius:var(--radius)}
     .out-valid{background:hsl(var(--purple)/0.05);border:1px solid hsl(var(--purple)/0.2);padding:1.5rem;border-radius:var(--radius)}
 
+    /* ── OAZYSE LIFE ── */
+    .life-wrap{border:1px solid hsl(var(--border));border-radius:var(--radius);background:
+      radial-gradient(circle at 18% 0%,hsl(var(--red)/0.1),transparent 28%),
+      radial-gradient(circle at 82% 16%,hsl(var(--green)/0.08),transparent 32%),
+      hsl(var(--bg2));overflow:hidden;margin-top:3rem}
+    .life-head{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid hsl(var(--border))}
+    .life-copy{padding:3rem}
+    .life-diagram{padding:3rem;border-left:1px solid hsl(var(--border));display:flex;flex-direction:column;gap:1rem;justify-content:center}
+    .life-row{display:grid;grid-template-columns:110px 1fr;gap:1rem;align-items:center;padding:1rem;border:1px solid hsl(var(--border));background:hsl(var(--bg)/0.45);border-radius:6px}
+    .life-chip{font-family:'SF Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:hsl(var(--green));border:1px solid hsl(var(--green)/0.28);padding:.35rem .55rem;border-radius:999px;text-align:center}
+    .life-row p{font-size:.78rem;line-height:1.6;color:hsl(var(--fg2));margin:0}
+    .life-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:hsl(var(--border))}
+    .life-card{background:hsl(var(--bg2));padding:2rem}
+    .life-card strong{display:block;font-family:'Questrial',sans-serif;font-size:1rem;color:hsl(var(--fg));margin:.75rem 0}
+    .life-card p{font-size:.78rem;line-height:1.7;color:hsl(var(--fg2));margin:0}
+    @media(max-width:800px){.life-head,.life-grid{grid-template-columns:1fr}.life-diagram{border-left:0;border-top:1px solid hsl(var(--border))}.life-copy,.life-diagram{padding:2rem}}
+
     /* ── 7 LAWS ── */
     .laws-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-top:3rem}
     .law{padding:2rem;border-left:2px solid hsl(var(--purple)/0.4);background:hsl(var(--card));border-radius:0 var(--radius) var(--radius) 0}
@@ -254,6 +271,7 @@
     <a href="/manifesto.html">manifesto</a>
     <a href="/PROTOCOL.md" target="_blank">protocol</a>
     <a href="#os" class="active">oazyse° os</a>
+    <a href="#life">oazyse° life</a>
     <a href="#live">oazyse° net</a>
     <a href="#laws">7 laws</a>
   </nav>
@@ -522,10 +540,55 @@
 </section>
 
 <!-- ════════════════════════════════════════
-     § 6  TRUTH COURT
+     § 6  OAZYSE LIFE
+════════════════════════════════════════ -->
+<section class="sec-w" id="life">
+  <p class="l-label" data-r>[ 05 ] — oazyse° life</p>
+  <div class="l-div" style="margin:1.5rem 0 2rem"><div class="l-dot"></div></div>
+  <h2 class="l-title grad" data-r data-d="1">The first product path:<br>organs, blood, scarce care.</h2>
+  <p class="l-text" data-r data-d="2" style="margin-top:.75rem;max-width:620px">
+    Not an organ marketplace. A proof system for transplant and blood allocation integrity:
+    every clinic action becomes a signed receipt, every queue change is auditable,
+    and reputation damage becomes public when someone tries to bypass the line.
+  </p>
+
+  <div class="life-wrap" data-r data-d="3">
+    <div class="life-head">
+      <div class="life-copy">
+        <p class="l-label" style="margin-bottom:1rem;color:hsl(var(--red)/0.72)">why this matters</p>
+        <p style="font-family:'Questrial',sans-serif;font-size:clamp(1.35rem,3vw,2rem);line-height:1.25;margin-bottom:1.5rem">
+          Scarcity is where trust breaks first.
+        </p>
+        <p class="l-text">
+          When a kidney, liver, heart, rare blood unit, ICU slot, or donor match appears,
+          people need more than a promise. They need proof that the rules were followed.
+          oazyse° life turns allocation events into verifiable packets on the same OS.
+        </p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem">
+          <a href="/judge" class="l-btn">run proof</a>
+          <a href="/api/demo/one-click" class="l-ghost" target="_blank">raw receipt demo ↗</a>
+        </div>
+      </div>
+      <div class="life-diagram">
+        <div class="life-row"><span class="life-chip">patient</span><p>Receives a signed queue receipt without exposing private medical details publicly.</p></div>
+        <div class="life-row"><span class="life-chip">clinic</span><p>Registers allocation events and builds a public reputation trail for fair handling.</p></div>
+        <div class="life-row"><span class="life-chip">agent</span><p>Checks rule violations: suspicious jumps, missing receipts, late changes, repeated overrides.</p></div>
+        <div class="life-row"><span class="life-chip">solana</span><p>Anchors the proof hash, timestamp, verdict and reputation-changing decision.</p></div>
+      </div>
+    </div>
+    <div class="life-grid">
+      <div class="life-card"><p class="l-label">receipt</p><strong>Queue integrity</strong><p>Patients can prove they entered a queue and that later status changes were recorded.</p></div>
+      <div class="life-card"><p class="l-label">court</p><strong>Clinic accountability</strong><p>Disputed allocation changes can be challenged by agents, auditors, or community reviewers.</p></div>
+      <div class="life-card"><p class="l-label">reputation</p><strong>Market pressure</strong><p>Clinics that follow the rules gain trust. Clinics that manipulate allocation lose public reputation.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     § 7  TRUTH COURT
 ════════════════════════════════════════ -->
 <section class="sec">
-  <p class="l-label" data-r>[ 05 ] — truth court</p>
+  <p class="l-label" data-r>[ 06 ] — truth court</p>
   <div class="l-div" style="margin:1.5rem 0 2rem"><div class="l-dot"></div></div>
   <h2 class="l-title grad" data-r data-d="1">Lied to the network?<br>Lose reputation on-chain.</h2>
   <p class="l-text" data-r data-d="2" style="margin-top:.75rem;max-width:520px">
@@ -560,10 +623,10 @@
 </section>
 
 <!-- ════════════════════════════════════════
-     § 7  THE SEVEN LAWS
+     § 8  THE SEVEN LAWS
 ════════════════════════════════════════ -->
 <section class="sec-w" id="laws">
-  <p class="l-label" data-r>[ 06 ] — the seven laws</p>
+  <p class="l-label" data-r>[ 07 ] — the seven laws</p>
   <div class="l-div" style="margin:1.5rem 0 2rem"><div class="l-dot"></div></div>
   <h2 class="l-title grad" data-r data-d="1">Every civilization needs<br>a constitution. These are ours.</h2>
   <p class="l-text" data-r data-d="2" style="margin-top:.75rem;max-width:500px">
@@ -583,10 +646,10 @@
 </section>
 
 <!-- ════════════════════════════════════════
-     § 8  TOKEN ECONOMICS
+     § 9  TOKEN ECONOMICS
 ════════════════════════════════════════ -->
 <section class="sec">
-  <p class="l-label" data-r>[ 07 ] — token economics</p>
+  <p class="l-label" data-r>[ 08 ] — token economics</p>
   <div class="l-div" style="margin:1.5rem 0 2rem"><div class="l-dot"></div></div>
   <h2 class="l-title grad" data-r data-d="1">Share truth. Earn tokens.<br>Automatically. On-chain.</h2>
 
@@ -607,7 +670,7 @@
 </section>
 
 <!-- ════════════════════════════════════════
-     § 9  THE CREATOR
+     § 10  THE CREATOR
 ════════════════════════════════════════ -->
 <section class="sec" style="text-align:center;border-top:1px solid hsl(var(--border))">
   <p class="l-label" data-r>[ the creator ]</p>
@@ -640,7 +703,7 @@
 </section>
 
 <!-- ════════════════════════════════════════
-     § 10  CTA / FOOTER
+     § 11  CTA / FOOTER
 ════════════════════════════════════════ -->
 <section class="footer" id="begin">
   <p class="l-label" data-r>[ join the commons ]</p>
